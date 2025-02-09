@@ -1,0 +1,19 @@
+services:
+  db:
+    user: root
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: econ-battle
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/init.sql
+
+volumes:
+  postgres_data:
