@@ -33,8 +33,8 @@ class AuthJWTConfig:
 class DatabaseConfig:
     """Database connection variables."""
 
-    name: Optional[str] = os.getenv('DBNAME')
-    test_name: Optional[str] = os.getenv("TEST_DB_NAME")
+    name: Optional[str] = 'econ-battle'  # os.getenv('DBNAME')
+    # test_name: Optional[str] = os.getenv("TEST_DB_NAME")
     user: Optional[str] = 'postgres'
     password: Optional[str] = 'postgres'
     port: int = 5432
@@ -49,7 +49,7 @@ class DatabaseConfig:
         return URL.create(
             drivername=f'{self.database_system}+{self.driver}',
             username=self.user,
-            database=self.test_name,
+            database=self.name,
             password=self.password,
             port=self.port,
             host=self.host,

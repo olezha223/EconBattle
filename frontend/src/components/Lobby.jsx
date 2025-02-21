@@ -1,28 +1,34 @@
-import { useNavigate } from 'react-router-dom';
+// components/Lobby.jsx
+import { useState, useEffect } from 'react';
 import { useWebSocketContext } from '../contexts/WebSocketContext';
-import { useEffect } from 'react';
-import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export default function Lobby() {
+  const { sendMessage, connect } = useWebSocketContext();
   const navigate = useNavigate();
-  const { sendMessage, lastMessage } = useWebSocketContext();
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
-    if (lastMessage?.data) {
-      const data = JSON.parse(lastMessage.data);
-      if (data.type === 'match_found') navigate('/game');
-    }
-  }, [lastMessage, navigate]);
+    const wsUrl = `ws://localhost:8000/ws`;
+    connect(wsUrl); // Подключаемся к WebSocket
+  }, [connect, navigate]);
+
+  const handleStartGame = () => {
+    if (isConnecting) return;
+
+    setIsConnecting(true);
+    sendMessage({ type: 'find_match' }); // Отправляем сообщение
+  };
 
   return (
     <div>
       <h1>Найти игру</h1>
-      <Button
-        variant="contained"
-        onClick={() => sendMessage(JSON.stringify({ type: 'find_match' }))}
+      <button
+        onClick={handleStartGame}
+        disabled={isConnecting}
       >
-        Играть
-      </Button>
+        {isConnecting ? 'Поиск...' : 'Начать игру'}
+      </button>
     </div>
   );
 }
