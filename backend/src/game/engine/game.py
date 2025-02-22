@@ -1,59 +1,114 @@
 import asyncio
 import json
 
-from starlette.websockets import WebSocket
+from starlette.websockets import WebSocket, WebSocketState
 
 from src.database.adapter import get_session
-from sqlalchemy import insert, select, func
+from sqlalchemy import insert
 
-from src.database.schemas import Problem, Match, Round
+from src.database.schemas import Match, Round
+from src.models.game import EventType
+from src.models.problems import ProblemDTO
 from src.models.users import User
+from src.repository.problems import ProblemsRepo
 
 
 class Game:
     def __init__(self, player1: User, player2: User, ws1: WebSocket, ws2: WebSocket):
+        self.problems_repo = ProblemsRepo()
         self.players: dict[int, User] = {player1.id: player1, player2.id: player2}
         self.sockets = {player1.id: ws1, player2.id: ws2}
         self.rounds = []
         self.current_round = 0
+        self.is_active = None
         self.scores = {player1.id: 0, player2.id: 0}
         self.wins = {player1.id: 0, player2.id: 0}
 
     async def start(self):
-        while self.current_round < 3 and max(self.wins.values()) < 2:
-            await self._start_round()
-            self.current_round += 1
-        await self._end_game()
+        self.is_active = True
+        try:
+            while self.is_active and self.current_round < 3:
+                if not self._has_active_connections():
+                    print("Aborting game - no active connections")
+                    break
+
+                await self._start_round()
+                self.current_round += 1
+        finally:
+            await self._cleanup()
+
+    def _has_active_connections(self):
+        return any(
+            ws.client_state == WebSocketState.CONNECTED
+            for ws in self.sockets.values()
+        )
+
+    async def _cleanup(self):
+        for player_id, ws in self.sockets.items():
+            try:
+                if ws.client_state == WebSocketState.CONNECTED:
+                    await ws.close(code=1000)
+            except Exception as e:
+                print(f"Cleanup error: {str(e)}")
+
+        self.sockets.clear()
 
     async def _notify_players(self, event_type: str, data: dict = None):
-        """Отправка сообщения всем игрокам"""
         message = {"type": event_type}
         if data:
             message.update(data)
 
-        for player in self.players:
-            ws = self.sockets[player.id]
+        for player in self.players.values():
+            ws = self.sockets.get(player.id)
+            if not ws or ws.client_state != WebSocketState.CONNECTED:
+                continue
+
             try:
                 await ws.send_json(message)
+            except RuntimeError as e:
+                if "close message has been sent" in str(e):
+                    await self._handle_disconnect(player.id)
+                else:
+                    print(f"Send error for {player.username}: {str(e)}")
             except Exception as e:
-                # Обработка ошибок подключения
+                print(f"Unexpected error: {str(e)}")
                 await self._handle_disconnect(player.id)
 
     async def _handle_disconnect(self, player_id: int):
-        """Обработка отключения игрока"""
-        # Пометить игрока как отключившегося
-        # Можно завершить игру или искать замену
-        ...
+        ws = self.sockets.get(player_id)
+        if not ws:
+            return
+
+        try:
+            if ws.client_state == WebSocketState.CONNECTED:
+                await ws.close(code=1000)
+        except Exception as e:
+            print(f"Close error: {str(e)}")
+        finally:
+            self.sockets.pop(player_id, None)
+            await self._check_game_continuation()
+
+    async def _check_game_continuation(self):
+        active_players = sum(
+            1 for ws in self.sockets.values()
+            if ws.client_state == WebSocketState.CONNECTED
+        )
+
+        if active_players < 1:
+            await self._cleanup()
+            self.is_active = False
+            print("Game session terminated due to no active players")
 
     async def _start_round(self):
-        problems = await self._fetch_problems(3)
-        await self._notify_players("round_start", {
-            "problems": [
-                {"id": p.id, "question": p.question_text}
-                for p in problems
-            ],
-            "time_limit": 180
-        })
+        problems = await self.problems_repo.get_random_problems(3)
+        print(problems)
+        await self._notify_players(
+            event_type=EventType.START_ROUND.value,
+            data={
+                "problems": [p.model_dump() for p in problems],
+                "time_limit": 180
+            }
+        )
         await self._send_problems(problems)
         answers = await self._collect_answers(timeout=180)
         scores = self._calculate_scores(answers, problems)
@@ -67,29 +122,11 @@ class Game:
         done, pending = await asyncio.wait(tasks, timeout=timeout)
         return {task.result()[0]: task.result()[1] for task in done}
 
-    async def _fetch_problems(self, count: int) -> list[dict]:
-        """Получение случайных задач из БД"""
-        async with get_session() as session:
-            result = await session.execute(
-                select(Problem)
-                .order_by(func.random())
-                .limit(count)
-            )
-            problems = result.scalars().all()
-            return [
-                {
-                    "id": p.id,
-                    "question": p.question_text,
-                    "answers": p.answers,
-                    "price": p.price
-                } for p in problems
-            ]
-
-    async def _send_problems(self, problems: list[dict]):
+    async def _send_problems(self, problems: list[ProblemDTO]):
         """Отправка вопросов игрокам"""
         message = {
-            "type": "round_start",
-            "problems": [{"id": p["id"], "text": p["question"]} for p in problems],
+            "type": EventType.START_ROUND.value,
+            "problems": [p.model_dump() for p in problems],
             "time_limit": 180
         }
         for ws in self.sockets.values():
@@ -124,7 +161,7 @@ class Game:
 
         # Отправка результатов раунда
         results = {
-            "type": "round_result",
+            "type": EventType.ROUND_RESULT.value,
             "scores": scores,
             "total_wins": self.wins
         }
@@ -168,7 +205,7 @@ class Game:
 
         # Отправка финальных результатов
         final_message = {
-            "type": "game_end",
+            "type": EventType.GAME_END.value,
             "winner_id": winner_id,
             "final_scores": self.scores
         }

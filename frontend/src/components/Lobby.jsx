@@ -1,33 +1,34 @@
-// components/Lobby.jsx
-import { useState, useEffect } from 'react';
-import { useWebSocketContext } from '../contexts/WebSocketContext';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useWebsocket } from '../contexts/WebsocketContext';
 
 export default function Lobby() {
-  const { sendMessage, connect } = useWebSocketContext();
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
-  const [isConnecting, setIsConnecting] = useState(false);
+  const { sendMessage } = useWebsocket();
 
-  useEffect(() => {
-    const wsUrl = `ws://localhost:8000/ws`;
-    connect(wsUrl); // Подключаемся к WebSocket
-  }, [connect, navigate]);
+  const handleFindMatch = () => {
+    if (!username.trim()) return;
 
-  const handleStartGame = () => {
-    if (isConnecting) return;
+    sendMessage(JSON.stringify({
+      type: 'join_queue',
+      username: username.trim()
+    }));
 
-    setIsConnecting(true);
-    sendMessage({ type: 'find_match' }); // Отправляем сообщение
+    navigate('/game');
   };
 
   return (
-    <div>
-      <h1>Найти игру</h1>
-      <button
-        onClick={handleStartGame}
-        disabled={isConnecting}
-      >
-        {isConnecting ? 'Поиск...' : 'Начать игру'}
+    <div className="lobby">
+      <h1>Введите имя</h1>
+      <input
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Ваше имя"
+      />
+      <button onClick={handleFindMatch}>
+        Найти игру
       </button>
     </div>
   );

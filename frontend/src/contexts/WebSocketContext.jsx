@@ -1,36 +1,79 @@
-// contexts/WebSocketContext.jsx
-import { createContext, useContext, useRef } from 'react';
+// contexts/WebsocketContext.jsx
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
-const WebSocketContext = createContext(null);
+const WebsocketContext = createContext(null);
 
-export const WebSocketProvider = ({ children }) => {
-  const ws = useRef(null);
+export const WebsocketProvider = ({ children }) => {
+  const [socketUrl] = useState('ws://localhost:8000/ws');
+  const [shouldReconnect, setShouldReconnect] = useState(true);
+  const [messageHistory, setMessageHistory] = useState([]);
 
-  const sendMessage = (message) => {
-    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify(message));
-    } else {
-      console.error("WebSocket is not connected");
+  // Параметры подключения
+  const { sendMessage, lastMessage, readyState, getWebSocket } = useWebSocket(
+    socketUrl,
+    {
+      shouldReconnect: () => shouldReconnect,
+      reconnectInterval: 3000,
+      reconnectAttempts: 5,
+      onReconnectStop: () => {
+        setShouldReconnect(false);
+        alert('Не удалось подключиться к серверу');
+      },
     }
-  };
+  );
 
-  const connect = (url) => {
-    ws.current = new WebSocket(url);
+  // Состояние подключения
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Подключение',
+    [ReadyState.OPEN]: 'Подключено',
+    [ReadyState.CLOSING]: 'Закрытие',
+    [ReadyState.CLOSED]: 'Отключено',
+  }[readyState];
 
-    ws.current.onopen = () => {
-      console.log("WebSocket connected");
-    };
+  // Обработка входящих сообщений
+  useEffect(() => {
+    if (lastMessage !== null) {
+      setMessageHistory((prev) => prev.concat(lastMessage));
+    }
+  }, [lastMessage]);
 
-    ws.current.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
-  };
+  // Автоматическое восстановление подключения
+  useEffect(() => {
+    if (readyState === ReadyState.CLOSED && shouldReconnect) {
+      const ws = getWebSocket();
+      ws?.reconnect();
+    }
+  }, [readyState, shouldReconnect]);
+
+  // Значение контекста
+  const contextValue = useMemo(() => ({
+    sendMessage,
+    lastMessage,
+    messageHistory,
+    readyState,
+    connectionStatus,
+    disconnect: () => {
+      setShouldReconnect(false);
+      getWebSocket()?.close();
+    },
+    reconnect: () => {
+      setShouldReconnect(true);
+      getWebSocket()?.reconnect();
+    },
+  }), [sendMessage, lastMessage, messageHistory, readyState]);
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, connect }}>
+    <WebsocketContext.Provider value={contextValue}>
       {children}
-    </WebSocketContext.Provider>
+    </WebsocketContext.Provider>
   );
 };
 
-export const useWebSocketContext = () => useContext(WebSocketContext);
+export const useWebsocket = () => {
+  const context = useContext(WebsocketContext);
+  if (!context) {
+    throw new Error('useWebsocket must be used within WebsocketProvider');
+  }
+  return context;
+};

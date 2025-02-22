@@ -1,19 +1,39 @@
-.timer-container {
-  width: 300px;
-  height: 30px;
-  background: #ddd;
-  border-radius: 15px;
-  margin: 20px 0;
+body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.timer-progress {
-  height: 100%;
-  width: var(--progress);
+.lobby {
+  text-align: center;
+}
+
+input {
+  padding: 10px;
+  margin: 10px;
+  width: 200px;
+}
+
+button {
+  padding: 10px 20px;
   background: #4CAF50;
-  border-radius: 15px;
-  transition: width 1s linear;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+.problem {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #ddd;
+}
+
+.result {
+  text-align: center;
+  padding: 20px;
 }

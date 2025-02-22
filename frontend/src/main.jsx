@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import { WebSocketProvider } from './contexts/WebSocketContext';
+import { WebsocketProvider } from './contexts/WebsocketContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <WebSocketProvider>
+      <WebsocketProvider>
         <App />
-      </WebSocketProvider>
+      </WebsocketProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

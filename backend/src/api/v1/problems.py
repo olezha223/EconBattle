@@ -8,7 +8,7 @@ from src.models.problems import ProblemDTO
 router_problems = APIRouter()
 
 
-@router_problems.get("/")
+@router_problems.get("/get_problems")
 async def get_problems():
     async with get_session() as session:
         result = await session.execute(
