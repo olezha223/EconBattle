@@ -2,32 +2,30 @@ from fastapi import WebSocket, APIRouter, Depends
 from starlette.websockets import WebSocketDisconnect
 
 from src.game.matchmaker import Matchmaker
-from src.models.users import User
+from src.models.users import UserDTO
+from src.service import get_user_service, UserService
 
 ws_router = APIRouter()
-matchmaker = Matchmaker()
+
+service = get_user_service()
 
 
-def get_user_service():
-    pass
+async def get_current_user_ws(username: str = "Oleg") -> UserDTO:
+    username: str = "Oleg"
+    return await service.get(username)
 
 
-def get_current_user_ws(username, service = Depends(get_user_service)) -> User:
-    return User()
-
-
-def get_ws_manager() -> Matchmaker:
-    return Matchmaker()
+manager = Matchmaker()
 
 
 @ws_router.websocket("/ws")
 async def websocket_endpoint(
-        websocket: WebSocket,
-        manager: Matchmaker = Depends(get_ws_manager)
+        websocket: WebSocket
 ):
     username = websocket.query_params.get("username")
-    user = get_current_user_ws(username)
+    user = await get_current_user_ws(username)
     try:
         await manager.connect(websocket, user)
     except WebSocketDisconnect:
+        print("error")
         await manager.disconnect(websocket)

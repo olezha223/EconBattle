@@ -3,12 +3,12 @@ import json
 from sqlalchemy import insert
 
 from src.database.schemas import Round, Match
-from src.models.users import User
+from src.models.users import UserDTO
 from src.repository import RepoInterface
 
 
 class MatchRepo(RepoInterface):
-    async def update_stats(self, players: dict[int, User], winner_id, current_round, rounds):
+    async def update_stats(self, players: dict[int, UserDTO], winner_id, current_round, rounds):
         async with self.session_getter() as session:
             match = Match(
                 player1_id=players[list(players)[0]].id,

@@ -1,12 +1,13 @@
-import { Routes, Route } from 'react-router-dom';
-import Lobby from './components/Lobby';
-import Game from './components/Game';
+// src/App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './components/Lobby';
+import GamePage from './components/Game';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Lobby />} />
-      <Route path="/game" element={<Game />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/game" element={<GamePage />} />
     </Routes>
   );
 }

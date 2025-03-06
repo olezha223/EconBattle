@@ -9,14 +9,14 @@ from sqlalchemy import insert
 from src.database.schemas import Match, Round
 from src.models.game import EventType
 from src.models.problems import ProblemDTO
-from src.models.users import User, Player
+from src.models.users import UserDTO, Player
 from src.repository.problems import ProblemsRepo
 
 
 class Game:
     def __init__(self, player1: Player, player2: Player):
         self.problems_repo = ProblemsRepo()
-        self.players: dict[int, User] = {
+        self.players: dict[int, UserDTO] = {
             player1.user.id: player1.user,
             player2.user.id: player2.user
         }

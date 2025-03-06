@@ -1,6 +1,10 @@
-fastapi
-pydantic
+fastapi~=0.115.8
+pydantic~=2.10.6
 uvicorn
 websockets
-sqlalchemy
-python-dotenv
+sqlalchemy~=2.0.38
+python-dotenv~=1.0.1
+redis
+asyncpg
+starlette~=0.45.3
+aiofiles~=24.1.0

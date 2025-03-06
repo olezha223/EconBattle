@@ -1,35 +1,48 @@
+// src/pages/HomePage.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useWebsocket } from '../contexts/WebsocketContext';
 
-export default function Lobby() {
+export default function HomePage() {
   const [username, setUsername] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [ws, setWs] = useState(null);
   const navigate = useNavigate();
-  const { sendMessage } = useWebsocket();
 
-  const handleFindMatch = () => {
-    if (!username.trim()) return;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!username) return;
 
-    sendMessage(JSON.stringify({
-      type: 'join_queue',
-      username: username.trim()
-    }));
+    const newWs = new WebSocket(`ws://localhost:8000/ws?username=${username}`);
+    setWs(newWs);
+    setIsSearching(true);
 
-    navigate('/game');
+    newWs.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'matched') {
+        navigate(`/game?game_id=${data.game_id}`);
+      }
+    };
+
+    newWs.onclose = () => {
+      setIsSearching(false);
+      setWs(null);
+    };
   };
 
   return (
-    <div className="lobby">
-      <h1>Введите имя</h1>
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Ваше имя"
-      />
-      <button onClick={handleFindMatch}>
-        Найти игру
-      </button>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Введите имя"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          disabled={isSearching}
+        />
+        <button type="submit" disabled={isSearching}>
+          {isSearching ? 'Поиск...' : 'Найти соперника'}
+        </button>
+      </form>
     </div>
   );
 }

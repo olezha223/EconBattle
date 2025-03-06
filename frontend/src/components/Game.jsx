@@ -1,136 +1,57 @@
-// components/Game.jsx
+// src/pages/GamePage.jsx
 import { useEffect, useState } from 'react';
-import { useWebsocket } from '../contexts/WebsocketContext';
-import { useNavigate } from 'react-router-dom';
-import { ReadyState } from 'react-use-websocket';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-export default function Game() {
-  const { lastMessage, readyState } = useWebsocket();
+export default function GamePage() {
+  const [problems, setProblems] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(180);
+  const location = useLocation();
   const navigate = useNavigate();
-  const [gameState, setGameState] = useState({
-    status: 'waiting', // waiting, playing, finished
-    problems: [],
-    timeLeft: 0,
-    score: 0,
-    opponent: null
-  });
+  const gameId = new URLSearchParams(location.search).get('game_id');
+  const [ws, setWs] = useState(null);
 
-  // Обработка изменения состояния соединения
   useEffect(() => {
-    if (readyState === ReadyState.CLOSED) {
-      alert('Соединение с сервером потеряно!');
-      navigate('/');
-    }
-  }, [readyState, navigate]);
+    const username = localStorage.getItem('username'); // Нужно сохранять username при входе
+    const newWs = new WebSocket(`ws://localhost:8000/ws?username=${username}`);
 
-  // Обработка входящих сообщений
-  useEffect(() => {
-    if (!lastMessage?.data) return;
+    newWs.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      switch (data.type) {
+        case 'start_round':
+          setProblems(data.problems);
+          setTimeLeft(data.time_limit);
+          break;
+        case 'opponent_disconnected':
+          alert('Соперник отключился!');
+          navigate('/');
+          break;
+      }
+    };
 
-    const data = JSON.parse(lastMessage.data);
+    setWs(newWs);
 
-    switch(data.type) {
-      case 'round_start':
-        setGameState({
-          ...gameState,
-          status: 'playing',
-          problems: data.problems,
-          timeLeft: data.time_left,
-          opponent: data.opponent
-        });
-        break;
-
-      case 'timer_update':
-        setGameState(prev => ({
-          ...prev,
-          timeLeft: data.time_left
-        }));
-        break;
-
-      case 'round_result':
-        setGameState(prev => ({
-          ...prev,
-          status: 'round_result',
-          score: data.your_score,
-          opponentScore: data.opponent_score
-        }));
-        break;
-
-      case 'game_over':
-        setGameState(prev => ({
-          ...prev,
-          status: 'finished',
-          score: data.final_score,
-          isWinner: data.is_winner
-        }));
-        break;
-    }
-  }, [lastMessage]);
-
-  // Отправка ответов
-  const handleAnswerSubmit = (problemId, answer) => {
-    const { sendMessage } = useWebsocket();
-    sendMessage(JSON.stringify({
-      type: 'submit_answer',
-      problem_id: problemId,
-      answer: answer
-    }));
-  };
+    return () => {
+      newWs.close();
+    };
+  }, [gameId, navigate]);
 
   return (
-    <div className="game-container">
-      {gameState.status === 'waiting' && (
-        <div className="waiting-screen">
-          <h2>Поиск соперника...</h2>
-          <p>Пожалуйста, подождите</p>
-        </div>
-      )}
-
-      {gameState.status === 'playing' && (
-        <>
-          <div className="game-header">
-            <h3>Соперник: {gameState.opponent?.username || 'Неизвестный'}</h3>
-            <div className="timer">
-              Осталось времени: {gameState.timeLeft} сек
+    <div>
+      <div>Время: {timeLeft} сек</div>
+      <div className="problems-container">
+        {problems.map((problem) => (
+          <div key={problem.id} className="problem-card">
+            <h3>Вопрос: {problem.question_text}</h3>
+            <div className="answers">
+              {Object.entries(problem.answers).map(([key, value]) => (
+                <button key={key} onClick={() => handleAnswer(problem.id, key)}>
+                  {value}
+                </button>
+              ))}
             </div>
           </div>
-
-          <div className="problems-list">
-            {gameState.problems.map((problem, index) => (
-              <div key={index} className="problem-card">
-                <h4>Вопрос {index + 1}</h4>
-                <p>{problem.question}</p>
-                <input
-                  type="number"
-                  placeholder="Ваш ответ"
-                  onChange={(e) =>
-                    handleAnswerSubmit(problem.id, e.target.value)
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {gameState.status === 'round_result' && (
-        <div className="round-result">
-          <h2>Результаты раунда</h2>
-          <p>Ваш счет: {gameState.score}</p>
-          <p>Счет соперника: {gameState.opponentScore}</p>
-        </div>
-      )}
-
-      {gameState.status === 'finished' && (
-        <div className="game-over">
-          <h2>Игра завершена!</h2>
-          <p>Финальный счет: {gameState.score}</p>
-          <p>{gameState.isWinner ? '🎉 Вы победили!' : '😢 Вы проиграли'}</p>
-          <button onClick={() => navigate('/')}>
-            Вернуться в лобби
-          </button>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
