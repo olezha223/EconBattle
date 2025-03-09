@@ -1,31 +1,21 @@
-from fastapi import WebSocket, APIRouter, Depends
-from starlette.websockets import WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, APIRouter
 
-from src.game.matchmaker import Matchmaker
-from src.models.users import UserDTO
-from src.service import get_user_service, UserService
+from src.service.game.matchmaker import MatchMaker
 
 ws_router = APIRouter()
 
-service = get_user_service()
+match_maker = MatchMaker()
 
 
-async def get_current_user_ws(username: str = "Oleg") -> UserDTO:
-    username: str = "Oleg"
-    return await service.get(username)
-
-
-manager = Matchmaker()
-
-
-@ws_router.websocket("/ws")
-async def websocket_endpoint(
-        websocket: WebSocket
-):
-    username = websocket.query_params.get("username")
-    user = await get_current_user_ws(username)
+@ws_router.websocket("/ws/{player_id}")
+async def websocket_endpoint(websocket: WebSocket, player_id: str):
+    await websocket.accept()
+    await websocket.send_json({"type": "connected", "msg": f"Игрок {player_id} подключен к серверу"})
     try:
-        await manager.connect(websocket, user)
-    except WebSocketDisconnect:
-        print("error")
-        await manager.disconnect(websocket)
+        await match_maker.add_player(websocket, player_id)
+    except Exception as e:
+        print(f'Упало с обычной ошибкой {player_id} \n {e}')
+        try:
+            await websocket.close()
+        except RuntimeError:
+            print(f"Упало с ошибкой, при этом закрыв соединение {player_id}")

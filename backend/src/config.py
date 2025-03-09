@@ -77,6 +77,12 @@ class AppConfig:
     version = "1.0"
     root_path = ""
 
+@dataclass
+class RedisConf:
+    redis_host: str = 'localhost'
+    redis_port: int = 6379
+    redis_db: int = 0
+    name: str = "active_players"
 
 @dataclass
 class Configuration:
@@ -87,6 +93,7 @@ class Configuration:
     db: DatabaseConfig = field(default_factory=DatabaseConfig)
     app: AppConfig = field(default_factory=AppConfig)
     auth_jwt: AuthJWTConfig = field(default_factory=AuthJWTConfig)
+    redis: RedisConf = field(default_factory=RedisConf)
 
 
 configuration = Configuration()
