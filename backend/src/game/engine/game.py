@@ -1,12 +1,4 @@
-import asyncio
-import json
-
 from starlette.websockets import WebSocket, WebSocketState
-
-from src.database.adapter import get_session
-from sqlalchemy import insert
-
-from src.database.schemas import Match, Round
 from src.models.game import EventType
 from src.models.problems import ProblemDTO
 from src.models.users import UserDTO, Player

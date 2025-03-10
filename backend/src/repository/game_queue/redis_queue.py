@@ -28,7 +28,7 @@ class RedisQueue(QueueInterface):
         keys = self.redis_client.hkeys(self.name)
         return keys[0].decode('utf-8') if keys else ''
 
-    def get_first_2(self) -> list[str, str]:
+    def get_first_2(self) -> list[str]:
         keys = self.redis_client.hkeys(self.name)
         return [keys[0].decode('utf-8') if keys else '', keys[1].decode('utf-8') if keys else '']
 
@@ -36,3 +36,8 @@ class RedisQueue(QueueInterface):
         first = self.first()
         self.remove_player(first)
         return first
+
+    def get_all(self) -> list[str]:
+        return [
+            key.decode("utf-8") if key else "" for key in self.redis_client.hkeys(self.name)
+        ]
