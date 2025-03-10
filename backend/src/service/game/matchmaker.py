@@ -1,11 +1,15 @@
+from src.models.users import Player, UserDTO
 from src.service.game.connection_manager import ConnectionManager
 import time
 import asyncio
+
+from src.service.game.game import Game
 
 
 class MatchMaker:
     def __init__(self):
         self.manager = ConnectionManager()
+        self.games: dict[tuple[str, str], Game] = dict()
 
     async def add_player(self, websocket, player_id):
         self.manager.add_connection(player_id, websocket)
@@ -29,14 +33,27 @@ class MatchMaker:
 
             player_2 = self.manager.get_connection(player_id_2)
             await player_2.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_1}"})
-            time.sleep(10)
             # отрубить обоих игроков
-            await self.manager.active_connections[player_id_1].close()
-            await self.manager.active_connections[player_id_2].close()
+            # await player_1.close()
+            # await player_2.close()
 
             # удалить из данных
             self.manager.remove_connection(player_id_1)
             self.manager.remove_connection(player_id_2)
+
+            # начать игру
+            game = Game(
+                player1=Player(
+                    user=UserDTO(id=int(player_id_1), username="Oleg", rating=1000),
+                    websocket=player_1
+                ),
+                player2=Player(
+                    user=UserDTO(id=int(player_id_2), username="Misha", rating=1100),
+                    websocket=player_2
+                )
+            )
+            self.games[(player_id_1, player_id_2)] = game
+            await game.start()
         else:
             # выйти из очереди и отключиться от сервера если никого не нашли
             try:
