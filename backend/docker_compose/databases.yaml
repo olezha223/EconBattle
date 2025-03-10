@@ -1,8 +1,13 @@
 services:
+  redis:
+    ports:
+      - "6379:6379"
+    image: "redis:latest"
+
   db:
     user: root
     build:
-      context: ./database
+      context: ../../database
       dockerfile: Dockerfile
     container_name: postgres_db
     environment:
@@ -13,12 +18,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/init.sql
-
-  redis:
-    image: "redis:latest"
-    ports:
-      - "6379:6379"
+      - ./../../database/init.sql:/init.sql
 
 volumes:
   postgres_data:

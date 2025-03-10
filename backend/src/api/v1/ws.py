@@ -17,5 +17,6 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
         print(f'Упало с обычной ошибкой {player_id} \n {e}')
         try:
             await websocket.close()
+            raise e
         except RuntimeError:
             print(f"Упало с ошибкой, при этом закрыв соединение {player_id}")

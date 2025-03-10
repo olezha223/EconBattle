@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class QueueInterface(ABC):
     @abstractmethod
-    def insert_player(self, player_id: str, state: str) -> None:
+    def insert_player(self, player_id: str) -> None:
         """Вставить игрока"""
         ...
 

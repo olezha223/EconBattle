@@ -21,8 +21,8 @@ class RedisQueue(QueueInterface):
     def remove_player(self, player_id: str) -> None:
         self.redis_client.hdel(self.name, player_id)
 
-    def insert_player(self, player_id: str, state: str) -> None:
-        self.redis_client.hset(self.name, player_id, state)
+    def insert_player(self, player_id: str) -> None:
+        self.redis_client.hset(self.name, player_id, "connected")
 
     def first(self) -> str:
         keys = self.redis_client.hkeys(self.name)

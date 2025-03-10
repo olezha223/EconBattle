@@ -16,7 +16,7 @@ class MatchMaker:
         start_waiting_time = time.time()
         while (
             self.manager.game_queue.get_len() <= 1 and
-            time.time() - start_waiting_time < 10 and
+            time.time() - start_waiting_time < 100 and
             self.manager.active_connections.get(player_id, False)
         ):
             await asyncio.sleep(2)
@@ -36,6 +36,8 @@ class MatchMaker:
             # отрубить обоих игроков
             # await player_1.close()
             # await player_2.close()
+
+            await asyncio.sleep(10)
 
             # удалить из данных
             self.manager.remove_connection(player_id_1)

@@ -29,5 +29,5 @@ class PythonQueue(QueueInterface):
     def remove_player(self, player_id: str) -> None:
         self.python_list.remove(player_id)
 
-    def insert_player(self, player_id: str, state: str) -> None:
+    def insert_player(self, player_id: str) -> None:
         self.python_list.append(player_id)

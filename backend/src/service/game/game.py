@@ -23,6 +23,7 @@ class Game:
 
     async def start(self):
         try:
+            await self._notify_players("Game", data={"msg": "Идет процесс игры"})
             while self.current_round < 3:
                 await self._start_round()
                 self.current_round += 1
@@ -30,7 +31,10 @@ class Game:
             await self._cleanup()
 
     async def _cleanup(self):
-        ...
+        for player in self.players.values():
+            ws = self.sockets.get(player.id)
+            await ws.send_json({"type": "Closing", "msg": f"{player.id} closing"})
+            await ws.close()
 
     async def _notify_players(self, event_type: str, data: dict = None):
         message = {"type": event_type}
@@ -39,7 +43,7 @@ class Game:
 
         for player in self.players.values():
             ws = self.sockets.get(player.id)
-            if not ws or ws.client_state != WebSocketState.CONNECTED:
+            if (not ws) or (ws.client_state != WebSocketState.CONNECTED):
                 continue
 
             await ws.send_json(message)
@@ -67,15 +71,13 @@ class Game:
 
     async def _start_round(self):
         problems = await self.problems_repo.get_random_problems(3)
-        print(problems)
         await self._notify_players(
-            event_type=EventType.START_ROUND.value,
+            event_type="Start Round",
             data={
                 "problems": [p.model_dump() for p in problems],
                 "time_limit": 180
             }
         )
-        await self._send_problems(problems)
         # answers = await self._collect_answers(timeout=180)
         # print(answers)
         # scores = self._calculate_scores(answers, problems)
@@ -89,15 +91,6 @@ class Game:
     #     done, pending = await asyncio.wait(tasks, timeout=timeout)
     #     return {task.result()[0]: task.result()[1] for task in done}
 
-    async def _send_problems(self, problems: list[ProblemDTO]):
-        """Отправка вопросов игрокам"""
-        message = {
-            "type": EventType.START_ROUND.value,
-            "problems": [p.model_dump() for p in problems],
-            "time_limit": 180
-        }
-        for ws in self.sockets.values():
-            await ws.send_json(message)
 
     # async def _wait_for_answer(self, player_id: int) -> tuple[int, list[int]]:
     #     """Ожидание ответа от конкретного игрока"""
