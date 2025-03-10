@@ -11,6 +11,12 @@ class MatchMaker:
         self.manager = ConnectionManager()
         self.games: dict[tuple[str, str], Game] = dict()
 
+    def _search_in_games(self, player_id: str) -> bool:
+        for key in self.games.keys():
+            if player_id in key:
+                return True
+        return False
+
     async def add_player(self, websocket, player_id):
         self.manager.add_connection(player_id, websocket)
         start_waiting_time = time.time()
@@ -20,11 +26,17 @@ class MatchMaker:
             self.manager.active_connections.get(player_id, False)
         ):
             await asyncio.sleep(2)
-            try:
-                await websocket.send_json({"type": "waiting", "msg": f"For {time.time() - start_waiting_time} sec."})
-            except RuntimeError:
-                pass
+            if not self._search_in_games(player_id):
+                print(f"{player_id} думаем, что он еще не в игре")
+                try:
+                    await websocket.send_json({"type": "waiting", "msg": f"For {time.time() - start_waiting_time} sec."})
+                except RuntimeError:
+                    continue
+            else:
+                continue
+                # print(f"{player_id} уже в игре, но система думает, что он ждет")
         if self.manager.game_queue.get_len() >= 2:
+            # print(f"{player_id} создает мэтч")
             player_id_1 = self.manager.game_queue.pop()
             player_id_2 = self.manager.game_queue.pop()
 
@@ -33,15 +45,6 @@ class MatchMaker:
 
             player_2 = self.manager.get_connection(player_id_2)
             await player_2.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_1}"})
-            # отрубить обоих игроков
-            # await player_1.close()
-            # await player_2.close()
-
-            await asyncio.sleep(10)
-
-            # удалить из данных
-            self.manager.remove_connection(player_id_1)
-            self.manager.remove_connection(player_id_2)
 
             # начать игру
             game = Game(
@@ -55,9 +58,15 @@ class MatchMaker:
                 )
             )
             self.games[(player_id_1, player_id_2)] = game
+            # print(f'Состояние переменной для игр на момент создания: {self.games}')
+            await asyncio.sleep(10)
             await game.start()
+            # удалить из данных
+            self.manager.remove_connection(player_id_1)
+            self.manager.remove_connection(player_id_2)
         else:
             # выйти из очереди и отключиться от сервера если никого не нашли
+            # print(f"Отработал выход из очереди для: {player_id}")
             try:
                 await self.manager.active_connections[player_id].close()
             except (RuntimeError, KeyError): # отработает в случае с успешным завершением поиска партнера
