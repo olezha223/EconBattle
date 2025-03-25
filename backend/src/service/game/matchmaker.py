@@ -27,16 +27,14 @@ class MatchMaker:
         ):
             await asyncio.sleep(2)
             if not self._search_in_games(player_id):
-                print(f"{player_id} думаем, что он еще не в игре")
                 try:
                     await websocket.send_json({"type": "waiting", "msg": f"For {time.time() - start_waiting_time} sec."})
                 except RuntimeError:
                     continue
             else:
                 continue
-                # print(f"{player_id} уже в игре, но система думает, что он ждет")
         if self.manager.game_queue.get_len() >= 2:
-            # print(f"{player_id} создает мэтч")
+            print(f"{player_id} создает мэтч")
             player_id_1 = self.manager.game_queue.pop()
             player_id_2 = self.manager.game_queue.pop()
 
@@ -58,15 +56,17 @@ class MatchMaker:
                 )
             )
             self.games[(player_id_1, player_id_2)] = game
-            # print(f'Состояние переменной для игр на момент создания: {self.games}')
+            print(f'Состояние переменной для игр на момент создания: {self.games}')
             await asyncio.sleep(10)
             await game.start()
             # удалить из данных
             self.manager.remove_connection(player_id_1)
             self.manager.remove_connection(player_id_2)
+            print("Состояние очереди игроков:", self.manager.game_queue.get_all())
+            print("Активные соединения:", self.manager.active_connections)
         else:
             # выйти из очереди и отключиться от сервера если никого не нашли
-            # print(f"Отработал выход из очереди для: {player_id}")
+            print(f"Отработал выход из очереди для: {player_id}")
             try:
                 await self.manager.active_connections[player_id].close()
             except (RuntimeError, KeyError): # отработает в случае с успешным завершением поиска партнера

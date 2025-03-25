@@ -1,4 +1,6 @@
-from starlette.websockets import WebSocket, WebSocketState
+import asyncio
+
+from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
 from src.models.game import EventType
 from src.models.problems import ProblemDTO
 from src.models.users import UserDTO, Player
@@ -24,10 +26,11 @@ class Game:
     async def start(self):
         try:
             await self._notify_players("Game", data={"msg": "Идет процесс игры"})
-            while self.current_round < 3:
+            while self.current_round < 2:
                 await self._start_round()
                 self.current_round += 1
         finally:
+            print(f"Позвали клинап для игры между {self.players}")
             await self._cleanup()
 
     async def _cleanup(self):
@@ -47,27 +50,6 @@ class Game:
                 continue
 
             await ws.send_json(message)
-            # except RuntimeError as e:
-            #     if "close message has been sent" in str(e):
-            #         await self._handle_disconnect(player.id)
-            #     else:
-            #         print(f"Send error for {player.username}: {str(e)}")
-            # except Exception as e:
-            #     print(f"Unexpected error: {str(e)}")
-            #     await self._handle_disconnect(player.id)
-
-    # async def _handle_disconnect(self, player_id: int):
-    #     ws = self.sockets.get(player_id)
-    #     if not ws:
-    #         return
-    #
-    #     try:
-    #         if ws.client_state == WebSocketState.CONNECTED:
-    #             await ws.close(code=1000)
-    #     except Exception as e:
-    #         print(f"Close error: {str(e)}")
-    #     finally:
-    #         self.sockets.pop(player_id, None)
 
     async def _start_round(self):
         problems = await self.problems_repo.get_random_problems(3)
@@ -78,27 +60,27 @@ class Game:
                 "time_limit": 180
             }
         )
-        # answers = await self._collect_answers(timeout=180)
-        # print(answers)
+        print("Начало раунда (игрокам отправили условия задач")
+        answers = await self._collect_answers(timeout=100)
+        print(answers)
         # scores = self._calculate_scores(answers, problems)
         # await self._update_scores(scores)
 
-    # async def _collect_answers(self, timeout: int):
-    #     tasks = [
-    #         asyncio.create_task(self._wait_for_answer(player_id))
-    #         for player_id in self.players
-    #     ]
-    #     done, pending = await asyncio.wait(tasks, timeout=timeout)
-    #     return {task.result()[0]: task.result()[1] for task in done}
+    async def _collect_answers(self, timeout: int):
+        tasks = [
+            asyncio.create_task(self._wait_for_answer(player_id))
+            for player_id in self.players
+        ]
+        done, pending = await asyncio.wait(tasks, timeout=timeout)
+        return {task.result()[0]: task.result()[1] for task in done}
 
-
-    # async def _wait_for_answer(self, player_id: int) -> tuple[int, list[int]]:
-    #     """Ожидание ответа от конкретного игрока"""
-    #     try:
-    #         data = await self.sockets[player_id].receive_json()
-    #         return player_id, data.get("answers", [])
-    #     except Exception:
-    #         return player_id, []
+    async def _wait_for_answer(self, player_id: int) -> tuple[int, list[int]]:
+        """Ожидание ответа от конкретного игрока"""
+        try:
+            data = await self.sockets[player_id].receive_json()
+            return player_id, data.get("answers", [])
+        except WebSocketDisconnect:
+            return player_id, []
 
     # def _calculate_scores(self, answers: dict, problems: list[ProblemDTO]) -> dict:
     #     """Расчет очков за раунд"""
