@@ -12,6 +12,7 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
     await websocket.accept()
     await websocket.send_json({"type": "connected", "msg": f"Игрок {player_id} подключен к серверу"})
     await match_maker.add_player(websocket, player_id)
+    print("вышло из игры для игрока", player_id)
     # try:
     #     await match_maker.add_player(websocket, player_id)
     # except Exception as e:
