@@ -98,7 +98,8 @@ class Game:
                 timeout=timeout
             )
         except asyncio.TimeoutError:
-            pass  # Время на ответы вышло
+            print("Время на ответы вышло")
+            pass
 
         # Собираем результаты
         answers = {}
@@ -107,8 +108,8 @@ class Game:
                 try:
                     player_id, result = task.result()
                     answers[player_id] = result
-                except:
-                    pass
+                except Exception as e:
+                    print("Неожиданная ошибкак при сборе результатов", str(e))
 
         # Отменяем оставшиеся задачи
         for task in tasks:
