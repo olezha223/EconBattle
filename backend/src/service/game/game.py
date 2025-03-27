@@ -133,9 +133,11 @@ class Game:
         for pid, user_answer in answers.items():
             for problem in problems:
                 problem_id = problem.id
-                user_answer = user_answer[problem_id]
-                if user_answer == problem.answers['correct']:
-                    scores[pid] += problem["price"]
+                answer_list = user_answer[str(problem_id)]
+                if answer_list:
+                    answer = answer_list[0]
+                    if answer == problem.answers['correct']:
+                        scores[pid] += problem.price
         return scores
 
     # async def _update_scores(self, scores: dict):

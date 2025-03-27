@@ -26,16 +26,16 @@ function RoundScreen({ problems, onSubmit, timeLeft }) {
 
   const handleSubmit = () => {
     const formattedAnswers = {}
-    problems.forEach((_, index) => {
-      formattedAnswers[`task${index + 1}`] = answers[index] ? [answers[index]] : []
+    problems.forEach((problem, index) => {
+      formattedAnswers[problem.id] = answers[index] !== null ? [answers[index]] : []
     })
-    onSubmit(formattedAnswers)
+    onSubmit({ answers: formattedAnswers })
   }
 
   return (
     <div className="round-container">
       <div className="progress-indicator">
-        Problem {currentProblemIndex + 1} of {problems.length}
+        Вопрос {currentProblemIndex + 1} из {problems.length}
       </div>
 
       <ProblemForm
@@ -49,14 +49,14 @@ function RoundScreen({ problems, onSubmit, timeLeft }) {
           onClick={handlePrevProblem}
           disabled={currentProblemIndex === 0}
         >
-          Previous
+          Назад
         </button>
 
         {currentProblemIndex < problems.length - 1 ? (
-          <button onClick={handleNextProblem}>Next</button>
+          <button onClick={handleNextProblem}>Следующий</button>
         ) : (
           <button onClick={handleSubmit} className="submit-button">
-            Submit Answers
+            Отправить ответы
           </button>
         )}
       </div>

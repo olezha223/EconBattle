@@ -39,9 +39,9 @@ function GameScreen({ ws, gameState, opponent, playerId }) {
 
   const handleAnswersSubmit = (answers) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ answers }))
-      setIsRoundActive(false)
+      ws.send(JSON.stringify(answers))
     }
+    setIsRoundActive(false)
   }
 
   return (
