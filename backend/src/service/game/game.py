@@ -70,18 +70,22 @@ class Game:
             event_type="Start Round",
             data={
                 "problems": [p.model_dump() for p in problems],
-                "time_limit": 180
+                "time_limit": 120
             }
         )
 
-        answers = await self._collect_answers(timeout=30)
+        # Бэкенд ждет на 10 секунд дольше
+        answers = await self._collect_answers(timeout=130)
 
-        # Заполняем отсутствующие ответы пустыми списками
-        for player_id in self.players:
-            if player_id not in answers:
-                answers[player_id] = []
-
-        print("Answers:", answers)
+        # Форматирование ответов
+        formatted = {
+            pid: {
+                f"task{i + 1}": [a] if a is not None else []
+                for i, a in enumerate(ans)
+            }
+            for pid, ans in answers.items()
+        }
+        print(formatted)
         # scores = self._calculate_scores(answers, problems)
         # await self._update_scores(scores)
 

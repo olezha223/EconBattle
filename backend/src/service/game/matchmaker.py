@@ -22,7 +22,7 @@ class MatchMaker:
         start_waiting_time = time.time()
         while (
             self.manager.game_queue.get_len() <= 1 and
-            time.time() - start_waiting_time < 100 and
+            time.time() - start_waiting_time < 3000 and
             self.manager.active_connections.get(player_id, False)
         ):
             await asyncio.sleep(2)
