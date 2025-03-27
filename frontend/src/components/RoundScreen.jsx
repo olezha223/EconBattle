@@ -25,10 +25,9 @@ function RoundScreen({ problems, onSubmit, timeLeft }) {
   }
 
   const handleSubmit = () => {
-    // Format answers according to backend requirements
     const formattedAnswers = {}
     problems.forEach((_, index) => {
-      formattedAnswers[`task${index + 1}`] = answers[index] !== null ? [answers[index]] : []
+      formattedAnswers[`task${index + 1}`] = answers[index] ? [answers[index]] : []
     })
     onSubmit(formattedAnswers)
   }

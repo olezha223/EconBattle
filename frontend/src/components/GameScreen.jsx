@@ -56,8 +56,14 @@ function GameScreen({ ws, gameState, opponent, playerId }) {
       {gameState === 'game' && (
         <>
           <div className="game-header">
-            <h2>Your opponent: {opponent}</h2>
-            {isRoundActive && <div className="timer">Time left: {timer}s</div>}
+            <div className="player-info">
+              <span className="player-name">{playerId}</span>
+              <span className="vs-text">vs</span>
+              <span className="opponent-name">{opponent}</span>
+            </div>
+            <div className="timer">
+              ⏳ {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+            </div>
           </div>
 
           {roundData && isRoundActive && (

@@ -1,35 +1,27 @@
-.game-container {
-  width: 100%;
-  max-width: 600px;
-  background-color: white;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.waiting-message {
-  text-align: center;
-  padding: 2rem;
-}
-
-.waiting-message h2 {
-  color: #3498db;
-  margin-bottom: 1rem;
-}
-
-.game-header {
+/* styles/GameScreen.css */
+.player-info {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  gap: 10px;
+}
+
+.player-name, .opponent-name {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.vs-text {
+  color: #7f8c8d;
+  font-size: 0.9em;
 }
 
 .timer {
   background-color: #e74c3c;
   color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }

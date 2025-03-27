@@ -77,16 +77,9 @@ class Game:
         # Бэкенд ждет на 10 секунд дольше
         answers = await self._collect_answers(timeout=130)
 
-        # Форматирование ответов
-        formatted = {
-            pid: {
-                f"task{i + 1}": [a] if a is not None else []
-                for i, a in enumerate(ans)
-            }
-            for pid, ans in answers.items()
-        }
-        print(formatted)
-        # scores = self._calculate_scores(answers, problems)
+        print(answers)
+        scores = self._calculate_scores(answers, problems)
+        print(scores)
         # await self._update_scores(scores)
 
     async def _collect_answers(self, timeout: int):
@@ -134,16 +127,16 @@ class Game:
             except (WebSocketDisconnect, RuntimeError):
                 return player_id, []
 
-    # def _calculate_scores(self, answers: dict, problems: list[ProblemDTO]) -> dict:
-    #     """Расчет очков за раунд"""
-    #     scores = {pid: 0 for pid in self.players}
-    #     for pid, user_answers in answers.items():
-    #         for idx, problem in enumerate(problems):
-    #             correct_answers = set(problem.answers)
-    #             user_answer = set(user_answers[idx]) if idx < len(user_answers) else set()
-    #             if user_answer == correct_answers:
-    #                 scores[pid] += problem["price"]
-    #     return scores
+    def _calculate_scores(self, answers: dict, problems: list[ProblemDTO]) -> dict:
+        """Расчет очков за раунд"""
+        scores = {pid: 0 for pid in self.players}
+        for pid, user_answer in answers.items():
+            for problem in problems:
+                problem_id = problem.id
+                user_answer = user_answer[problem_id]
+                if user_answer == problem.answers['correct']:
+                    scores[pid] += problem["price"]
+        return scores
 
     # async def _update_scores(self, scores: dict):
     #     """Обновление счетчиков побед"""

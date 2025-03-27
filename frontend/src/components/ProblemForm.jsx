@@ -1,20 +1,26 @@
+// components/ProblemForm.jsx
 import '../styles/ProblemForm.css'
 
 function ProblemForm({ problem, answer, onAnswerChange }) {
+  const handleOptionSelect = (selectedAnswer) => {
+    onAnswerChange(selectedAnswer)
+  }
+
   return (
     <div className="problem-container">
-      <h3 className="problem-title">{problem.title}</h3>
-      <div className="problem-description">{problem.description}</div>
+      <h3 className="problem-title">Вопрос за {problem.price} очков</h3>
+      <div className="problem-question">{problem.question_text}</div>
 
-      <div className="answer-input">
-        <label htmlFor="answer">Your answer:</label>
-        <input
-          id="answer"
-          type="text"
-          value={answer || ''}
-          onChange={(e) => onAnswerChange(e.target.value)}
-          placeholder="Enter your answer"
-        />
+      <div className="answer-options">
+        {problem.answers.options.map((option, index) => (
+          <button
+            key={index}
+            className={`option-button ${answer === option ? 'selected' : ''}`}
+            onClick={() => handleOptionSelect(option)}
+          >
+            {option}
+          </button>
+        ))}
       </div>
     </div>
   )

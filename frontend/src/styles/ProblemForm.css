@@ -1,3 +1,4 @@
+/* styles/ProblemForm.css */
 .problem-container {
   background-color: #f8f9fa;
   padding: 1.5rem;
@@ -8,25 +9,46 @@
 .problem-title {
   color: #2c3e50;
   margin-bottom: 0.5rem;
-}
-
-.problem-description {
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
-  white-space: pre-line;
-}
-
-.answer-input {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.answer-input label {
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
-.answer-input input {
-  width: 100%;
-  max-width: 300px;
+.problem-question {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  font-size: 1.1rem;
+  white-space: pre-line;
+}
+
+.answer-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.option-button {
+  padding: 12px;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.option-button:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.option-button.selected {
+  background-color: #2980b9;
+  color: white;
+  border-color: #2980b9;
+}
+
+@media (max-width: 600px) {
+  .answer-options {
+    grid-template-columns: 1fr;
+  }
 }
