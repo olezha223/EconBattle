@@ -1,90 +1,75 @@
-import { useState, useEffect } from 'react';
-import LoginScreen from './components/LoginScreen';
-import WaitingForOpponent from './components/WaitingForOpponent';
-import RoundScreen from './components/RoundScreen';
+// Верхнеуровневый компонент App.jsx
+import { useState, useEffect } from 'react'
+import GameScreen from './components/GameScreen'
+import LobbyScreen from './components/LobbyScreen'
+import './styles/index.css'
 
 function App() {
-  const [gameState, setGameState] = useState('login');
-  const [playerId, setPlayerId] = useState('');
-  const [websocket, setWebsocket] = useState(null);
-  const [opponentId, setOpponentId] = useState('');
-  const [currentRound, setCurrentRound] = useState(null);
-  const [answers, setAnswers] = useState([]);
-  const [error, setError] = useState('');
+  const [gameState, setGameState] = useState('lobby')
+  const [opponent, setOpponent] = useState(null)
+  const [playerId, setPlayerId] = useState('')
+  const [ws, setWs] = useState(null)
 
+  // Общий обработчик сообщений
   useEffect(() => {
-    if (!websocket) return;
+    if (!ws) return
 
-    const handleMessage = (event) => {
-      const data = JSON.parse(event.data);
-      switch (data.type) {
-        case 'connected':
-          setGameState('waiting');
-          break;
+    const messageHandler = (event) => {
+      const message = JSON.parse(event.data)
+      switch(message.type) {
         case 'matched':
-          const opponent = data.msg.split(': ')[1];
-          setOpponentId(opponent);
-          setGameState('matched');
-          break;
+          setOpponent(message.msg.split(': ')[1])
+          setGameState('game')
+          break
         case 'Start Round':
-          setCurrentRound({
-            problems: data.problems,
-            timeLimit: data.time_limit
-          });
-          setAnswers(Array(data.problems.length).fill(''));
-          setGameState('round');
-          break;
+          // Обработка начала раунда
+          break
         case 'Closing':
-          websocket.close();
-          setGameState('closed');
-          break;
-        default:
-          console.log('Unknown message type:', data.type);
+          ws.close()
+          break
       }
-    };
+    }
 
-    const handleError = (error) => {
-      setError('Ошибка подключения');
-    };
+    ws.addEventListener('message', messageHandler)
+    return () => ws.removeEventListener('message', messageHandler)
+  }, [ws])
 
-    const handleClose = () => {
-      setGameState('closed');
-    };
+  // Обработчик закрытия соединения
+  useEffect(() => {
+    if (!ws) return
 
-    websocket.addEventListener('message', handleMessage);
-    websocket.addEventListener('error', handleError);
-    websocket.addEventListener('close', handleClose);
+    const closeHandler = () => {
+      setGameState('lobby')
+      setWs(null)
+    }
 
-    return () => {
-      websocket.removeEventListener('message', handleMessage);
-      websocket.removeEventListener('error', handleError);
-      websocket.removeEventListener('close', handleClose);
-    };
-  }, [websocket]);
-
-  const handleLogin = (enteredId) => {
-    const ws = new WebSocket(`ws://localhost:8000/ws/${enteredId}`);
-    setWebsocket(ws);
-    setPlayerId(enteredId);
-  };
+    ws.addEventListener('close', closeHandler)
+    return () => ws.removeEventListener('close', closeHandler)
+  }, [ws])
 
   return (
-    <div className="app">
-      {gameState === 'login' && <LoginScreen onLogin={handleLogin} />}
-      {gameState === 'waiting' && <WaitingForOpponent />}
-      {gameState === 'matched' && (
-        <WaitingForOpponent opponentId={opponentId} />
-      )}
-      {gameState === 'round' && (
-        <RoundScreen
-          problems={currentRound.problems}
-          answers={answers}
-          setAnswers={setAnswers}
-          websocket={websocket}
+    <div className="app-container">
+      {gameState === 'lobby' && (
+        <LobbyScreen 
+          onConnect={(id) => {
+            const newWs = new WebSocket(`ws://localhost:8000/ws/${id}`)
+            newWs.onopen = () => {
+              setPlayerId(id)
+              setGameState('waiting')
+              setWs(newWs)
+            }
+          }}
         />
       )}
-      {gameState === 'closed' && <div className="closed">Игра завершена</div>}
-      {error && <div className="error">Ошибка: {error}</div>}
+      
+      {(gameState === 'waiting' || gameState === 'game') && (
+        <GameScreen 
+          ws={ws}
+          gameState={gameState}
+          opponent={opponent}
+          playerId={playerId}
+        />
+      )}
     </div>
   );
 }

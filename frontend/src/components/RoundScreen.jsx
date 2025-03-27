@@ -1,47 +1,68 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react'
+import ProblemForm from './ProblemForm'
+import '../styles/RoundScreen.css'
 
-function RoundScreen({ problems, answers, setAnswers, websocket }) {
-  const [hasSent, setHasSent] = useState(false);
+function RoundScreen({ problems, onSubmit, timeLeft }) {
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0)
+  const [answers, setAnswers] = useState(Array(problems.length).fill(null))
 
   const handleAnswerChange = (index, value) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = value;
-    setAnswers(newAnswers);
-  };
+    const newAnswers = [...answers]
+    newAnswers[index] = value
+    setAnswers(newAnswers)
+  }
 
-  useEffect(() => {
-    if (
-      !hasSent &&
-      problems &&
-      answers.length === problems.length &&
-      answers.every((a) => a !== '')
-    ) {
-      websocket.send(JSON.stringify({ answers }));
-      setHasSent(true);
+  const handleNextProblem = () => {
+    if (currentProblemIndex < problems.length - 1) {
+      setCurrentProblemIndex(currentProblemIndex + 1)
     }
-  }, [answers, problems, hasSent, websocket]);
+  }
+
+  const handlePrevProblem = () => {
+    if (currentProblemIndex > 0) {
+      setCurrentProblemIndex(currentProblemIndex - 1)
+    }
+  }
+
+  const handleSubmit = () => {
+    // Format answers according to backend requirements
+    const formattedAnswers = {}
+    problems.forEach((_, index) => {
+      formattedAnswers[`task${index + 1}`] = answers[index] !== null ? [answers[index]] : []
+    })
+    onSubmit(formattedAnswers)
+  }
 
   return (
-    <div className="round-screen">
-      <h2 className="round-title">Раунд</h2>
-      <div className="problems-list">
-        {problems.map((problem, index) => (
-          <div key={index} className="problem-item">
-            <p className="problem-question">
-              Задача {index + 1}: {problem.question}
-            </p>
-            <input
-              type="text"
-              value={answers[index] || ''}
-              onChange={(e) => handleAnswerChange(index, e.target.value)}
-              placeholder="Введите ответ"
-              className="answer-input"
-            />
-          </div>
-        ))}
+    <div className="round-container">
+      <div className="progress-indicator">
+        Problem {currentProblemIndex + 1} of {problems.length}
+      </div>
+
+      <ProblemForm
+        problem={problems[currentProblemIndex]}
+        answer={answers[currentProblemIndex]}
+        onAnswerChange={(value) => handleAnswerChange(currentProblemIndex, value)}
+      />
+
+      <div className="navigation-buttons">
+        <button
+          onClick={handlePrevProblem}
+          disabled={currentProblemIndex === 0}
+        >
+          Previous
+        </button>
+
+        {currentProblemIndex < problems.length - 1 ? (
+          <button onClick={handleNextProblem}>Next</button>
+        ) : (
+          <button onClick={handleSubmit} className="submit-button">
+            Submit Answers
+          </button>
+        )}
       </div>
     </div>
-  );
+  )
 }
 
-export default RoundScreen;
+export default RoundScreen

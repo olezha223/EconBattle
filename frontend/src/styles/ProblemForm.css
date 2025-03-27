@@ -1,0 +1,32 @@
+.problem-container {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+}
+
+.problem-title {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.problem-description {
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.answer-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.answer-input label {
+  font-weight: bold;
+}
+
+.answer-input input {
+  width: 100%;
+  max-width: 300px;
+}

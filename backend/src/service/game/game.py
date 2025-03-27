@@ -128,6 +128,7 @@ class Game:
             try:
                 if self.sockets[player_id].client_state == WebSocketState.CONNECTED:
                     data = await self.sockets[player_id].receive_json()
+                    print(data, player_id)
                     return player_id, data.get("answers", [])
                 return player_id, []
             except (WebSocketDisconnect, RuntimeError):
