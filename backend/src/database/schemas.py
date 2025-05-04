@@ -1,30 +1,45 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, func
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, func, Enum, Float
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-Base = declarative_base()
+from src.models.problems import TaskTypeEnum, AnswerTypeEnum
+
+class Base(DeclarativeBase):
+    __abstract__ = True
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
 
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(255), unique=True, nullable=False)
-    rating = Column(Integer, default=1000)
+    student_rating = Column(Integer, default=1000, nullable=False)
+    teacher_rating = Column(Integer, default=1000, nullable=False)
+
+
 
 
 class Problem(Base):
-    __tablename__ = 'problems'
+    __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True)
-    question_text = Column(String, nullable=False)
-    answers = Column(JSON, nullable=False)
-    price = Column(Integer, default=100)
+    creator_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    name = Column(String, nullable=False)
+    text = Column(String, nullable=False)
+    price = Column(Integer, nullable=True)
+    type = Column(Enum(TaskTypeEnum), nullable=False)
+
+class Answer(Base):
+    __tablename__ = "answers"
+
+    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    type = Column(Enum(AnswerTypeEnum), nullable=False)
+    value = Column(JSON, nullable=False)
+    correct_value = Column(JSON, nullable=False)
 
 
 class Match(Base):
     __tablename__ = 'matches'
 
-    id = Column(Integer, primary_key=True)
     player1_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     player2_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     winner_id = Column(Integer, ForeignKey('users.id'))
@@ -35,7 +50,6 @@ class Match(Base):
 class Round(Base):
     __tablename__ = 'rounds'
 
-    id = Column(Integer, primary_key=True)
     match_id = Column(Integer, ForeignKey('matches.id'), nullable=False)
     round_number = Column(Integer, nullable=False)
     player1_score = Column(Integer, default=0)

@@ -5,7 +5,10 @@ from fastapi import WebSocket
 class UserDTO(BaseModel):
     id: int
     username: str
-    rating: int
+    student_rating: int
+    teacher_rating: int
+    #played_games: int
+    #created_competitions: int
 
 
 class Player:

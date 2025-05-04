@@ -15,6 +15,6 @@ class UserRepo(RepoInterface):
 
     async def create(self, username) -> int:
         async with self.session_getter() as session:
-            stmt = insert(User).values(username=username, rating=1000).returning(User.id)
+            stmt = insert(User).values(username=username).returning(User.id)
             result = await session.execute(stmt)
             return result.scalar_one_or_none()
