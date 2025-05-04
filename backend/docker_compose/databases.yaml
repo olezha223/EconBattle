@@ -1,24 +1,26 @@
 services:
-  redis:
-    ports:
-      - "6379:6379"
-    image: "redis:latest"
+#  redis:
+#    ports:
+#      - "6379:6379"
+#    image: "redis:latest"
 
   db:
     user: root
-    build:
-      context: ../../database
-      dockerfile: Dockerfile
+    image: postgres:17
+#    build:
+#      context: ../../database
+#      dockerfile: Dockerfile
     container_name: postgres_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: econ-battle
+      POSTGRES_TEST_DB: econ-battle-test
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./../../database/init.sql:/init.sql
+#      - ./../../database/init.sql:/init.sql
 
 volumes:
   postgres_data:

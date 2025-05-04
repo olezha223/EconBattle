@@ -4,12 +4,12 @@ from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
 from src.models.game import EventType
 from src.models.problems import ProblemDTO
 from src.models.users import UserDTO, Player
-from src.repository.problems import ProblemsRepo
+from src.repository.problems import ProblemRepo
 
 
 class Game:
     def __init__(self, player1: Player, player2: Player):
-        self.problems_repo = ProblemsRepo()
+        self.problems_repo = ProblemRepo()
         self.players: dict[int, UserDTO] = {
             player1.user.id: player1.user,
             player2.user.id: player2.user

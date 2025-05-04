@@ -6,13 +6,13 @@ from src.repository import RepoInterface
 
 
 class TaskRepo(RepoInterface):
-    async def create(self, task: TaskDTO):
+    async def create(self, task: TaskDTO) -> int:
         async with self.session_getter() as session:
             result = await session.execute(
                 insert(Problem).values(**task.model_dump())
                 .returning(Problem.id)
             )
-            task_id = result.scalar_one_or_none()
+            task_id = result.scalar()
             return task_id
 
     async def get(self, task_id: int) -> TaskDTO:
