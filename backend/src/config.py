@@ -47,7 +47,7 @@ class DatabaseConfig:
         return URL.create(
             drivername=f'{self.database_system}+{self.driver}',
             username=self.user,
-            database=self.name,
+            database=self.test_name,
             password=self.password,
             port=self.port,
             host=self.host,

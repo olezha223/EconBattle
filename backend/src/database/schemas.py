@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, func, Enum, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, func
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from src.models.problems import TaskTypeEnum, AnswerTypeEnum
@@ -26,13 +27,8 @@ class Problem(Base):
     name = Column(String, nullable=False)
     text = Column(String, nullable=False)
     price = Column(Integer, nullable=True)
-    type = Column(Enum(TaskTypeEnum), nullable=False)
-
-class Answer(Base):
-    __tablename__ = "answers"
-
-    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
-    type = Column(Enum(AnswerTypeEnum), nullable=False)
+    task_type = Column(String, nullable=False)
+    answer_type = Column(String, nullable=False)
     value = Column(JSON, nullable=False)
     correct_value = Column(JSON, nullable=False)
 

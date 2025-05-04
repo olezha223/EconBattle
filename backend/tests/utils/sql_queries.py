@@ -1,7 +1,5 @@
 # SQL-скрипт для инициализации
 INIT_COMMANDS = [
-    "CREATE TYPE task_type AS ENUM ('multiple choice', 'single choice', 'one word answer', 'one number answer');",
-    "CREATE TYPE answer_type AS ENUM ('string', 'float', 'int', 'list_int', 'list_float');",
     """
     CREATE TABLE users (
         id SERIAL PRIMARY KEY,
@@ -19,18 +17,11 @@ INIT_COMMANDS = [
         name TEXT NOT NULL,
         text TEXT NOT NULL,
         price INTEGER,
-        type task_type NOT NULL,
-        FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-    """,
-    """
-    CREATE TABLE answers (
-        id SERIAL PRIMARY KEY,
-        task_id INTEGER NOT NULL,
-        type answer_type NOT NULL,
+        task_type VARCHAR NOT NULL,
         value JSONB NOT NULL,
+        answer_type VARCHAR NOT NULL,
         correct_value JSONB NOT NULL,
-        FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+        FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
     );
     """
 ]
@@ -40,6 +31,6 @@ def get_cleanup_script(table: str):
     return f"DROP TABLE {table} CASCADE;"
 
 CLEANUP_SCRIPTS = [
-    get_cleanup_script(table) for table in ['answers', 'tasks', 'users']
-] + ['DROP TYPE IF EXISTS task_type, answer_type;']
+    get_cleanup_script(table) for table in ['tasks', 'users']
+]
 
