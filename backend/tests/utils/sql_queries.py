@@ -38,3 +38,8 @@ INIT_COMMANDS = [
 # Скрипт для очистки таблиц
 def get_cleanup_script(table: str):
     return f"DROP TABLE {table} CASCADE;"
+
+CLEANUP_SCRIPTS = [
+    get_cleanup_script(table) for table in ['answers', 'tasks', 'users']
+] + ['DROP TYPE IF EXISTS task_type, answer_type;']
+
