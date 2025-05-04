@@ -16,7 +16,7 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, Any, None]:
     loop.close()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 async def setup_database():
     async with get_session_test() as session:
         for command in INIT_COMMANDS:

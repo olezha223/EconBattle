@@ -5,7 +5,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE users (
         id SERIAL PRIMARY KEY,
-        username TEXT NOT NULL UNIQUE,
+        username TEXT NOT NULL,
         student_rating INTEGER NOT NULL DEFAULT 1000,
         teacher_rating INTEGER NOT NULL DEFAULT 1000,
         played_games INTEGER NOT NULL DEFAULT 0,
