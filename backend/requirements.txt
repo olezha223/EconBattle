@@ -8,3 +8,5 @@ redis
 asyncpg
 starlette~=0.45.3
 aiofiles~=24.1.0
+pytest
+pytest-asyncio
