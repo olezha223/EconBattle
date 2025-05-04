@@ -20,17 +20,25 @@ class User(Base):
 
 
 
-class Problem(Base):
+class Task(Base):
     __tablename__ = "tasks"
 
     creator_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
     text = Column(String, nullable=False)
-    price = Column(Integer, nullable=True)
+    price = Column(Integer, nullable=False)
     task_type = Column(String, nullable=False)
     answer_type = Column(String, nullable=False)
     value = Column(JSON, nullable=False)
     correct_value = Column(JSON, nullable=False)
+
+
+class Rule(Base):
+    __tablename__ = "rules"
+    max_players = Column(Integer, nullable=False)
+    max_rounds = Column(Integer, nullable=False)
+    round_time_in_seconds = Column(Integer, nullable=False)
+    tasks_markup = Column(JSON, nullable=False)
 
 
 class Match(Base):

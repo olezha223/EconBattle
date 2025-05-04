@@ -23,6 +23,15 @@ INIT_COMMANDS = [
         correct_value JSONB NOT NULL,
         FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
     );
+    """,
+    """
+    CREATE TABLE rules (
+        id SERIAL PRIMARY KEY,
+        max_players INTEGER NOT NULL,
+        max_rounds INTEGER NOT NULL,
+        round_time_in_seconds INTEGER NOT NULL,
+        tasks_markup JSONB NOT NULL
+    );
     """
 ]
 
@@ -31,6 +40,6 @@ def get_cleanup_script(table: str):
     return f"DROP TABLE {table} CASCADE;"
 
 CLEANUP_SCRIPTS = [
-    get_cleanup_script(table) for table in ['tasks', 'users']
+    get_cleanup_script(table) for table in ['tasks', 'users', 'rules']
 ]
 
