@@ -7,8 +7,8 @@ class UserDTO(BaseModel):
     username: str
     student_rating: int
     teacher_rating: int
-    #played_games: int
-    #created_competitions: int
+    # played_games: list[int]
+    # created_competitions: list[int]
 
 
 class Player:

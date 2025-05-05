@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 
 
-class Competition(BaseModel):
-    played_games: list[int]
+class CompetitionDTO(BaseModel):
     name: str
-    rules: int
-    tasks: list[int]
-    creator: int
+    creator_id: int
+    # settings
+    max_players: int
+    max_rounds: int
+    round_time_in_seconds: int
+    tasks_markup: dict[str, list[int]]

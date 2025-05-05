@@ -30,8 +30,13 @@ class Task(Base):
     correct_value = Column(JSON, nullable=False)
 
 
-class Rule(Base):
-    __tablename__ = "rules"
+class Competition(Base):
+    __tablename__ = 'competitions'
+
+    name = Column(String, nullable=False)
+    creator_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+
+    # настройки игры
     max_players = Column(Integer, nullable=False)
     max_rounds = Column(Integer, nullable=False)
     round_time_in_seconds = Column(Integer, nullable=False)
@@ -48,6 +53,7 @@ class Round(Base):
 
 class Game(Base):
     __tablename__ = 'games'
+    competition_id = Column(Integer, ForeignKey("competitions.id"), nullable=False)
 
     player_1 = Column(Integer, ForeignKey('users.id'), nullable=False)
     player_2 = Column(Integer, ForeignKey('users.id'), nullable=False)
@@ -56,12 +62,3 @@ class Game(Base):
     status_player_2 = Column(String, nullable=False)
     rating_difference_player_1 = Column(Integer, nullable=False)
     rating_difference_player_2 = Column(Integer, nullable=False)
-
-class Competition(Base):
-    __tablename__ = 'competitions'
-
-    played_games = Column(ARRAY(Integer), default=[], nullable=False)
-    name = Column(String, nullable=False)
-    rules = Column(Integer, ForeignKey('rules.id'), nullable=False)
-    tasks = Column(ARRAY(Integer), default=[], nullable=False)
-    creator = Column(Integer, ForeignKey('users.id'), nullable=False)

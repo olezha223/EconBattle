@@ -24,8 +24,11 @@ INIT_COMMANDS = [
     );
     """,
     """
-    CREATE TABLE rules (
+    CREATE TABLE competitions (
         id SERIAL PRIMARY KEY,
+        name VARCHAR NOT NULL,
+        creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        -- competition settings
         max_players INTEGER NOT NULL,
         max_rounds INTEGER NOT NULL,
         round_time_in_seconds INTEGER NOT NULL,
@@ -44,6 +47,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE games (
         id SERIAL PRIMARY KEY,
+        competition_id INTEGER NOT NULL REFERENCES competitions(id) ON DELETE CASCADE,
         player_1 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         player_2 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         rounds INTEGER[] NOT NULL DEFAULT ARRAY[]::INTEGER[],
@@ -53,16 +57,6 @@ INIT_COMMANDS = [
         rating_difference_player_2 INTEGER NOT NULL
     );
     """,
-    """
-    CREATE TABLE competitions (
-        id SERIAL PRIMARY KEY,
-        played_games_ids INTEGER[] NOT NULL DEFAULT ARRAY[]::INTEGER[],
-        name VARCHAR NOT NULL,
-        rules_id INTEGER NOT NULL REFERENCES rules(id) ON DELETE CASCADE,
-        tasks_ids INTEGER[] NOT NULL DEFAULT ARRAY[]::INTEGER[],
-        creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
-    );
-    """
 ]
 
 # Скрипт для очистки таблиц
@@ -70,6 +64,6 @@ def get_cleanup_script(table: str):
     return f"DROP TABLE {table} CASCADE;"
 
 CLEANUP_SCRIPTS = [
-    get_cleanup_script(table) for table in ['tasks', 'users', 'rules', 'games', 'rounds', 'competitions']
+    get_cleanup_script(table) for table in ['tasks', 'games', 'rounds', 'competitions', 'users']
 ]
 
