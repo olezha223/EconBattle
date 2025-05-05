@@ -17,8 +17,6 @@ class User(Base):
     teacher_rating = Column(Integer, default=1000, nullable=False)
 
 
-
-
 class Task(Base):
     __tablename__ = "tasks"
 
@@ -58,3 +56,12 @@ class Game(Base):
     status_player_2 = Column(String, nullable=False)
     rating_difference_player_1 = Column(Integer, nullable=False)
     rating_difference_player_2 = Column(Integer, nullable=False)
+
+class Competition(Base):
+    __tablename__ = 'competitions'
+
+    played_games = Column(ARRAY(Integer), default=[], nullable=False)
+    name = Column(String, nullable=False)
+    rules = Column(Integer, ForeignKey('rules.id'), nullable=False)
+    tasks = Column(ARRAY(Integer), default=[], nullable=False)
+    creator = Column(Integer, ForeignKey('users.id'), nullable=False)
