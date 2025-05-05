@@ -7,10 +7,8 @@ from tests.utils.adapter import get_session_test
 task_repo = TaskRepo(session_getter=get_session_test)
 
 async def test_create(create_user):
-    user = create_user
-
     task = TaskDTO(
-        creator_id=user.id,
+        creator_id=1,
         name="test",
         text="test",
         price=1000,
@@ -25,10 +23,8 @@ async def test_create(create_user):
 
 
 async def test_create_multiple(create_user):
-    user = create_user
-
     task = TaskDTO(
-        creator_id=user.id,
+        creator_id=1,
         name="test",
         text="test",
         price=1000,
@@ -42,7 +38,7 @@ async def test_create_multiple(create_user):
     assert task_id == 1
 
     task_2 = TaskDTO(
-        creator_id=user.id,
+        creator_id=2,
         name="test-2",
         text="test-2",
         price=1000,
@@ -56,10 +52,8 @@ async def test_create_multiple(create_user):
     assert task_id == 2
 
 async def test_get(create_user):
-    user = create_user
-
     test_task_1 = TaskDTO(
-        creator_id=user.id,
+        creator_id=1,
         name="test",
         text="test",
         price=1000,
@@ -73,7 +67,7 @@ async def test_get(create_user):
     assert task_id_1 == 1
 
     test_task_2 = TaskDTO(
-        creator_id=user.id,
+        creator_id=2,
         name="test-2",
         text="test-2",
         price=1000,
