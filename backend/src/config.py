@@ -19,12 +19,9 @@ if os.path.exists(dotenv_path):
 
 
 @dataclass(frozen=True)
-class AuthJWTConfig:
-    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
-    public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
-    algorithm: str = "RS256"
-    access_token_expire_minutes: int = 5
-    refresh_token_expire_days: int = 30
+class AuthConfig:
+    client_id: str = os.getenv('CLIENT_ID', 'example')
+    client_secret: str = os.getenv('CLIENT_SECRET', 'example')
 
 
 @dataclass
@@ -90,7 +87,7 @@ class Configuration:
     logging_level: int = int(os.getenv('LOGGING_LEVEL', logging.INFO))
     db: DatabaseConfig = field(default_factory=DatabaseConfig)
     app: AppConfig = field(default_factory=AppConfig)
-    auth_jwt: AuthJWTConfig = field(default_factory=AuthJWTConfig)
+    auth: AuthConfig = field(default_factory=AuthConfig)
     redis: RedisConf = field(default_factory=RedisConf)
 
 

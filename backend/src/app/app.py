@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 
 class App(FastAPI):
@@ -32,5 +33,7 @@ class App(FastAPI):
             allow_methods=allow_methods,
             allow_headers=allow_headers
         )
+
+        self.add_middleware(SessionMiddleware, secret_key="tunk-tunk-tunk-sahur")
 
         return self
