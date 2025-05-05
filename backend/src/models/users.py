@@ -7,8 +7,26 @@ class UserDTO(BaseModel):
     username: str
     student_rating: int
     teacher_rating: int
-    # played_games: list[int]
-    # created_competitions: list[int]
+
+class UserExtended(UserDTO):
+    played_games: list[int]
+    created_competitions: list[int]
+    created_tasks: list[int]
+
+
+class UserStatistics(BaseModel):
+    # статистика как игрока
+    wins_count: int
+    losses_count: int
+    tie_count: int
+
+    # статистика как составителя задач
+    tasks_created: int
+    mean_task_difficulty: float
+
+    # статистика как организатора соревнований
+    competitions_created: int
+    games_played: int
 
 
 class Player:

@@ -4,6 +4,7 @@ from typing import Generator, Any
 import pytest
 from sqlalchemy import text
 
+from src.service import UserService
 from tests.utils.adapter import get_session_test
 from tests.utils.sql_queries import INIT_COMMANDS, CLEANUP_SCRIPTS
 from src.database.schemas import Round, Task, Competition
@@ -15,7 +16,7 @@ from src.repository.games import GamesRepo
 from src.repository.competitions import CompetitionsRepo
 from src.models.problems import TaskDTO, TaskTypeEnum, AnswerTypeEnum
 from src.models.round import StatusEnum, RoundDTO
-from src.models.users import UserDTO
+from src.models.users import UserDTO, UserExtended, UserStatistics
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -59,6 +60,15 @@ async def round_repo():
 async def games_repo():
     return GamesRepo(session_getter=get_session_test)
 
+# сервисы
+@pytest.fixture
+async def user_service(user_repo, task_repo, competition_repo, games_repo):
+    return UserService(
+        user_repo=user_repo,
+        task_repo=task_repo,
+        games_repo=games_repo,
+        competitions_repo=competition_repo
+    )
 
 # блок с данными
 @pytest.fixture
@@ -164,6 +174,15 @@ async def round_3_dto():
         status_player_2=StatusEnum.LOSER
     )
 
+@pytest.fixture
+async def user_info_1_dto(user_1_dto):
+    return UserExtended(
+        **user_1_dto.model_dump(),
+        played_games=[],
+        created_competitions=[1, ],
+        created_tasks=[1, ]
+    )
+
 # фикстуры для вставки данных
 @pytest.fixture
 async def create_users(user_repo, user_1_dto, user_2_dto, user_3_dto):
@@ -230,3 +249,16 @@ async def create_rounds(create_competitions, round_repo, round_1_dto, round_2_dt
     assert round_1 == round_1_dto
     assert round_2 == round_2_dto
     assert round_3 == round_3_dto
+
+
+@pytest.fixture
+async def user_stats_1_dto(create_competitions):
+    return UserStatistics(
+        wins_count=0,
+        losses_count=0,
+        tie_count=0,
+        tasks_created=1,
+        mean_task_difficulty=1000,
+        competitions_created=1,
+        games_played=0
+    )
