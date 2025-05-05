@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, func
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.dialects.postgresql import ENUM, ARRAY
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from src.models.problems import TaskTypeEnum, AnswerTypeEnum
 
 class Base(DeclarativeBase):
     __abstract__ = True
@@ -41,21 +40,21 @@ class Rule(Base):
     tasks_markup = Column(JSON, nullable=False)
 
 
-class Match(Base):
-    __tablename__ = 'matches'
-
-    player1_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    player2_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    winner_id = Column(Integer, ForeignKey('users.id'))
-    created_at = Column(DateTime, default=func.now())
-    total_rounds = Column(Integer, nullable=False)
-
-
 class Round(Base):
-    __tablename__ = 'rounds'
+    __tablename__ = "rounds"
+    points_player_1 = Column(Integer, nullable=False)
+    points_player_2 = Column(Integer, nullable=False)
+    status_player_1 = Column(String, nullable=False)
+    status_player_2 = Column(String, nullable=False)
 
-    match_id = Column(Integer, ForeignKey('matches.id'), nullable=False)
-    round_number = Column(Integer, nullable=False)
-    player1_score = Column(Integer, default=0)
-    player2_score = Column(Integer, default=0)
-    problems = Column(JSON, nullable=False)  # Список ID задач [1, 5, 3]
+
+class Game(Base):
+    __tablename__ = 'games'
+
+    player_1 = Column(Integer, ForeignKey('users.id'), nullable=False)
+    player_2 = Column(Integer, ForeignKey('users.id'), nullable=False)
+    rounds = Column(ARRAY(Integer), default=[], nullable=False)
+    status_player_1 = Column(String, nullable=False)
+    status_player_2 = Column(String, nullable=False)
+    rating_difference_player_1 = Column(Integer, nullable=False)
+    rating_difference_player_2 = Column(Integer, nullable=False)

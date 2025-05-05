@@ -8,10 +8,10 @@ user_repo = UserRepo(session_getter=get_session_test)
 
 @pytest.fixture
 async def create_user() -> UserDTO:
-    user_id = await user_repo.create("user")
+    user_id = await user_repo.create_with_username("user")
     assert user_id == 1
 
-    user = await user_repo.get("user")
+    user = await user_repo.get_by_username("user")
     assert user == UserDTO(
         id=user_id,
         username="user",

@@ -1,3 +1,4 @@
+from src.database.schemas import Task
 from src.models.problems import TaskDTO, TaskTypeEnum, AnswerTypeEnum
 from src.repository.tasks import TaskRepo
 from tests.test_repository import create_user
@@ -18,7 +19,7 @@ async def test_create(create_user):
         answer_type=AnswerTypeEnum.STRING,
         correct_value={"correct": ["answer1"]}
     )
-    task_id = await task_repo.create(task)
+    task_id = await task_repo.create(model=task, orm=Task)
 
     assert task_id == 1
 
@@ -36,7 +37,7 @@ async def test_create_multiple(create_user):
         answer_type=AnswerTypeEnum.STRING,
         correct_value={"correct": ["answer1"]}
     )
-    task_id = await task_repo.create(task)
+    task_id = await task_repo.create(model=task, orm=Task)
 
     assert task_id == 1
 
@@ -50,7 +51,7 @@ async def test_create_multiple(create_user):
         answer_type=AnswerTypeEnum.STRING,
         correct_value={"correct": ["answer1"]}
     )
-    task_id = await task_repo.create(task_2)
+    task_id = await task_repo.create(model=task_2, orm=Task)
 
     assert task_id == 2
 
@@ -67,7 +68,7 @@ async def test_get(create_user):
         answer_type=AnswerTypeEnum.STRING,
         correct_value={"correct": ["answer1"]}
     )
-    task_id_1 = await task_repo.create(test_task_1)
+    task_id_1 = await task_repo.create(model=test_task_1, orm=Task)
 
     assert task_id_1 == 1
 
@@ -81,12 +82,12 @@ async def test_get(create_user):
         answer_type=AnswerTypeEnum.STRING,
         correct_value={"correct": ["answer1"]}
     )
-    task_id_2 = await task_repo.create(test_task_2)
+    task_id_2 = await task_repo.create(model=test_task_2, orm=Task)
 
     assert task_id_2 == 2
 
-    task_1 = await task_repo.get(task_id_1)
+    task_1 = await task_repo.get(object_id=task_id_1, orm_class=Task, model_class=TaskDTO)
     assert task_1 == test_task_1
 
-    task_2 = await task_repo.get(task_id_2)
+    task_2 = await task_repo.get(object_id=task_id_2, orm_class=Task, model_class=TaskDTO)
     assert task_2 == test_task_2

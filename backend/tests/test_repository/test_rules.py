@@ -1,3 +1,4 @@
+from src.database.schemas import Rule
 from src.models.rules import RulesDTO
 from src.repository.rules import RulesRepo
 from tests.utils.adapter import get_session_test
@@ -12,7 +13,7 @@ async def test_create():
         tasks_markup = {"round_1": [1, 2, 3]}
     )
 
-    rule_id = await rules_repo.create(rule)
+    rule_id = await rules_repo.create(model=rule, orm=Rule)
 
     assert rule_id == 1
 
@@ -25,7 +26,7 @@ async def test_create_multiple():
         tasks_markup={"round_1": [1, 2, 3]}
     )
 
-    rule_id = await rules_repo.create(rule)
+    rule_id = await rules_repo.create(model=rule, orm=Rule)
 
     assert rule_id == 1
 
@@ -36,7 +37,7 @@ async def test_create_multiple():
         tasks_markup={"round_1": [3, 2, 1]}
     )
 
-    rule_id = await rules_repo.create(rule)
+    rule_id = await rules_repo.create(model=rule, orm=Rule)
 
     assert rule_id == 2
 
@@ -49,7 +50,7 @@ async def test_get():
         tasks_markup={"round_1": [1, 2, 3]}
     )
 
-    rule_id_1 = await rules_repo.create(test_rule_1)
+    rule_id_1 = await rules_repo.create(model=test_rule_1, orm=Rule)
 
     assert rule_id_1 == 1
 
@@ -60,12 +61,12 @@ async def test_get():
         tasks_markup={"round_1": [3, 2, 1]}
     )
 
-    rule_id_2 = await rules_repo.create(test_rule_2)
+    rule_id_2 = await rules_repo.create(model=test_rule_2, orm=Rule)
 
     assert rule_id_2 == 2
 
-    rule_1 = await rules_repo.get(rule_id_1)
+    rule_1 = await rules_repo.get(object_id=rule_id_1, orm_class=Rule, model_class=RulesDTO)
     assert rule_1 == test_rule_1
 
-    rule_2 = await rules_repo.get(rule_id_2)
+    rule_2 = await rules_repo.get(object_id=rule_id_2, orm_class=Rule, model_class=RulesDTO)
     assert rule_2 == test_rule_2

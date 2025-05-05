@@ -6,14 +6,14 @@ from src.repository import RepoInterface
 
 
 class UserRepo(RepoInterface):
-    async def get(self, username: str) -> UserDTO:
+    async def get_by_username(self, username: str) -> UserDTO:
         async with self.session_getter() as session:
             stmt = select(User).where(User.username == username)
             result = await session.execute(stmt)
             scalar = result.scalar_one_or_none()
             return UserDTO.model_validate(scalar, from_attributes=True)
 
-    async def create(self, username) -> int:
+    async def create_with_username(self, username) -> int:
         async with self.session_getter() as session:
             stmt = insert(User).values(username=username).returning(User.id)
             result = await session.execute(stmt)
