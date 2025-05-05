@@ -21,11 +21,9 @@ async def setup_database():
     async with get_session_test() as session:
         for command in INIT_COMMANDS:
             await session.execute(text(command))
-            await session.commit()
     try:
         yield
     finally:
         async with get_session_test() as session:
             for command in CLEANUP_SCRIPTS:
                 await session.execute(text(command))
-                await session.commit()
