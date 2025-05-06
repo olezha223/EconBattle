@@ -109,6 +109,7 @@ async def user_3_dto():
 @pytest.fixture
 async def task_1_dto():
     return TaskDTO(
+        id=1,
         creator_id='1',
         name="test",
         text="test",
@@ -123,6 +124,7 @@ async def task_1_dto():
 @pytest.fixture
 async def task_2_dto():
     return TaskDTO(
+        id=2,
         creator_id='2',
         name="test-2",
         text="test-2",
@@ -136,6 +138,7 @@ async def task_2_dto():
 @pytest.fixture
 async def task_3_dto():
     return TaskDTO(
+        id=3,
         creator_id='2',
         name="test-3",
         text="test-3",
@@ -155,7 +158,7 @@ async def competition_1_dto():
         max_players=2,
         max_rounds=1,
         round_time_in_seconds=1,
-        tasks_markup={"round_1": [1, ]}
+        tasks_markup={1: [1, ]}
     )
 
 @pytest.fixture
@@ -167,7 +170,7 @@ async def competition_2_dto():
         max_players=2,
         max_rounds=2,
         round_time_in_seconds=1,
-        tasks_markup={"round_1": [1, ], "round_2": [2, 3]}
+        tasks_markup={1: [1, ], 2: [2, 3]}
     )
 
 @pytest.fixture

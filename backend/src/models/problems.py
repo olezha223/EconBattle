@@ -18,7 +18,8 @@ class AnswerTypeEnum(str, Enum):
     LIST_FLOAT = "LIST_FLOAT"
 
 
-class TaskDTO(BaseModel):
+class TaskWithoutAnswers(BaseModel):
+    id: int
     creator_id: str
     name: str
     text: str
@@ -26,4 +27,6 @@ class TaskDTO(BaseModel):
     task_type: str
     value: dict[str, Any]
     answer_type: str
+
+class TaskDTO(TaskWithoutAnswers):
     correct_value: dict[str, Any]

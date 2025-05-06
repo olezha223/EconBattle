@@ -8,4 +8,4 @@ class CompetitionDTO(BaseModel):
     max_players: int
     max_rounds: int
     round_time_in_seconds: int
-    tasks_markup: dict[str, list[int]]
+    tasks_markup: dict[int, list[int]]

@@ -1,20 +1,26 @@
 import asyncio
 
 from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
+
+from src.database.schemas import Competition
+from src.models.competition import CompetitionDTO
 from src.models.game import EventType
-from src.models.problems import TaskDTO
+from src.models.problems import TaskDTO, TaskWithoutAnswers
 from src.models.users import UserDTO, Player
+from src.repository.competitions import CompetitionsRepo
 from src.repository.tasks import TaskRepo
+from src.service import TaskService, get_task_service
+from tests.conftest import task_repo
 
 
 class Game:
-    def __init__(self, player1: Player, player2: Player):
-        self.problems_repo = TaskRepo()
-        self.players: dict[int, UserDTO] = {
+    def __init__(self, player1: Player, player2: Player, competition_id: int):
+        self.task_service = get_task_service()
+        self.players: dict[str, UserDTO] = {
             player1.user.id: player1.user,
             player2.user.id: player2.user
         }
-        self.sockets: dict[int, WebSocket] = {
+        self.sockets: dict[str, WebSocket] = {
             player1.user.id: player1.websocket,
             player2.user.id: player2.websocket
         }
@@ -22,6 +28,11 @@ class Game:
             player1.user.id: asyncio.Lock(),
             player2.user.id: asyncio.Lock()
         }
+        self.competition_repo = CompetitionsRepo()
+        self.competition_id = competition_id
+
+        self.competition = None
+        self.tasks_markup = {}
 
         self.rounds = []
         self.current_round = 0
@@ -29,9 +40,15 @@ class Game:
         self.wins = {player1.user.id: 0, player2.user.id: 0}
 
     async def start(self):
+        self.competition = await self.competition_repo.get(
+            self.competition_id,
+            model_class=CompetitionDTO,
+            orm_class=Competition
+        )
+        self.tasks_markup = self.competition.tasks_markup
         try:
             await self._notify_players("Game", data={"msg": "Идет процесс игры"})
-            while self.current_round < 2:
+            while self.current_round < self.competition.max_rounds:
                 print(f"Начинаем раунд {self.current_round}")
                 await self._start_round()
                 self.current_round += 1
@@ -64,12 +81,19 @@ class Game:
 
             await ws.send_json(message)
 
+    async def _get_problems_for_round(self) -> list[TaskWithoutAnswers]:
+        tasks = [
+            await self.task_service.get(task_id) for task_id in
+            self.tasks_markup[self.current_round + 1]
+        ]
+        return tasks
+
     async def _start_round(self):
-        problems = await self.problems_repo.get_random_problems(3)
+        problems = await self._get_problems_for_round()
         await self._notify_players(
             event_type="Start Round",
             data={
-                "problems": [p.model_dump() for p in problems],
+                "problems": [self.task_service.get_task_without_answers(p).model_dump() for p in problems],
                 "time_limit": 120
             }
         )
@@ -80,7 +104,7 @@ class Game:
         print(answers)
         scores = self._calculate_scores(answers, problems)
         print(scores)
-        # await self._update_scores(scores)
+        await self._update_scores(scores)
 
     async def _collect_answers(self, timeout: int):
         tasks = {
@@ -133,29 +157,32 @@ class Game:
         for pid, user_answer in answers.items():
             for problem in problems:
                 problem_id = problem.id
-                answer_list = user_answer[str(problem_id)]
+                answer_list = user_answer.get(str(problem_id), None)
                 if answer_list:
-                    answer = answer_list[0]
-                    if answer == problem.answers['correct']:
+                    print("----")
+                    print(problem.correct_value.get("answers", []))
+                    print(answer_list)
+                    print("----")
+                    if answer_list == problem.correct_value.get("answers", []):
                         scores[pid] += problem.price
         return scores
 
-    # async def _update_scores(self, scores: dict):
-    #     """Обновление счетчиков побед"""
-    #     max_score = max(scores.values())
-    #     for pid, score in scores.items():
-    #         self.scores[pid] += score
-    #         if score == max_score and score > 0:
-    #             self.wins[pid] += 1
-    #
-    #     # Отправка результатов раунда
-    #     results = {
-    #         "type": EventType.ROUND_RESULT.value,
-    #         "scores": scores,
-    #         "total_wins": self.wins
-    #     }
-    #     for ws in self.sockets.values():
-    #         await ws.send_json(results)
+    async def _update_scores(self, scores: dict):
+        """Обновление счетчиков побед"""
+        max_score = max(scores.values())
+        for pid, score in scores.items():
+            self.scores[pid] += score
+            if score == max_score and score > 0:
+                self.wins[pid] += 1
+
+        # Отправка результатов раунда
+        results = {
+            "type": EventType.ROUND_RESULT.value,
+            "scores": scores,
+            "total_wins": self.wins
+        }
+        for ws in self.sockets.values():
+            await ws.send_json(results)
 
     # async def _end_game(self):
     #     """Финализация игры и обновление рейтингов"""
@@ -200,7 +227,7 @@ class Game:
     #     }
     #     for ws in self.sockets.values():
     #         await ws.send_json(final_message)
-    #
+
     # async def _update_rating(self, winner_id: int):
     #     """Обновление рейтинга в БД"""
     #     async with get_session() as session:

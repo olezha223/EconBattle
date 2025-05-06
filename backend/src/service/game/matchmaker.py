@@ -60,12 +60,13 @@ class MatchMaker:
             user_2 = await self.user_service.get_user(player_id_2)
             game = Game(
                 player1=Player(user=user_1, websocket=player_1),
-                player2=Player(user=user_2, websocket=player_2)
+                player2=Player(user=user_2, websocket=player_2),
+                competition_id=competition_id
             )
             self.games[(player_id_1, player_id_2)] = game
             print(f'Состояние переменной для игр на момент создания: {self.games}')
             await asyncio.sleep(10)
-            # await game.start()
+            await game.start()
 
             # удалить из активных соединений игроков
             self.manager.remove_connection(player_id_1)
