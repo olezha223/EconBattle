@@ -2,8 +2,11 @@ import asyncio
 from typing import Generator, Any
 
 import pytest
+import redis
 from sqlalchemy import text
 
+from src.config import configuration
+from src.repository.game_queue.redis_queue import RedisQueue
 from src.service import UserService
 from tests.utils.adapter import get_session_test
 from tests.utils.sql_queries import INIT_COMMANDS, CLEANUP_SCRIPTS
@@ -39,7 +42,27 @@ async def setup_database():
             for command in CLEANUP_SCRIPTS:
                 await session.execute(text(command))
 
+@pytest.fixture(scope="function", autouse=True)
+async def clear_redis():
+    try:
+        yield
+    finally:
+        redis_client = redis.Redis(
+            host=configuration.redis.redis_host,
+            port=configuration.redis.redis_port,
+            db=configuration.redis.redis_db,
+            decode_responses=True
+        )
+        keys = redis_client.keys("game_queue:*")
+        if keys:
+            redis_client.delete(*keys)
+
+
 # репозитории
+@pytest.fixture
+async def redis_queue():
+    return RedisQueue()
+
 @pytest.fixture
 async def user_repo():
     return UserRepo(session_getter=get_session_test)

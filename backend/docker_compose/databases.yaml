@@ -1,8 +1,8 @@
 services:
-#  redis:
-#    ports:
-#      - "6379:6379"
-#    image: "redis:latest"
+  redis:
+    ports:
+      - "6379:6379"
+    image: "redis:latest"
 
   db:
     user: root
