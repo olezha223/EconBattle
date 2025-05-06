@@ -1,23 +1,22 @@
-from fastapi import FastAPI, WebSocket, APIRouter
+from fastapi import FastAPI, WebSocket, APIRouter, Query
 
 from src.service.game.matchmaker import MatchMaker
 
-ws_router = APIRouter()
+ws_router = APIRouter(
+    prefix="/ws",
+    tags=["WS"],
+)
 
 match_maker = MatchMaker()
 
 
-@ws_router.websocket("/ws/{player_id}")
-async def websocket_endpoint(websocket: WebSocket, player_id: int):
+@ws_router.websocket("/")
+async def websocket_endpoint(
+        websocket: WebSocket,
+        player_id: int = Query(..., alias="user_id", description="ID of the player"),
+        competition_id: int = Query(..., alias="competition_id", description="ID of the competition")
+):
     await websocket.accept()
     await websocket.send_json({"type": "connected", "msg": f"Игрок {player_id} подключен к серверу"})
-    await match_maker.add_player(websocket, player_id)
+    await match_maker.add_player(websocket, player_id, competition_id)
     print("вышло из игры для игрока", player_id)
-    # try:
-    #     await match_maker.add_player(websocket, player_id)
-    # except Exception as e:
-    #     print(f'Упало с обычной ошибкой {player_id} \n {e}')
-    #     try:
-    #         await websocket.close()
-    #     except RuntimeError:
-    #         print(f"Упало с ошибкой, при этом закрыв соединение {player_id}")

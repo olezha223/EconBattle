@@ -1,7 +1,9 @@
 from starlette.websockets import WebSocket
 
-from src.models.users import Player, UserDTO
-from src.service import UserService, get_user_service
+from src.models.users import Player
+from src.repository.game_queue.interface import QueueInterface
+from src.repository.game_queue.redis_queue import RedisQueue
+from src.service import get_user_service
 from src.service.game.connection_manager import ConnectionManager
 import time
 import asyncio
@@ -13,6 +15,7 @@ class MatchMaker:
     def __init__(self):
         self.manager = ConnectionManager()
         self.user_service = get_user_service()
+        self.game_queue: QueueInterface = RedisQueue()
         self.games: dict[tuple[int, int], Game] = dict()
 
     def _search_in_games(self, player_id: int) -> bool:
@@ -21,11 +24,15 @@ class MatchMaker:
                 return True
         return False
 
-    async def add_player(self, websocket: WebSocket, player_id: int):
+    async def add_player(self, websocket: WebSocket, player_id: int, competition_id: int):
+        # добавить игрока в активные соединения
         self.manager.add_connection(player_id, websocket)
+        # добавить игроку в очередь для данного соревнования
+        self.game_queue.insert_player(competition_id, player_id)
+
         start_waiting_time = time.time()
         while (
-            self.manager.game_queue.get_len() <= 1 and
+            self.game_queue.get_len(competition_id) <= 1 and
             time.time() - start_waiting_time < 3000 and
             self.manager.active_connections.get(player_id, False)
         ):
@@ -37,10 +44,10 @@ class MatchMaker:
                     continue
             else:
                 continue
-        if self.manager.game_queue.get_len() >= 2:
+        if self.game_queue.get_len(competition_id) >= 2:
             print(f"{player_id} создает мэтч")
-            player_id_1 = self.manager.game_queue.pop()
-            player_id_2 = self.manager.game_queue.pop()
+            player_id_1 = self.game_queue.pop(competition_id)
+            player_id_2 = self.game_queue.pop(competition_id)
 
             player_1 = self.manager.get_connection(player_id_1)
             await player_1.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_2}"})
@@ -58,11 +65,12 @@ class MatchMaker:
             self.games[(player_id_1, player_id_2)] = game
             print(f'Состояние переменной для игр на момент создания: {self.games}')
             await asyncio.sleep(10)
-            await game.start()
-            # удалить из данных
+            # await game.start()
+
+            # удалить из активных соединений игроков
             self.manager.remove_connection(player_id_1)
             self.manager.remove_connection(player_id_2)
-            print("Состояние очереди игроков:", self.manager.game_queue.get_all())
+            print("Состояние очереди игроков:", self.game_queue.get_all(competition_id))
             print("Активные соединения:", self.manager.active_connections)
         else:
             # выйти из очереди и отключиться от сервера если никого не нашли
@@ -72,3 +80,4 @@ class MatchMaker:
             except (RuntimeError, KeyError): # отработает в случае с успешным завершением поиска партнера
                 pass
             self.manager.remove_connection(player_id)
+            self.game_queue.remove_player(competition_id, player_id)
