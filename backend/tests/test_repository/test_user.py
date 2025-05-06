@@ -37,3 +37,8 @@ async def test_get_two(user_1_dto, user_2_dto):
     other = await user_repo.get_by_username("user_2")
     assert admin == user_1_dto
     assert other == user_2_dto
+
+
+async def test_get_not_existing():
+    user = await user_repo.get_by_username("foo")
+    assert user is None
