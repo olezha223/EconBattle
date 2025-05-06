@@ -5,9 +5,7 @@ INIT_COMMANDS = [
         id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
         student_rating INTEGER NOT NULL DEFAULT 1000,
-        teacher_rating INTEGER NOT NULL DEFAULT 1000,
-        played_games INTEGER NOT NULL DEFAULT 0,
-        created_competitions INTEGER NOT NULL DEFAULT 0
+        teacher_rating INTEGER NOT NULL DEFAULT 1000
     );
     """,
     """

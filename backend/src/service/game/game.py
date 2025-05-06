@@ -215,10 +215,8 @@ class Game:
 
     async def _end_game(self):
         """Финализация игры и обновление рейтингов"""
-        winner_id = max(self.wins, key=self.wins.get)
-        if self.wins[winner_id] < 2:
-            pass
-        elif winner_id == self.user_1_id:
+        winner_id = max(self.scores, key=self.scores.get)
+        if winner_id == self.user_1_id:
             self.player_final_info[self.user_1_id] = {"status": StatusEnum.WINNER.value, "diff": 10}
             self.player_final_info[self.user_2_id] = {"status": StatusEnum.LOSER.value, "diff": -10}
         else:
