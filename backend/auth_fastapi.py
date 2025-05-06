@@ -5,12 +5,7 @@ from starlette.requests import Request
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
-
-from src.repository.competitions import CompetitionsRepo
-from src.repository.games import GamesRepo
-from src.repository.tasks import TaskRepo
-from src.repository.users import UserRepo
-from src.service import UserService
+from src.service import get_user_service
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="!secret")
@@ -27,7 +22,7 @@ oauth.register(
     }
 )
 
-service = UserService(user_repo=UserRepo(), games_repo=GamesRepo(), task_repo=TaskRepo(), competitions_repo=CompetitionsRepo())
+service = get_user_service()
 
 @app.get('/')
 async def homepage(request: Request):

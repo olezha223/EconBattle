@@ -3,17 +3,17 @@ from abc import ABC, abstractmethod
 
 class QueueInterface(ABC):
     @abstractmethod
-    def insert_player(self, player_id: str) -> None:
+    def insert_player(self, player_id: int) -> None:
         """Вставить игрока"""
         ...
 
     @abstractmethod
-    def remove_player(self, player_id: str) -> None:
+    def remove_player(self, player_id: int) -> None:
         """Убрать игрока"""
         ...
 
     @abstractmethod
-    def check_exists(self, player_id: str) -> bool:
+    def check_exists(self, player_id: int) -> bool:
         """Проверить наличие"""
         ...
 
@@ -23,21 +23,21 @@ class QueueInterface(ABC):
         ...
 
     @abstractmethod
-    def first(self) -> str:
+    def first(self) -> int:
         """Получить первый элемент"""
         ...
 
     @abstractmethod
-    def get_first_2(self) -> list[str]:
+    def get_first_2(self) -> list[int]:
         """Получить первые два элемента"""
         ...
 
     @abstractmethod
-    def pop(self) -> str:
+    def pop(self) -> int:
         """Достать и удалить первый элемент"""
         ...
 
     @abstractmethod
-    def get_all(self) -> list[str]:
+    def get_all(self) -> list[int]:
         """Получить всю очередь"""
         ...

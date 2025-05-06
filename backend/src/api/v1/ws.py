@@ -8,7 +8,7 @@ match_maker = MatchMaker()
 
 
 @ws_router.websocket("/ws/{player_id}")
-async def websocket_endpoint(websocket: WebSocket, player_id: str):
+async def websocket_endpoint(websocket: WebSocket, player_id: int):
     await websocket.accept()
     await websocket.send_json({"type": "connected", "msg": f"Игрок {player_id} подключен к серверу"})
     await match_maker.add_player(websocket, player_id)

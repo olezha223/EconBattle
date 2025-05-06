@@ -1,4 +1,7 @@
+from starlette.websockets import WebSocket
+
 from src.models.users import Player, UserDTO
+from src.service import UserService, get_user_service
 from src.service.game.connection_manager import ConnectionManager
 import time
 import asyncio
@@ -9,15 +12,16 @@ from src.service.game.game import Game
 class MatchMaker:
     def __init__(self):
         self.manager = ConnectionManager()
-        self.games: dict[tuple[str, str], Game] = dict()
+        self.user_service = get_user_service()
+        self.games: dict[tuple[int, int], Game] = dict()
 
-    def _search_in_games(self, player_id: str) -> bool:
+    def _search_in_games(self, player_id: int) -> bool:
         for key in self.games.keys():
             if player_id in key:
                 return True
         return False
 
-    async def add_player(self, websocket, player_id):
+    async def add_player(self, websocket: WebSocket, player_id: int):
         self.manager.add_connection(player_id, websocket)
         start_waiting_time = time.time()
         while (
@@ -45,15 +49,11 @@ class MatchMaker:
             await player_2.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_1}"})
 
             # начать игру
+            user_1 = await self.user_service.get_user(player_id_1)
+            user_2 = await self.user_service.get_user(player_id_2)
             game = Game(
-                player1=Player(
-                    user=UserDTO(id=int(player_id_1), username="user", student_rating=1000, teacher_rating=1000),
-                    websocket=player_1
-                ),
-                player2=Player(
-                    user=UserDTO(id=int(player_id_2), username="user", student_rating=1000, teacher_rating=1000),
-                    websocket=player_2
-                )
+                player1=Player(user=user_1, websocket=player_1),
+                player2=Player(user=user_2, websocket=player_2)
             )
             self.games[(player_id_1, player_id_2)] = game
             print(f'Состояние переменной для игр на момент создания: {self.games}')
