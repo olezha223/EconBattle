@@ -22,6 +22,12 @@ class UserService:
         self.task_repo = task_repo
         self.competitions_repo = competitions_repo
 
+    async def update_student_rating(self, rating_difference: int, user_id: int) -> None:
+        await self.user_repo.update_student_rating(rating_difference, user_id)
+
+    async def update_teacher_rating(self, rating_difference: int, user_id: int) -> None:
+        await self.user_repo.update_teacher_rating(rating_difference, user_id)
+
     async def create_user(self, user_id: str, username: str):
         await self.user_repo.create(model=UserDTO(id=user_id, username=username), orm=User)
 

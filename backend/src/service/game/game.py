@@ -2,56 +2,59 @@ import asyncio
 
 from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
 
-from src.database.schemas import Competition
-from src.models.competition import CompetitionDTO
-from src.models.game import EventType
+from src.models.game import EventType, GameDTO
 from src.models.problems import TaskDTO, TaskWithoutAnswers
+from src.models.round import StatusEnum, RoundDTO
 from src.models.users import UserDTO, Player
-from src.repository.competitions import CompetitionsRepo
-from src.repository.tasks import TaskRepo
-from src.service import TaskService, get_task_service
-from tests.conftest import task_repo
+from src.service import get_task_service, get_game_service, get_competition_service, get_user_service, get_round_service
 
 
 class Game:
     def __init__(self, player1: Player, player2: Player, competition_id: int):
         self.task_service = get_task_service()
+        self.game_service = get_game_service()
+        self.competition_service = get_competition_service()
+        self.user_service = get_user_service()
+        self.round_service = get_round_service()
+
+        self.user_1_id = player1.user.id
+        self.user_2_id = player2.user.id
+
         self.players: dict[str, UserDTO] = {
-            player1.user.id: player1.user,
-            player2.user.id: player2.user
+            self.user_1_id: player1.user,
+            self.user_2_id: player2.user,
         }
         self.sockets: dict[str, WebSocket] = {
-            player1.user.id: player1.websocket,
-            player2.user.id: player2.websocket
+            self.user_1_id: player1.websocket,
+            self.user_2_id: player2.websocket
         }
         self.locks: dict[int, asyncio.Lock] = {
-            player1.user.id: asyncio.Lock(),
-            player2.user.id: asyncio.Lock()
+            self.user_1_id: asyncio.Lock(),
+            self.user_2_id: asyncio.Lock()
         }
-        self.competition_repo = CompetitionsRepo()
+
+        self.player_final_info: dict[str, str] = {
+            self.user_1_id: {"status": StatusEnum.TIE.value, "diff": 0},
+            self.user_2_id: {"status": StatusEnum.TIE.value, "diff": 0},
+        }
+
         self.competition_id = competition_id
-
         self.competition = None
-        self.tasks_markup = {}
 
-        self.rounds = []
+        self.round_ids = []
         self.current_round = 0
         self.scores = {player1.user.id: 0, player2.user.id: 0}
         self.wins = {player1.user.id: 0, player2.user.id: 0}
 
     async def start(self):
-        self.competition = await self.competition_repo.get(
-            self.competition_id,
-            model_class=CompetitionDTO,
-            orm_class=Competition
-        )
-        self.tasks_markup = self.competition.tasks_markup
+        self.competition = await self.competition_service.get_competition(self.competition_id)
         try:
             await self._notify_players("Game", data={"msg": "Идет процесс игры"})
             while self.current_round < self.competition.max_rounds:
                 print(f"Начинаем раунд {self.current_round}")
                 await self._start_round()
                 self.current_round += 1
+            await self._end_game()
         except asyncio.CancelledError:
             # Обработка прерывания игры
             print("Игра прервана")
@@ -84,7 +87,7 @@ class Game:
     async def _get_problems_for_round(self) -> list[TaskWithoutAnswers]:
         tasks = [
             await self.task_service.get(task_id) for task_id in
-            self.tasks_markup[self.current_round + 1]
+            self.competition.tasks_markup[self.current_round + 1]
         ]
         return tasks
 
@@ -94,12 +97,12 @@ class Game:
             event_type="Start Round",
             data={
                 "problems": [self.task_service.get_task_without_answers(p).model_dump() for p in problems],
-                "time_limit": 120
+                "time_limit": self.competition.round_time_in_seconds - 10
             }
         )
 
         # Бэкенд ждет на 10 секунд дольше
-        answers = await self._collect_answers(timeout=130)
+        answers = await self._collect_answers(timeout=self.competition.round_time_in_seconds)
 
         print(answers)
         scores = self._calculate_scores(answers, problems)
@@ -159,10 +162,10 @@ class Game:
                 problem_id = problem.id
                 answer_list = user_answer.get(str(problem_id), None)
                 if answer_list:
-                    print("----")
-                    print(problem.correct_value.get("answers", []))
-                    print(answer_list)
-                    print("----")
+                    # print("----")
+                    # print(problem.correct_value.get("answers", []))
+                    # print(answer_list)
+                    # print("----")
                     if answer_list == problem.correct_value.get("answers", []):
                         scores[pid] += problem.price
         return scores
@@ -170,10 +173,27 @@ class Game:
     async def _update_scores(self, scores: dict):
         """Обновление счетчиков побед"""
         max_score = max(scores.values())
+        status_player_1 = StatusEnum.TIE.value
+        status_player_2 = StatusEnum.TIE.value
         for pid, score in scores.items():
             self.scores[pid] += score
             if score == max_score and score > 0:
+                if pid == self.user_1_id:
+                    status_player_1 = StatusEnum.WINNER.value
+                    status_player_2 = StatusEnum.LOSER.value
+                else:
+                    status_player_2 = StatusEnum.WINNER.value
+                    status_player_1 = StatusEnum.LOSER.value
                 self.wins[pid] += 1
+
+        round_dto = RoundDTO(
+            points_player_1=self.user_1_id,
+            points_player_2=self.user_2_id,
+            status_player_1=status_player_1,
+            status_player_2=status_player_2
+        )
+        round_id = await self.round_service.create(round_dto)
+        self.round_ids.append(round_id)
 
         # Отправка результатов раунда
         results = {
@@ -184,54 +204,46 @@ class Game:
         for ws in self.sockets.values():
             await ws.send_json(results)
 
-    # async def _end_game(self):
-    #     """Финализация игры и обновление рейтингов"""
-    #     winner_id = max(self.wins, key=self.wins.get)
-    #     if self.wins[winner_id] < 2:
-    #         winner_id = None  # Ничья, если никто не набрал 2 победы
-    #
-    #     # Сохранение матча в БД
-    #     async with get_session() as session:
-    #         match = Match(
-    #             player1_id=self.players[list(self.players)[0]].id,
-    #             player2_id=self.players[list(self.players)[1]].id,
-    #             winner_id=winner_id
-    #         )
-    #         session.add(match)
-    #         await session.commit()
-    #
-    #         # Сохранение раундов
-    #         for round_num in range(self.current_round):
-    #             await session.execute(
-    #                 insert(Round).values(
-    #                     match_id=match.id,
-    #                     round_number=round_num,
-    #                     problems=json.dumps(
-    #                         [p["id"] for p in self.rounds[round_num]["problems"]]
-    #                     ),
-    #                     player1_score=self.rounds[round_num]["scores"][list(self.players)[0]],
-    #                     player2_score=self.rounds[round_num]["scores"][list(self.players)[1]]
-    #                 )
-    #             )
-    #         await session.commit()
-    #
-    #     # Обновление рейтинга
-    #     if winner_id:
-    #         await self._update_rating(winner_id)
-    #
-    #     # Отправка финальных результатов
-    #     final_message = {
-    #         "type": EventType.GAME_END.value,
-    #         "winner_id": winner_id,
-    #         "final_scores": self.scores
-    #     }
-    #     for ws in self.sockets.values():
-    #         await ws.send_json(final_message)
+    def get_final_msg(self, pid: str):
+        return {
+            "type": EventType.GAME_END.value,
+            "status": self.player_final_info[pid]['status'],
+            "diff": self.player_final_info[pid]['diff'],
+            "final_scores": self.scores
+        }
 
-    # async def _update_rating(self, winner_id: int):
-    #     """Обновление рейтинга в БД"""
-    #     async with get_session() as session:
-    #         for pid in self.players:
-    #             user = await session.get(User, pid)
-    #             user.rating += 10 if pid == winner_id else -10
-    #         await session.commit()
+
+    async def _end_game(self):
+        """Финализация игры и обновление рейтингов"""
+        winner_id = max(self.wins, key=self.wins.get)
+        if self.wins[winner_id] < 2:
+            pass
+        elif winner_id == self.user_1_id:
+            self.player_final_info[self.user_1_id] = {"status": StatusEnum.WINNER.value, "diff": 10}
+            self.player_final_info[self.user_2_id] = {"status": StatusEnum.LOSER.value, "diff": -10}
+        else:
+            self.player_final_info[self.user_1_id] = {"status": StatusEnum.LOSER.value, "diff": -10}
+            self.player_final_info[self.user_2_id] = {"status": StatusEnum.WINNER.value, "diff": 10}
+
+        # Отправка финальных результатов
+        for pid, ws in self.sockets.items():
+            await ws.send_json(self.get_final_msg(pid))
+
+        game_dto = GameDTO(
+            competition_id=self.competition_id,
+            player_1=self.user_1_id,
+            player_2=self.user_2_id,
+            rounds=self.round_ids,
+            status_player_1=self.player_final_info[self.user_1_id]['status'],
+            status_player_2=self.player_final_info[self.user_2_id]['status'],
+            rating_difference_player_1=self.player_final_info[self.user_1_id]['diff'],
+            rating_difference_player_2=self.player_final_info[self.user_2_id]['diff'],
+        )
+        await self.game_service.create_game(game_dto)
+        await self._update_rating()
+
+    async def _update_rating(self):
+        for pid in self.players.keys():
+            diff = self.player_final_info[pid]['diff']
+            await self.user_service.update_student_rating(diff, pid)
+
