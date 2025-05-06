@@ -9,8 +9,8 @@ class EventType(Enum):
 
 class GameDTO(BaseModel):
     competition_id: int
-    player_1: int
-    player_2: int
+    player_1: str
+    player_2: str
     rounds: list[int]
     status_player_1: str
     status_player_2: str

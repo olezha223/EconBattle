@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class CompetitionDTO(BaseModel):
     name: str
-    creator_id: int
+    creator_id: str
     # settings
     max_players: int
     max_rounds: int

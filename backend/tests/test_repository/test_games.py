@@ -5,8 +5,8 @@ from tests.conftest import create_rounds, games_repo
 
 game_1 = GameDTO(
     competition_id=1,
-    player_1=1,
-    player_2=2,
+    player_1='1',
+    player_2='2',
     rounds=[1, ],
     status_player_1=StatusEnum.WINNER.value,
     status_player_2=StatusEnum.LOSER.value,
@@ -16,8 +16,8 @@ game_1 = GameDTO(
 
 game_2 = GameDTO(
     competition_id=1,
-    player_1=1,
-    player_2=2,
+    player_1='1',
+    player_2='2',
     rounds=[2, 3],
     status_player_1=StatusEnum.WINNER.value,
     status_player_2=StatusEnum.LOSER.value,

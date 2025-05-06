@@ -16,15 +16,15 @@ class MatchMaker:
         self.manager = ConnectionManager()
         self.user_service = get_user_service()
         self.game_queue: QueueInterface = RedisQueue()
-        self.games: dict[tuple[int, int], Game] = dict()
+        self.games: dict[tuple[str, str], Game] = dict()
 
-    def _search_in_games(self, player_id: int) -> bool:
+    def _search_in_games(self, player_id: str) -> bool:
         for key in self.games.keys():
             if player_id in key:
                 return True
         return False
 
-    async def add_player(self, websocket: WebSocket, player_id: int, competition_id: int):
+    async def add_player(self, websocket: WebSocket, player_id: str, competition_id: int):
         # добавить игрока в активные соединения
         self.manager.add_connection(player_id, websocket)
         # добавить игроку в очередь для данного соревнования

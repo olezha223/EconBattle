@@ -19,7 +19,7 @@ class RepoInterface:
             )
             return result.scalar()
 
-    async def get(self, object_id: int, orm_class: Type[Base], model_class: Type[BaseModel]) -> Optional[BaseModel]:
+    async def get(self, object_id: int | str, orm_class: Type[Base], model_class: Type[BaseModel]) -> Optional[BaseModel]:
         async with self.session_getter() as session:
             result = await session.execute(
                 select(orm_class)

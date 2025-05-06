@@ -96,20 +96,20 @@ async def user_service(user_repo, task_repo, competition_repo, games_repo):
 # блок с данными
 @pytest.fixture
 async def user_1_dto():
-    return UserDTO(id=1, username="user_1",student_rating=1000,teacher_rating=1000)
+    return UserDTO(id='1', username="user_1",student_rating=1000,teacher_rating=1000)
 
 @pytest.fixture
 async def user_2_dto():
-    return UserDTO(id=2, username="user_2",student_rating=1000,teacher_rating=1000)
+    return UserDTO(id='2', username="user_2",student_rating=1000,teacher_rating=1000)
 
 @pytest.fixture
 async def user_3_dto():
-    return UserDTO(id=3, username="user_3", student_rating=1000, teacher_rating=1000)
+    return UserDTO(id='3', username="user_3", student_rating=1000, teacher_rating=1000)
 
 @pytest.fixture
 async def task_1_dto():
     return TaskDTO(
-        creator_id=1,
+        creator_id='1',
         name="test",
         text="test",
         price=1000,
@@ -123,7 +123,7 @@ async def task_1_dto():
 @pytest.fixture
 async def task_2_dto():
     return TaskDTO(
-        creator_id=2,
+        creator_id='2',
         name="test-2",
         text="test-2",
         price=1000,
@@ -136,7 +136,7 @@ async def task_2_dto():
 @pytest.fixture
 async def task_3_dto():
     return TaskDTO(
-        creator_id=2,
+        creator_id='2',
         name="test-3",
         text="test-3",
         price=1000,
@@ -150,7 +150,7 @@ async def task_3_dto():
 async def competition_1_dto():
     return CompetitionDTO(
         name='тестовое соревнование с одним раундом с 1 задачей',
-        creator_id=1,
+        creator_id='1',
         # settings
         max_players=2,
         max_rounds=1,
@@ -162,7 +162,7 @@ async def competition_1_dto():
 async def competition_2_dto():
     return CompetitionDTO(
         name='тестовое соревнование с двумя раундами с 1 и 2 задачами соответственно',
-        creator_id=2,
+        creator_id='2',
         # settings
         max_players=2,
         max_rounds=2,
@@ -209,12 +209,12 @@ async def user_info_1_dto(user_1_dto):
 # фикстуры для вставки данных
 @pytest.fixture
 async def create_users(user_repo, user_1_dto, user_2_dto, user_3_dto):
-    user_id_1 = await user_repo.create_with_username(username="user_1")
-    user_id_2 = await user_repo.create_with_username(username="user_2")
-    user_id_3 = await user_repo.create_with_username(username="user_3")
-    assert user_id_1 == 1
-    assert user_id_2 == 2
-    assert user_id_3 == 3
+    user_id_1 = await user_repo.create_with_username(username="user_1", id='1')
+    user_id_2 = await user_repo.create_with_username(username="user_2", id='2')
+    user_id_3 = await user_repo.create_with_username(username="user_3", id='3')
+    assert user_id_1 == '1'
+    assert user_id_2 == '2'
+    assert user_id_3 == '3'
 
     user_1 = await user_repo.get_by_username(username="user_1")
     user_2 = await user_repo.get_by_username(username="user_2")

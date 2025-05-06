@@ -16,8 +16,11 @@ class UserRepo(RepoInterface):
             if scalar:
                 return UserDTO.model_validate(scalar, from_attributes=True)
 
-    async def create_with_username(self, username) -> int:
+    async def create_with_username(self, username: str, id: str) -> str:
         async with self.session_getter() as session:
-            stmt = insert(User).values(username=username).returning(User.id)
-            result = await session.execute(stmt)
-            return result.scalar_one_or_none()
+            user = await self.get(object_id=id, orm_class=User, model_class=UserDTO)
+            if not user:
+                stmt = insert(User).values(username=username, id=id).returning(User.id)
+                result = await session.execute(stmt)
+                return result.scalar_one_or_none()
+            return user.id

@@ -19,7 +19,7 @@ class AnswerTypeEnum(str, Enum):
 
 
 class TaskDTO(BaseModel):
-    creator_id: int
+    creator_id: str
     name: str
     text: str
     price: int

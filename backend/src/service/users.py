@@ -22,13 +22,13 @@ class UserService:
         self.task_repo = task_repo
         self.competitions_repo = competitions_repo
 
-    async def create_user(self, user_id: int, username: str):
+    async def create_user(self, user_id: str, username: str):
         await self.user_repo.create(model=UserDTO(id=user_id, username=username), orm=User)
 
-    async def get_user(self, user_id: int) -> Optional[UserDTO]:
+    async def get_user(self, user_id: str) -> Optional[UserDTO]:
         return await self.user_repo.get(object_id=user_id, orm_class=User, model_class=UserDTO)
 
-    async def get_user_information(self, user_id: int) -> UserExtended:
+    async def get_user_information(self, user_id: str) -> UserExtended:
         user_base_info = await self.user_repo.get(object_id=user_id, orm_class=User, model_class=UserDTO)
         played_games = await self.games_repo.get_played_games(user_id)
         created_competitions = await self.competitions_repo.get_created_competitions(user_id)

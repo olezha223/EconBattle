@@ -13,7 +13,7 @@ match_maker = MatchMaker()
 @ws_router.websocket("/")
 async def websocket_endpoint(
         websocket: WebSocket,
-        player_id: int = Query(..., alias="user_id", description="ID of the player"),
+        player_id: str = Query(..., alias="user_id", description="ID of the player"),
         competition_id: int = Query(..., alias="competition_id", description="ID of the competition")
 ):
     await websocket.accept()

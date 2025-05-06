@@ -2,7 +2,7 @@
 INIT_COMMANDS = [
     """
     CREATE TABLE users (
-        id SERIAL PRIMARY KEY,
+        id TEXT PRIMARY KEY,
         username TEXT NOT NULL,
         student_rating INTEGER NOT NULL DEFAULT 1000,
         teacher_rating INTEGER NOT NULL DEFAULT 1000,
@@ -13,7 +13,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE tasks (
         id SERIAL PRIMARY KEY,
-        creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         name TEXT NOT NULL,
         text TEXT NOT NULL,
         price INTEGER,
@@ -27,7 +27,7 @@ INIT_COMMANDS = [
     CREATE TABLE competitions (
         id SERIAL PRIMARY KEY,
         name VARCHAR NOT NULL,
-        creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         -- competition settings
         max_players INTEGER NOT NULL,
         max_rounds INTEGER NOT NULL,
@@ -48,8 +48,8 @@ INIT_COMMANDS = [
     CREATE TABLE games (
         id SERIAL PRIMARY KEY,
         competition_id INTEGER NOT NULL REFERENCES competitions(id) ON DELETE CASCADE,
-        player_1 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        player_2 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        player_1 TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        player_2 TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         rounds INTEGER[] NOT NULL DEFAULT ARRAY[]::INTEGER[],
         status_player_1 VARCHAR NOT NULL,
         status_player_2 VARCHAR NOT NULL,

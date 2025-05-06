@@ -3,7 +3,7 @@ from fastapi import WebSocket
 
 
 class UserDTO(BaseModel):
-    id: int
+    id: str
     username: str
     student_rating: int = Field(default=1000)
     teacher_rating: int = Field(default=1000)
