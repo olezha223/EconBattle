@@ -1,10 +1,11 @@
 import json
-from fastapi import APIRouter, Header, HTTPException, Depends
+from fastapi import APIRouter, Header, HTTPException, Depends, Query
 from starlette.config import Config
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from src.config import configuration
+from src.models.users import UserDTO
 from src.service import get_user_service
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
@@ -21,6 +22,15 @@ oauth.register(
 router_user = APIRouter()
 
 service = get_user_service()
+
+@router_user.post(
+    path='/user',
+)
+async def create_new_user(
+        user_id: str =  Query(..., title='User ID'),
+        username: str = Query(..., title='Username'),
+) -> None:
+    return await service.create_user(user_id=user_id, username=username)
 
 @router_user.get('/')
 async def homepage(request: Request):
