@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi import WebSocket
 
 
 class UserDTO(BaseModel):
     id: int
     username: str
-    student_rating: int
-    teacher_rating: int
+    student_rating: int = Field(default=1000)
+    teacher_rating: int = Field(default=1000)
 
 class UserExtended(UserDTO):
     played_games: list[int]

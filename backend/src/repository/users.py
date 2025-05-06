@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import select, insert
 
 from src.database.schemas import User
@@ -6,12 +8,13 @@ from src.repository import RepoInterface
 
 
 class UserRepo(RepoInterface):
-    async def get_by_username(self, username: str) -> UserDTO:
+    async def get_by_username(self, username: str) -> Optional[UserDTO]:
         async with self.session_getter() as session:
             stmt = select(User).where(User.username == username)
             result = await session.execute(stmt)
             scalar = result.scalar_one_or_none()
-            return UserDTO.model_validate(scalar, from_attributes=True)
+            if scalar:
+                return UserDTO.model_validate(scalar, from_attributes=True)
 
     async def create_with_username(self, username) -> int:
         async with self.session_getter() as session:

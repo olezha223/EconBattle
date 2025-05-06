@@ -47,11 +47,11 @@ class MatchMaker:
             # начать игру
             game = Game(
                 player1=Player(
-                    user=UserDTO(id=int(player_id_1), username="Oleg", rating=1000),
+                    user=UserDTO(id=int(player_id_1), username="user", student_rating=1000, teacher_rating=1000),
                     websocket=player_1
                 ),
                 player2=Player(
-                    user=UserDTO(id=int(player_id_2), username="Misha", rating=1100),
+                    user=UserDTO(id=int(player_id_2), username="user", student_rating=1000, teacher_rating=1000),
                     websocket=player_2
                 )
             )

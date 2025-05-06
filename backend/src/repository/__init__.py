@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Optional
 
 from pydantic import BaseModel
 from sqlalchemy import insert, select
@@ -19,11 +19,12 @@ class RepoInterface:
             )
             return result.scalar()
 
-    async def get(self, object_id: int, orm_class: Type[Base], model_class: Type[BaseModel]) -> BaseModel:
+    async def get(self, object_id: int, orm_class: Type[Base], model_class: Type[BaseModel]) -> Optional[BaseModel]:
         async with self.session_getter() as session:
             result = await session.execute(
                 select(orm_class)
                 .where(orm_class.id == object_id)
             )
-            result_data = result.scalar()
-            return model_class.model_validate(result_data, from_attributes=True)
+            result_data = result.scalar_one_or_none()
+            if result_data:
+                return model_class.model_validate(result_data, from_attributes=True)

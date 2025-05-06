@@ -1,3 +1,5 @@
+from typing import Optional
+
 from src.database.schemas import User
 from src.models.round import StatusEnum
 from src.models.users import UserDTO, UserExtended, UserStatistics
@@ -19,6 +21,12 @@ class UserService:
         self.games_repo = games_repo
         self.task_repo = task_repo
         self.competitions_repo = competitions_repo
+
+    async def create_user(self, user_id: int, username: str):
+        await self.user_repo.create(model=UserDTO(id=user_id, username=username), orm=User)
+
+    async def get_user(self, user_id: int) -> Optional[UserDTO]:
+        return await self.user_repo.get(object_id=user_id, orm_class=User, model_class=UserDTO)
 
     async def get_user_information(self, user_id: int) -> UserExtended:
         user_base_info = await self.user_repo.get(object_id=user_id, orm_class=User, model_class=UserDTO)

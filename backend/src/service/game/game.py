@@ -2,14 +2,14 @@ import asyncio
 
 from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
 from src.models.game import EventType
-from src.models.problems import ProblemDTO
+from src.models.problems import TaskDTO
 from src.models.users import UserDTO, Player
-from src.repository.problems import ProblemRepo
+from src.repository.tasks import TaskRepo
 
 
 class Game:
     def __init__(self, player1: Player, player2: Player):
-        self.problems_repo = ProblemRepo()
+        self.problems_repo = TaskRepo()
         self.players: dict[int, UserDTO] = {
             player1.user.id: player1.user,
             player2.user.id: player2.user
@@ -127,7 +127,7 @@ class Game:
             except (WebSocketDisconnect, RuntimeError):
                 return player_id, []
 
-    def _calculate_scores(self, answers: dict, problems: list[ProblemDTO]) -> dict:
+    def _calculate_scores(self, answers: dict, problems: list[TaskDTO]) -> dict:
         """Расчет очков за раунд"""
         scores = {pid: 0 for pid in self.players}
         for pid, user_answer in answers.items():

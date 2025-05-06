@@ -6,6 +6,12 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
 
+from src.repository.competitions import CompetitionsRepo
+from src.repository.games import GamesRepo
+from src.repository.tasks import TaskRepo
+from src.repository.users import UserRepo
+from src.service import UserService
+
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="!secret")
 
@@ -21,6 +27,7 @@ oauth.register(
     }
 )
 
+service = UserService(user_repo=UserRepo(), games_repo=GamesRepo(), task_repo=TaskRepo(), competitions_repo=CompetitionsRepo())
 
 @app.get('/')
 async def homepage(request: Request):
@@ -48,8 +55,12 @@ async def auth(request: Request):
     except OAuthError as error:
         return HTMLResponse(f'<h1>{error.error}</h1>')
     user = token.get('userinfo')
+    # получить информацию о юзере
     if user:
         request.session['user'] = dict(user)
+        user_info = await service.get_user(user_id=user.get("sub"))
+        if not user_info:
+            await service.create_user(user_id=user.get("sub"), username=user.get("name"))
     return RedirectResponse(url='/')
 
 
