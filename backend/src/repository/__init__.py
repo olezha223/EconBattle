@@ -11,7 +11,7 @@ class RepoInterface:
     def __init__(self, session_getter=get_session):
         self.session_getter = session_getter
 
-    async def create(self, model: BaseModel, orm: Type[Base]) -> int:
+    async def create(self, model: BaseModel, orm: Type[Base]) -> int | str:
         async with self.session_getter() as session:
             result = await session.execute(
                 insert(orm).values(**model.model_dump())

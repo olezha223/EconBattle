@@ -239,9 +239,9 @@ async def user_info_1_dto(user_1_dto):
 # фикстуры для вставки данных
 @pytest.fixture
 async def create_users(user_repo, user_1_dto, user_2_dto, user_3_dto):
-    user_id_1 = await user_repo.create_with_username(username="user_1", id='1')
-    user_id_2 = await user_repo.create_with_username(username="user_2", id='2')
-    user_id_3 = await user_repo.create_with_username(username="user_3", id='3')
+    user_id_1 = await user_repo.create_with_username(username="user_1", user_id='1')
+    user_id_2 = await user_repo.create_with_username(username="user_2", user_id='2')
+    user_id_3 = await user_repo.create_with_username(username="user_3", user_id='3')
     assert user_id_1 == '1'
     assert user_id_2 == '2'
     assert user_id_3 == '3'

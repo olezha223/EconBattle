@@ -8,12 +8,15 @@ from src.repository import RepoInterface
 
 
 class UserRepo(RepoInterface):
-    async def update_student_rating(self, rating_difference: int, user_id: int) -> None:
+    async def get_by_id(self, user_id: str) -> Optional[UserDTO]:
+        return await self.get(object_id=user_id, orm_class=User, model_class=UserDTO)
+
+    async def update_student_rating(self, rating_difference: int, user_id: str) -> None:
         stmt = update(User).where(User.id == user_id).values(student_rating=User.student_rating + rating_difference)
         async with self.session_getter() as session:
             await session.execute(stmt)
 
-    async def update_teacher_rating(self, rating_difference: int, user_id: int) -> None:
+    async def update_teacher_rating(self, rating_difference: int, user_id: str) -> None:
         stmt = update(User).where(User.id == user_id).values(teacher_rating=User.teacher_rating + rating_difference)
         async with self.session_getter() as session:
             await session.execute(stmt)
@@ -26,11 +29,8 @@ class UserRepo(RepoInterface):
             if scalar:
                 return UserDTO.model_validate(scalar, from_attributes=True)
 
-    async def create_with_username(self, username: str, id: str) -> str:
-        async with self.session_getter() as session:
-            user = await self.get(object_id=id, orm_class=User, model_class=UserDTO)
-            if not user:
-                stmt = insert(User).values(username=username, id=id).returning(User.id)
-                result = await session.execute(stmt)
-                return result.scalar_one_or_none()
-            return user.id
+    async def create_with_username(self, username: str, user_id: str) -> str:
+        get_result = await self.get_by_id(user_id)
+        if get_result:
+            return get_result.id
+        return await self.create(model=UserDTO(username=username, id=user_id), orm=User)
