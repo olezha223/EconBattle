@@ -1,16 +1,45 @@
 from typing import Optional
-
-from src.database.schemas import Competition
-from src.models.competition import CompetitionDTO
+from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition
 from src.repository.competitions import CompetitionsRepo
+from src.repository.games import GamesRepo
 
 
 class CompetitionService:
-    def __init__(self, competition_repo: CompetitionsRepo):
+    def __init__(self, competition_repo: CompetitionsRepo, games_repo: GamesRepo):
         self.competition_repo = competition_repo
+        self.games_repo = games_repo
 
     async def get_competition(self, competition_id: int) -> Optional[CompetitionDTO]:
-        return await self.competition_repo.get(competition_id, Competition, CompetitionDTO)
+        return await self.competition_repo.get_by_id(competition_id)
 
-    async def create_competition(self, competition: CompetitionDTO) -> int:
-        return await self.competition_repo.create(competition, Competition)
+    async def create_competition(self, competition: NewCompetition) -> int:
+        return await self.competition_repo.create_competition(competition)
+
+    async def get_all_competitions_created_by_user(self, user_id: str) -> list[CompetitionDTO]:
+        return await self.competition_repo.get_all_competitions_created_by_user(user_id)
+
+    async def get_all_competitions(self) -> list[CompetitionDTO]:
+        return await self.competition_repo.get_all_competitions()
+
+    async def get_all_competitions_previews_for_user(self, user_id: str) -> list[CompetitionPreview]:
+        competitions = await self.get_all_competitions_created_by_user(user_id)
+        return await self._get_previews(competitions)
+
+    async def get_all_competitions_previews(self) -> list[CompetitionPreview]:
+        competitions = await self.get_all_competitions()
+        return await self._get_previews(competitions)
+
+    async def _get_previews(self, competitions: list[CompetitionDTO]) -> list[CompetitionPreview]:
+        result = []
+        for competition in competitions:
+            games_played = await self.games_repo.get_played_games_in_competition(competition_id=competition.id)
+            unique_players = await self.games_repo.get_unique_players(games_played)
+            preview = CompetitionPreview(
+                id=competition.id,
+                name=competition.name,
+                created_at=competition.created_at,
+                games_played=len(games_played),
+                unique_players=len(unique_players)
+            )
+            result.append(preview)
+        return result

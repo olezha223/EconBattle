@@ -1,14 +1,39 @@
 from typing import List
 
-from sqlalchemy import select
+from sqlalchemy import select, insert
 
 from src.database.schemas import Competition
+from src.models.competition import CompetitionDTO, NewCompetition
 from src.repository import RepoInterface
 
 
 class CompetitionsRepo(RepoInterface):
+    async def create_competition(self, competition: NewCompetition) -> int:
+        stmt = insert(Competition).values(**competition.model_dump()).returning(Competition.id)
+        async with self.session_getter() as session:
+            result = await session.execute(stmt)
+            return result.scalar_one()
+
+    async def get_by_id(self, competition_id: int) -> CompetitionDTO:
+        competition = await self.get(competition_id, orm_class=Competition, model_class=CompetitionDTO)
+        if not competition:
+            raise ValueError(f"Competition with id {competition_id} not found")
+        return competition
+
+    async def get_all_competitions_created_by_user(self, user_id: str) -> list[CompetitionDTO]:
+        stmt = select(Competition).where(Competition.creator_id == user_id)
+        async with self.session_getter() as session:
+            result = await session.execute(stmt)
+            return result.scalars().fetchall()
+
     async def get_created_competitions(self, user_id: str) -> List[int]:
         stmt = select(Competition.id).where(Competition.creator_id == user_id)
+        async with self.session_getter() as session:
+            result = await session.execute(stmt)
+            return result.scalars().fetchall()
+
+    async def get_all_competitions(self) -> List[CompetitionDTO]:
+        stmt = select(Competition).order_by(Competition.created_at)
         async with self.session_getter() as session:
             result = await session.execute(stmt)
             return result.scalars().fetchall()

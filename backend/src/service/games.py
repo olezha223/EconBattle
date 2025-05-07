@@ -1,11 +1,37 @@
+from typing import List
+
 from src.database.schemas import Game
-from src.models.game import GameDTO
+from src.models.game import GameDTO, GameDTOExtended
+from src.repository.competitions import CompetitionsRepo
 from src.repository.games import GamesRepo
+from src.repository.rounds import RoundsRepo
+from src.repository.users import UserRepo
 
 
 class GameService:
-    def __init__(self, game_repo: GamesRepo):
+    def __init__(
+            self,
+            game_repo: GamesRepo,
+            round_repo: RoundsRepo,
+            user_repo: UserRepo,
+            competition_repo: CompetitionsRepo
+    ):
         self.game_repo = game_repo
+        self.round_repo = round_repo
+        self.competition_repo = competition_repo
+        self.user_repo = user_repo
 
     async def create_game(self, model: GameDTO) -> int:
         return await self.game_repo.create(model, orm=Game)
+
+    async def get_all(self, user_id: str) -> List[GameDTOExtended]:
+        game_ids = await self.game_repo.get_played_games_by_user(user_id=user_id)
+        result = []
+        for game_id in game_ids:
+            game = await self.game_repo.get_by_id(game_id)
+            round_data = []
+            for round_id in game.rounds:
+                round_data.append(await self.round_repo.get_by_id(round_id))
+            competition = await self.competition_repo.get_by_id(game.competition_id)
+            creator = await self.user_repo.get_by_id(competition.creator_id)
+            creator_name = creator.username

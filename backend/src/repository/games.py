@@ -1,15 +1,40 @@
 from typing import List
 
-from sqlalchemy import select, or_, and_
+from sqlalchemy import select, or_, and_, union_all
 
 from src.database.schemas import Game
+from src.models.game import GameDTO
 from src.models.round import StatusEnum
 from src.repository import RepoInterface
 
 
 class GamesRepo(RepoInterface):
-    async def get_played_games(self, user_id: int) -> List[int]:
+    async def get_by_id(self, game_id: int) -> GameDTO:
+        return await self.get(object_id=game_id, orm_class=Game, model_class=GameDTO)
+
+    async def get_played_games_by_user(self, user_id: int) -> List[int]:
         stmt = select(Game.id).where(or_(Game.player_1 == user_id, Game.player_2 == user_id))
+        async with self.session_getter() as session:
+            result = await session.execute(stmt)
+            return result.scalars().fetchall()
+
+    async def get_played_games_in_competition(self, competition_id: int) -> List[int]:
+        stmt = select(Game.id).where(Game.competition_id == competition_id)
+        async with self.session_getter() as session:
+            result = await session.execute(stmt)
+            return result.scalars().fetchall()
+
+    async def get_unique_players(self, game_ids: List[int]) -> List[int]:
+        player1_subquery = (
+            select(Game.player_1.label('player'))
+            .where(Game.id.in_(game_ids))
+        )
+        player2_subquery = (
+            select(Game.player_2.label('player'))
+            .where(Game.id.in_(game_ids))
+        )
+        combined = union_all(player1_subquery, player2_subquery).alias('combined')
+        stmt = select(combined.c.player).distinct()
         async with self.session_getter() as session:
             result = await session.execute(stmt)
             return result.scalars().fetchall()

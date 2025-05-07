@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import List
+from fastapi import APIRouter, Depends, Query
 from starlette import status
 
-from src.models.competition import CompetitionDTO
+from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition
 from src.service import CompetitionService, get_competition_service
 
 router_competitions = APIRouter(
@@ -18,7 +19,7 @@ router_competitions = APIRouter(
     name="Create Competition",
 )
 async def create_competition(
-        competition: CompetitionDTO,
+        competition: NewCompetition,
         service: CompetitionService = Depends(get_competition_service),
 ) -> int:
     return await service.create_competition(competition)
@@ -35,3 +36,41 @@ async def get_competition_by_id(
         service: CompetitionService = Depends(get_competition_service),
 ) -> CompetitionDTO:
     return await service.get_competition(competition_id)
+
+
+@router_competitions.get(
+    path="/all",
+    description="Get all competitions previews for creator",
+    tags=["competitions"],
+    status_code=status.HTTP_200_OK,
+    name="Get all competitions previews",
+)
+async def get_all_competitions_previews_for_user(
+        user_id: str = Query(..., description="Creator ID"),
+        service: CompetitionService = Depends(get_competition_service),
+) -> List[CompetitionPreview]:
+    return await service.get_all_competitions_previews_for_user(user_id)
+
+@router_competitions.get(
+    path="/all",
+    description="Get all competitions previews",
+    tags=["competitions"],
+    status_code=status.HTTP_200_OK,
+    name="Get all competitions previews",
+)
+async def get_all_competitions_previews(
+        service: CompetitionService = Depends(get_competition_service),
+) -> List[CompetitionPreview]:
+    return await service.get_all_competitions_previews()
+
+@router_competitions.get(
+    path="/",
+    description="Get all competitions",
+    tags=["competitions"],
+    status_code=status.HTTP_200_OK,
+    name="Get all competitions",
+)
+async def get_all_competitions(
+        service: CompetitionService = Depends(get_competition_service),
+) -> List[CompetitionDTO]:
+    return await service.get_all_competitions()
