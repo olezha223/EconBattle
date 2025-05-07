@@ -29,3 +29,12 @@ async def test_get_user(user_service, create_users, user_1_dto):
 
     user_none = await user_service.get_user("none")
     assert user_none is None
+
+async def test_update_rating(user_service, create_users):
+    await user_service.update_teacher_rating(rating_difference=10000, user_id="1")
+    user_1 = await user_service.get_user("1")
+    assert user_1.teacher_rating == 11000
+
+    await user_service.update_student_rating(rating_difference=-10000, user_id="1")
+    user_1 = await user_service.get_user("1")
+    assert user_1.student_rating == 0
