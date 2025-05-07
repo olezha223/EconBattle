@@ -55,3 +55,8 @@ async def test_update_rating(create_users, user_repo):
     await user_repo.update_teacher_rating(rating_difference=-1000, user_id='2')
     user_2 = await user_repo.get_by_username("user_2")
     assert user_2.teacher_rating == 0
+
+
+async def test_large_update_rating(create_users, user_repo):
+    await user_repo.update_teacher_rating(rating_difference=-10000, user_id='1')
+    assert (await user_repo.get_by_username("user_1")).teacher_rating == 0

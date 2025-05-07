@@ -12,11 +12,23 @@ class UserRepo(RepoInterface):
         return await self.get(object_id=user_id, orm_class=User, model_class=UserDTO)
 
     async def update_student_rating(self, rating_difference: int, user_id: str) -> None:
+        actual_user = await self.get_by_id(user_id)
+        if actual_user is None:
+            raise ValueError(f"User {user_id} not found")
+        if actual_user.student_rating + rating_difference < 0:
+            rating_difference = - actual_user.student_rating
+
         stmt = update(User).where(User.id == user_id).values(student_rating=User.student_rating + rating_difference)
         async with self.session_getter() as session:
             await session.execute(stmt)
 
     async def update_teacher_rating(self, rating_difference: int, user_id: str) -> None:
+        actual_user = await self.get_by_id(user_id)
+        if actual_user is None:
+            raise ValueError(f"User {user_id} not found")
+        if actual_user.teacher_rating + rating_difference < 0:
+            rating_difference = - actual_user.teacher_rating
+
         stmt = update(User).where(User.id == user_id).values(teacher_rating=User.teacher_rating + rating_difference)
         async with self.session_getter() as session:
             await session.execute(stmt)
