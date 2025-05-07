@@ -53,6 +53,20 @@ async def get_all_competitions_previews_for_user(
 
 @router_competitions.get(
     path="/all",
+    description="Get all competitions for creator",
+    tags=["competitions"],
+    status_code=status.HTTP_200_OK,
+    name="Get all competitions for creator"
+)
+async def get_all_competitions_for_user(
+        user_id: str = Query(..., description="Creator ID"),
+        service: CompetitionService = Depends(get_competition_service),
+) -> List[CompetitionDTO]:
+    return await service.get_all_competitions_created_by_user(user_id)
+
+
+@router_competitions.get(
+    path="/all",
     description="Get all competitions previews",
     tags=["competitions"],
     status_code=status.HTTP_200_OK,
