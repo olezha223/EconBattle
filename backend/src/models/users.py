@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 from fastapi import WebSocket
 
@@ -9,12 +11,14 @@ class UserDTO(BaseModel):
     teacher_rating: int = Field(default=1000)
 
 class UserExtended(UserDTO):
+    created_at: datetime
     played_games: list[int]
     created_competitions: list[int]
     created_tasks: list[int]
 
 
 class UserStatistics(BaseModel):
+    created_at: datetime
     # статистика как игрока
     wins_count: int
     losses_count: int

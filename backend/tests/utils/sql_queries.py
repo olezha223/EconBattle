@@ -3,6 +3,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE users (
         id TEXT PRIMARY KEY,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         username TEXT NOT NULL,
         student_rating INTEGER NOT NULL DEFAULT 1000,
         teacher_rating INTEGER NOT NULL DEFAULT 1000
@@ -11,6 +12,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE tasks (
         id SERIAL PRIMARY KEY,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         name TEXT NOT NULL,
         text TEXT NOT NULL,
@@ -24,6 +26,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE competitions (
         id SERIAL PRIMARY KEY,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         name VARCHAR NOT NULL,
         creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         -- competition settings
@@ -36,6 +39,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE rounds (
         id SERIAL PRIMARY KEY,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         points_player_1 INTEGER NOT NULL,
         points_player_2 INTEGER NOT NULL,
         status_player_1 VARCHAR NOT NULL,
@@ -45,6 +49,7 @@ INIT_COMMANDS = [
     """
     CREATE TABLE games (
         id SERIAL PRIMARY KEY,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         competition_id INTEGER NOT NULL REFERENCES competitions(id) ON DELETE CASCADE,
         player_1 TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         player_2 TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

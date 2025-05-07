@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel
 
@@ -12,6 +13,7 @@ class EventType(Enum):
 
 class GameDTO(BaseModel):
     competition_id: int
+    created_at: datetime
     player_1: str
     player_2: str
     rounds: list[int]

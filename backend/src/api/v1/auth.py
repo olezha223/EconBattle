@@ -1,11 +1,9 @@
 import json
-from fastapi import APIRouter, Header, HTTPException, Depends, Query
+from fastapi import APIRouter, Query
 from starlette.config import Config
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
-from src.config import configuration
-from src.models.users import UserDTO
 from src.service import get_user_service
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
