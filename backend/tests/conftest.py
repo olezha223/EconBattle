@@ -6,11 +6,12 @@ import redis
 from sqlalchemy import text
 
 from src.config import configuration
+from src.models.game import GameDTO
 from src.repository.game_queue.redis_queue import RedisQueue
 from src.service import UserService
 from tests.utils.adapter import get_session_test
 from tests.utils.sql_queries import INIT_COMMANDS, CLEANUP_SCRIPTS
-from src.database.schemas import Round, Task, Competition
+from src.database.schemas import Round, Task, Competition, Game
 from src.models.competition import CompetitionDTO
 from src.repository.users import UserRepo
 from src.repository.tasks import TaskRepo
@@ -201,6 +202,32 @@ async def round_3_dto():
     )
 
 @pytest.fixture
+async def game_1_dto():
+    return GameDTO(
+        competition_id=1,
+        player_1='1',
+        player_2='2',
+        rounds=[1, ],
+        status_player_1=StatusEnum.WINNER.value,
+        status_player_2=StatusEnum.LOSER.value,
+        rating_difference_player_1=14,
+        rating_difference_player_2=-20
+    )
+
+@pytest.fixture
+async def game_2_dto():
+    return GameDTO(
+        competition_id=1,
+        player_1='1',
+        player_2='2',
+        rounds=[2, 3],
+        status_player_1=StatusEnum.WINNER.value,
+        status_player_2=StatusEnum.LOSER.value,
+        rating_difference_player_1=14,
+        rating_difference_player_2=-20
+    )
+
+@pytest.fixture
 async def user_info_1_dto(user_1_dto):
     return UserExtended(
         **user_1_dto.model_dump(),
@@ -276,6 +303,18 @@ async def create_rounds(create_competitions, round_repo, round_1_dto, round_2_dt
     assert round_2 == round_2_dto
     assert round_3 == round_3_dto
 
+
+@pytest.fixture
+async def create_games(create_rounds, games_repo, game_1_dto, game_2_dto):
+    dto_id_1 = await games_repo.create(model=game_1_dto, orm=Game)
+    dto_id_2 = await games_repo.create(model=game_2_dto, orm=Game)
+    assert dto_id_1 == 1
+    assert dto_id_2 == 2
+
+    dto_1 = await games_repo.get(object_id=dto_id_1, orm_class=Game, model_class=GameDTO)
+    dto_2 = await games_repo.get(object_id=dto_id_2, orm_class=Game, model_class=GameDTO)
+    assert dto_1 == game_1_dto
+    assert dto_2 == game_2_dto
 
 @pytest.fixture
 async def user_stats_1_dto(create_competitions):

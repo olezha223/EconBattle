@@ -1,6 +1,6 @@
 from src.database.schemas import Competition
 from src.models.competition import CompetitionDTO
-from tests.conftest import create_tasks, competition_repo, competition_1_dto, competition_2_dto
+from tests.conftest import create_tasks, competition_repo, competition_1_dto, competition_2_dto, create_competitions
 
 
 async def test_create(create_tasks, competition_repo, competition_1_dto):
@@ -30,12 +30,7 @@ async def test_get(create_tasks, competition_repo, competition_1_dto, competitio
     assert dto_2 == competition_2_dto
 
 
-async def test_get_created_competitions(create_tasks, competition_repo, competition_1_dto, competition_2_dto):
-    dto_id_1 = await competition_repo.create(model=competition_1_dto, orm=Competition)
-    dto_id_2 = await competition_repo.create(model=competition_2_dto, orm=Competition)
-    assert dto_id_1 == 1
-    assert dto_id_2 == 2
-
+async def test_get_created_competitions(create_competitions, competition_repo):
     assert await competition_repo.get_created_competitions('1') == [1]
     assert await competition_repo.get_created_competitions('2') == [2]
     assert await competition_repo.get_created_competitions('3') == []
