@@ -33,3 +33,8 @@ async def test_get(create_rounds, games_repo, game_1_dto, game_2_dto):
 async def test_get_played_games(create_games, games_repo):
     assert await games_repo.get_played_games('1') == [1, 2]
     assert await games_repo.get_played_games('2') == [1, 2]
+
+async def test_get_status_count(create_games, games_repo):
+    assert await games_repo.get_status_count('1', 'winner') == 2
+    assert await games_repo.get_status_count('2', 'loser') == 2
+    assert await games_repo.get_status_count('1000', 'winner') == 0
