@@ -1,22 +1,21 @@
-from src.database.schemas import Task
-from tests.conftest import create_users, task_repo, task_1_dto, task_2_dto, create_tasks
+from tests.conftest import create_users, task_repo, task_1_dto, task_2_dto, create_tasks, new_task_1_dto, new_task_2_dto
 
 
-async def test_create(create_users, task_repo, task_1_dto):
-    task_id = await task_repo.create(model=task_1_dto, orm=Task)
+async def test_create(create_users, task_repo, new_task_1_dto):
+    task_id = await task_repo.create_task(new_task_1_dto)
     assert task_id == 1
 
 
-async def test_create_multiple(create_users, task_repo, task_1_dto, task_2_dto):
-    task_id_1 = await task_repo.create(model=task_1_dto, orm=Task)
-    task_id_2 = await task_repo.create(model=task_2_dto, orm=Task)
+async def test_create_multiple(create_users, task_repo, new_task_1_dto, new_task_2_dto):
+    task_id_1 = await task_repo.create_task(new_task_1_dto)
+    task_id_2 = await task_repo.create_task(new_task_2_dto)
     assert task_id_1 == 1
     assert task_id_2 == 2
 
 
-async def test_get(create_users, task_repo, task_1_dto, task_2_dto):
-    task_id_1 = await task_repo.create(model=task_1_dto, orm=Task)
-    task_id_2 = await task_repo.create(model=task_2_dto, orm=Task)
+async def test_get(create_users, task_repo, task_1_dto, task_2_dto, new_task_1_dto, new_task_2_dto):
+    task_id_1 = await task_repo.create_task(new_task_1_dto)
+    task_id_2 = await task_repo.create_task(new_task_2_dto)
     assert task_id_1 == 1
     assert task_id_2 == 2
 
@@ -24,6 +23,9 @@ async def test_get(create_users, task_repo, task_1_dto, task_2_dto):
     task_2 = await task_repo.get_task_by_id(task_id_2)
     assert task_1 == task_1_dto
     assert task_2 == task_2_dto
+
+    task_none = await task_repo.get_task_by_id(13245)
+    assert task_none is None
 
 
 async def test_get_created_tasks(create_tasks, task_repo):

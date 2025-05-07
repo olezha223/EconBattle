@@ -1,6 +1,5 @@
 from typing import Optional, Any
-from src.database.schemas import Task
-from src.models.problems import TaskDTO, TaskWithoutAnswers
+from src.models.problems import TaskDTO, TaskWithoutAnswers, TaskFromAuthor
 from src.repository.tasks import TaskRepo
 
 
@@ -24,6 +23,8 @@ class TaskService:
         task = await self.get(task_id)
         return task.correct_value
 
+    async def create(self, task: TaskFromAuthor) -> int:
+        return await self.task_repo.create_task(task)
 
-    async def create(self, task: TaskDTO) -> int:
-        return await self.task_repo.create(model=task, orm=Task)
+    async def get_all(self, user_id: str) -> list[TaskDTO]:
+        return await self.task_repo.get_all(user_id)

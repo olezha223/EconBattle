@@ -18,6 +18,17 @@ class AnswerTypeEnum(str, Enum):
     LIST_FLOAT = "LIST_FLOAT"
 
 
+class TaskFromAuthor(BaseModel):
+    creator_id: str
+    name: str
+    text: str
+    price: int
+    task_type: str
+    value: dict[str, Any]
+    answer_type: str
+    correct_value: dict[str, Any]
+
+
 class TaskWithoutAnswers(BaseModel):
     id: int
     creator_id: str

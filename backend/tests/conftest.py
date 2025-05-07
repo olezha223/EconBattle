@@ -8,7 +8,7 @@ from sqlalchemy import text
 from src.config import configuration
 from src.models.game import GameDTO
 from src.repository.game_queue.redis_queue import RedisQueue
-from src.service import UserService
+from src.service import UserService, TaskService
 from tests.utils.adapter import get_session_test
 from tests.utils.sql_queries import INIT_COMMANDS, CLEANUP_SCRIPTS
 from src.database.schemas import Round, Task, Competition, Game
@@ -18,7 +18,7 @@ from src.repository.tasks import TaskRepo
 from src.repository.rounds import RoundsRepo
 from src.repository.games import GamesRepo
 from src.repository.competitions import CompetitionsRepo
-from src.models.problems import TaskDTO, TaskTypeEnum, AnswerTypeEnum
+from src.models.problems import TaskDTO, TaskTypeEnum, AnswerTypeEnum, TaskFromAuthor
 from src.models.round import StatusEnum, RoundDTO
 from src.models.users import UserDTO, UserExtended, UserStatistics
 
@@ -94,6 +94,10 @@ async def user_service(user_repo, task_repo, competition_repo, games_repo):
         competitions_repo=competition_repo
     )
 
+@pytest.fixture
+async def task_service(task_repo):
+    return TaskService(task_repo=task_repo)
+
 # блок с данными
 @pytest.fixture
 async def user_1_dto():
@@ -108,9 +112,8 @@ async def user_3_dto():
     return UserDTO(id='3', username="user_3", student_rating=1000, teacher_rating=1000)
 
 @pytest.fixture
-async def task_1_dto():
-    return TaskDTO(
-        id=1,
+async def new_task_1_dto():
+    return TaskFromAuthor(
         creator_id='1',
         name="test",
         text="test",
@@ -121,11 +124,16 @@ async def task_1_dto():
         correct_value={"correct": ["answer1"]}
     )
 
+@pytest.fixture
+async def task_1_dto(new_task_1_dto):
+    return TaskDTO(
+        id=1,
+        **new_task_1_dto.model_dump()
+    )
 
 @pytest.fixture
-async def task_2_dto():
-    return TaskDTO(
-        id=2,
+async def new_task_2_dto():
+    return TaskFromAuthor(
         creator_id='2',
         name="test-2",
         text="test-2",
@@ -137,9 +145,15 @@ async def task_2_dto():
     )
 
 @pytest.fixture
-async def task_3_dto():
+async def task_2_dto(new_task_2_dto):
     return TaskDTO(
-        id=3,
+        id=2,
+        **new_task_2_dto.model_dump()
+    )
+
+@pytest.fixture
+async def new_task_3_dto():
+    return TaskFromAuthor(
         creator_id='2',
         name="test-3",
         text="test-3",
@@ -148,6 +162,13 @@ async def task_3_dto():
         value={"answers": ["answer1", "answer2"]},
         answer_type=AnswerTypeEnum.STRING,
         correct_value={"correct": ["answer1"]}
+    )
+
+@pytest.fixture
+async def task_3_dto(new_task_3_dto):
+    return TaskDTO(
+        id=3,
+        **new_task_3_dto.model_dump()
     )
 
 @pytest.fixture
@@ -255,10 +276,14 @@ async def create_users(user_repo, user_1_dto, user_2_dto, user_3_dto):
 
 
 @pytest.fixture
-async def create_tasks(create_users, task_repo, task_1_dto, task_2_dto, task_3_dto):
-    task_id_1 = await task_repo.create(model=task_1_dto, orm=Task)
-    task_id_2 = await task_repo.create(model=task_2_dto, orm=Task)
-    task_id_3 = await task_repo.create(model=task_3_dto, orm=Task)
+async def create_tasks(
+        create_users, task_repo,
+        task_1_dto, task_2_dto, task_3_dto,
+        new_task_1_dto, new_task_2_dto, new_task_3_dto
+):
+    task_id_1 = await task_repo.create_task(new_task_1_dto)
+    task_id_2 = await task_repo.create_task(new_task_2_dto)
+    task_id_3 = await task_repo.create_task(new_task_3_dto)
     assert task_id_1 == 1
     assert task_id_2 == 2
     assert task_id_3 == 3

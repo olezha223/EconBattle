@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlalchemy import select, func, insert
 
 from src.database.schemas import Task
-from src.models.problems import TaskDTO
+from src.models.problems import TaskDTO, TaskFromAuthor
 from src.repository import RepoInterface
 
 
@@ -28,3 +28,15 @@ class TaskRepo(RepoInterface):
             result = await session.execute(stmt)
             price_list = result.scalars().fetchall()
             return 0 if len(price_list) == 0 else sum(price_list) / len(price_list)
+
+    async def create_task(self, task: TaskFromAuthor) -> int:
+        async with self.session_getter() as session:
+            stmt = insert(Task).values(**task.model_dump()).returning(Task.id)
+            result = await session.execute(stmt)
+            return result.scalar_one()
+
+    async def get_all(self, user_id: str) -> List[TaskDTO]:
+        async with self.session_getter() as session:
+            stmt = select(Task).where(Task.creator_id == user_id).order_by(Task.id)
+            result = await session.execute(stmt)
+            return result.scalars().fetchall()
