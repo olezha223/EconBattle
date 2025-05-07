@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import Any
 
@@ -32,6 +33,7 @@ class TaskFromAuthor(BaseModel):
 class TaskWithoutAnswers(BaseModel):
     id: int
     creator_id: str
+    created_at: datetime
     name: str
     text: str
     price: int
@@ -41,3 +43,12 @@ class TaskWithoutAnswers(BaseModel):
 
 class TaskDTO(TaskWithoutAnswers):
     correct_value: dict[str, Any]
+
+class TaskPreview(BaseModel):
+    id: int
+    created_at: datetime
+    creator_id: str
+    name: str
+    used_in_competitions: int
+    creator_name: str
+    # TODO: добавить сюда поле сколько раз решили

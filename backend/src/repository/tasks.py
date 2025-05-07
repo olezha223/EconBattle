@@ -35,8 +35,15 @@ class TaskRepo(RepoInterface):
             result = await session.execute(stmt)
             return result.scalar_one()
 
-    async def get_all(self, user_id: str) -> List[TaskDTO]:
+    async def get_all_problems_for_user(self, user_id: str) -> List[TaskDTO]:
         async with self.session_getter() as session:
             stmt = select(Task).where(Task.creator_id == user_id).order_by(Task.id)
             result = await session.execute(stmt)
             return result.scalars().fetchall()
+
+    async def get_all_problems_without_user(self, user_id: str) -> List[TaskDTO]:
+        async with self.session_getter() as session:
+            stmt = select(Task).where(Task.creator_id != user_id).order_by(Task.id)
+            result = await session.execute(stmt)
+            return result.scalars().fetchall()
+

@@ -37,3 +37,12 @@ class CompetitionsRepo(RepoInterface):
         async with self.session_getter() as session:
             result = await session.execute(stmt)
             return result.scalars().fetchall()
+
+    async def get_competitions_with_task(self, task_id: int) -> List[CompetitionDTO]:
+        all_competitions = await self.get_all_competitions()
+        result = []
+        for competition in all_competitions:
+            if task_id in competition.tasks_markup.values():
+                result.append(competition)
+        return result
+
