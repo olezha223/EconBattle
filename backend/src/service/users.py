@@ -28,11 +28,11 @@ class UserService:
     async def update_teacher_rating(self, rating_difference: int, user_id: int) -> None:
         await self.user_repo.update_teacher_rating(rating_difference, user_id)
 
-    async def create_user(self, user_id: str, username: str):
-        await self.user_repo.create(model=UserDTO(id=user_id, username=username), orm=User)
+    async def create_user(self, user_id: str, username: str) -> str:
+        return await self.user_repo.create_with_username(user_id=user_id, username=username)
 
     async def get_user(self, user_id: str) -> Optional[UserDTO]:
-        return await self.user_repo.get(object_id=user_id, orm_class=User, model_class=UserDTO)
+        return await self.user_repo.get_by_id(user_id)
 
     async def get_user_information(self, user_id: str) -> UserExtended:
         user_base_info = await self.user_repo.get(object_id=user_id, orm_class=User, model_class=UserDTO)
