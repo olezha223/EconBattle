@@ -204,14 +204,13 @@ class Game:
         for ws in self.sockets.values():
             await ws.send_json(results)
 
-    def get_final_msg(self, pid: str):
+    def _get_final_msg(self, pid: str):
         return {
             "type": EventType.GAME_END.value,
             "status": self.player_final_info[pid]['status'],
             "diff": self.player_final_info[pid]['diff'],
             "final_scores": self.scores
         }
-
 
     async def _end_game(self):
         """Финализация игры и обновление рейтингов"""
@@ -225,7 +224,7 @@ class Game:
 
         # Отправка финальных результатов
         for pid, ws in self.sockets.items():
-            await ws.send_json(self.get_final_msg(pid))
+            await ws.send_json(self._get_final_msg(pid))
 
         game_dto = GameDTO(
             competition_id=self.competition_id,
