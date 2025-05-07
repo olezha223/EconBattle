@@ -57,7 +57,9 @@ INIT_COMMANDS = [
         status_player_1 VARCHAR NOT NULL,
         status_player_2 VARCHAR NOT NULL,
         rating_difference_player_1 INTEGER NOT NULL,
-        rating_difference_player_2 INTEGER NOT NULL
+        rating_difference_player_2 INTEGER NOT NULL,
+        score_player_1 INTEGER NOT NULL,
+        score_player_2 INTEGER NOT NULL
     );
     """,
 ]

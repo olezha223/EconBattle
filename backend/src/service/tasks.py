@@ -1,4 +1,3 @@
-from typing import Optional, Any
 from src.models.problems import TaskDTO, TaskWithoutAnswers, TaskFromAuthor, TaskPreview
 from src.repository.competitions import CompetitionsRepo
 from src.repository.tasks import TaskRepo
@@ -23,11 +22,7 @@ class TaskService:
             raise ValueError(f"Task with id {task_id} not found")
         return task
 
-    async def get_task_answer(self, task_id: int) -> dict[str, Any]:
-        task = await self.get(task_id)
-        return task.correct_value
-
-    async def create(self, task: TaskFromAuthor) -> int:
+    async def create_task(self, task: TaskFromAuthor) -> int:
         return await self.task_repo.create_task(task)
 
     async def get_all_problems_previews_for_user(self, user_id: str) -> list[TaskPreview]:

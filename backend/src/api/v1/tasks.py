@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from fastapi import APIRouter, Depends, Query
 from starlette import status
@@ -23,7 +23,7 @@ async def create_problem(
         task: TaskFromAuthor,
         service: TaskService = Depends(get_task_service)
 ) -> int:
-    return await service.create(task)
+    return await service.create_task(task)
 
 @router_problems.get(
     path="/",
@@ -64,3 +64,18 @@ async def get_all_problems_previews_without_users(
         service: TaskService = Depends(get_task_service)
 ) -> List[TaskPreview]:
     return await service.get_all_problems_previews_without_users(user_id)
+
+
+@router_problems.get(
+    path="/check-answer",
+    description="Get correct answer by task id",
+    tags=["tasks"],
+    status_code=status.HTTP_200_OK,
+    name="Get correct"
+)
+async def get_answer(
+        task_id: int = Query(..., description="ID of the task"),
+        service: TaskService = Depends(get_task_service)
+) -> dict[str, Any]:
+    task = await service.get(task_id=task_id)
+    return task.correct_value

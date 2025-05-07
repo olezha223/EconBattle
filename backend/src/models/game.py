@@ -21,6 +21,8 @@ class GameDTO(BaseModel):
     status_player_2: str
     rating_difference_player_1: int
     rating_difference_player_2: int
+    score_player_1: int
+    score_player_2: int
 
 class GameDTOExtended(GameDTO):
     round_data: list[RoundDTO]
