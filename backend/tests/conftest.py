@@ -143,7 +143,7 @@ async def task_3_dto():
         creator_id='2',
         name="test-3",
         text="test-3",
-        price=1000,
+        price=1200,
         task_type=TaskTypeEnum.SINGLE_CHOICE.value,
         value={"answers": ["answer1", "answer2"]},
         answer_type=AnswerTypeEnum.STRING,
@@ -263,9 +263,9 @@ async def create_tasks(create_users, task_repo, task_1_dto, task_2_dto, task_3_d
     assert task_id_2 == 2
     assert task_id_3 == 3
 
-    task_1 = await task_repo.get(object_id=task_id_1, orm_class=Task, model_class=TaskDTO)
-    task_2 = await task_repo.get(object_id=task_id_2, orm_class=Task, model_class=TaskDTO)
-    task_3 = await task_repo.get(object_id=task_id_3, orm_class=Task, model_class=TaskDTO)
+    task_1 = await task_repo.get_task_by_id(task_id_1)
+    task_2 = await task_repo.get_task_by_id(task_id_2)
+    task_3 = await task_repo.get_task_by_id(task_id_3)
     assert task_1 == task_1_dto
     assert task_2 == task_2_dto
     assert task_3 == task_3_dto
