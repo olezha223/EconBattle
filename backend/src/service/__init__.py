@@ -20,16 +20,22 @@ def get_user_service():
 def get_task_service():
     return TaskService(
         task_repo=TaskRepo(),
+        user_repo=UserRepo(),
+        competition_repo=CompetitionsRepo(),
     )
 
 def get_competition_service():
     return CompetitionService(
         competition_repo=CompetitionsRepo(),
+        games_repo=GamesRepo(),
     )
 
 def get_game_service():
     return GameService(
         game_repo=GamesRepo(),
+        competition_repo=CompetitionsRepo(),
+        user_repo=UserRepo(),
+        round_repo=RoundsRepo(),
     )
 
 def get_round_service():

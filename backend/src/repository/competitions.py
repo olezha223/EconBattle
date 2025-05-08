@@ -42,7 +42,8 @@ class CompetitionsRepo(RepoInterface):
         all_competitions = await self.get_all_competitions()
         result = []
         for competition in all_competitions:
-            if task_id in competition.tasks_markup.values():
-                result.append(competition)
+            for round_obj in competition.tasks_markup.values():
+                if task_id in round_obj:
+                    result.append(competition)
         return result
 

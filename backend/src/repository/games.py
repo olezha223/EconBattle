@@ -12,7 +12,7 @@ class GamesRepo(RepoInterface):
     async def get_by_id(self, game_id: int) -> GameDTO:
         return await self.get(object_id=game_id, orm_class=Game, model_class=GameDTO)
 
-    async def get_played_games_by_user(self, user_id: int) -> List[int]:
+    async def get_played_games_by_user(self, user_id: int) -> List[GameDTO]:
         stmt = select(Game.id).where(or_(Game.player_1 == user_id, Game.player_2 == user_id))
         async with self.session_getter() as session:
             result = await session.execute(stmt)

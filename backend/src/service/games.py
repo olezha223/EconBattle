@@ -25,13 +25,20 @@ class GameService:
         return await self.game_repo.create(model, orm=Game)
 
     async def get_all(self, user_id: str) -> List[GameDTOExtended]:
-        game_ids = await self.game_repo.get_played_games_by_user(user_id=user_id)
+        games = await self.game_repo.get_played_games_by_user(user_id=user_id)
         result = []
-        for game_id in game_ids:
-            game = await self.game_repo.get_by_id(game_id)
+        for game in games:
             round_data = []
             for round_id in game.rounds:
                 round_data.append(await self.round_repo.get_by_id(round_id))
             competition = await self.competition_repo.get_by_id(game.competition_id)
             creator = await self.user_repo.get_by_id(competition.creator_id)
             creator_name = creator.username
+            game_dto = GameDTOExtended(
+                **game.model_dump(),
+                competition_name=competition.name,
+                creator_name=creator_name
+            )
+            result.append(game_dto)
+
+        return result

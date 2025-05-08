@@ -17,11 +17,11 @@ oauth.register(
     }
 )
 
-router_user = APIRouter()
+router_auth = APIRouter()
 
 service = get_user_service()
 
-@router_user.post(
+@router_auth.post(
     path='/user',
 )
 async def create_new_user(
@@ -30,7 +30,7 @@ async def create_new_user(
 ) -> None:
     return await service.create_user(user_id=user_id, username=username)
 
-@router_user.get('/')
+@router_auth.get('/')
 async def homepage(request: Request):
     user = request.session.get('user')
     if user:
@@ -43,13 +43,13 @@ async def homepage(request: Request):
     return HTMLResponse('<a href="/login">login</a>')
 
 
-@router_user.get('/login')
+@router_auth.get('/login')
 async def login(request: Request):
     redirect_uri = 'http://localhost:8000/auth'
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
-@router_user.get('/auth')
+@router_auth.get('/auth')
 async def auth(request: Request):
     try:
         token = await oauth.google.authorize_access_token(request)
@@ -65,7 +65,7 @@ async def auth(request: Request):
     return RedirectResponse(url='/')
 
 
-@router_user.get('/logout')
+@router_auth.get('/logout')
 async def logout(request: Request):
     request.session.pop('user', None)
     return RedirectResponse(url='/')

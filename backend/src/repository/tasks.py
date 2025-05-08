@@ -16,8 +16,8 @@ class TaskRepo(RepoInterface):
             if task:
                 return TaskDTO.model_validate(task, from_attributes=True)
 
-    async def get_created_tasks(self, user_id: int) -> List[int]:
-        stmt = select(Task.id).where(Task.creator_id == user_id)
+    async def get_created_tasks(self, user_id: int) -> List[TaskDTO]:
+        stmt = select(Task).where(Task.creator_id == user_id)
         async with self.session_getter() as session:
             result = await session.execute(stmt)
             return result.scalars().fetchall()
