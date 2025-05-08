@@ -3,13 +3,13 @@ from typing import Optional
 from sqlalchemy import select, insert, update
 
 from src.database.schemas import User
-from src.models.users import UserDTO
+from src.models.users import UserDTO, UserData
 from src.repository import RepoInterface
 
 
 class UserRepo(RepoInterface):
-    async def get_by_id(self, user_id: str) -> Optional[UserDTO]:
-        return await self.get(object_id=user_id, orm_class=User, model_class=UserDTO)
+    async def get_by_id(self, user_id: str) -> Optional[UserData]:
+        return await self.get(object_id=user_id, orm_class=User, model_class=UserData)
 
     async def update_student_rating(self, rating_difference: int, user_id: str) -> None:
         actual_user = await self.get_by_id(user_id)
@@ -32,6 +32,15 @@ class UserRepo(RepoInterface):
         stmt = update(User).where(User.id == user_id).values(teacher_rating=User.teacher_rating + rating_difference)
         async with self.session_getter() as session:
             await session.execute(stmt)
+
+    async def update_username(self, username: str, user_id: str) -> None:
+        actual_user = await self.get_by_id(user_id)
+        if actual_user is None:
+            raise ValueError(f"User {user_id} not found")
+        stmt = update(User).where(User.username == username).values(username=username)
+        async with self.session_getter() as session:
+            await session.execute(stmt)
+
 
     async def get_by_username(self, username: str) -> Optional[UserDTO]:
         async with self.session_getter() as session:

@@ -10,15 +10,11 @@ class UserDTO(BaseModel):
     student_rating: int = Field(default=1000)
     teacher_rating: int = Field(default=1000)
 
-class UserExtended(UserDTO):
+class UserData(UserDTO):
     created_at: datetime
-    played_games: list[int]
-    created_competitions: list[int]
-    created_tasks: list[int]
 
-
-class UserStatistics(BaseModel):
-    created_at: datetime
+class UserInfo(UserData):
+    user_activity: dict[datetime, int]
     # статистика как игрока
     wins_count: int
     losses_count: int
