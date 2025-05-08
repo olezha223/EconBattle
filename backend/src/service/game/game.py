@@ -187,8 +187,10 @@ class Game:
                 self.wins[pid] += 1
 
         round_dto = RoundDTO(
-            points_player_1=self.user_1_id,
-            points_player_2=self.user_2_id,
+            player_1=self.user_1_id,
+            player_2=self.user_2_id,
+            points_player_1=scores[self.user_1_id],
+            points_player_2=scores[self.user_2_id],
             status_player_1=status_player_1,
             status_player_2=status_player_2
         )

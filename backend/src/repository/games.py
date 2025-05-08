@@ -16,10 +16,10 @@ class GamesRepo(RepoInterface):
         return await self.get(object_id=game_id, orm_class=Game, model_class=NewGame)
 
     async def get_played_games_by_user(self, user_id: int) -> List[GameDTO]:
-        stmt = select(Game.id).where(or_(Game.player_1 == user_id, Game.player_2 == user_id))
+        stmt = select(Game).where(or_(Game.player_1 == user_id, Game.player_2 == user_id))
         async with self.session_getter() as session:
             result = await session.execute(stmt)
-            return result.scalars().fetchall()
+            return [GameDTO.model_validate(item, from_attributes=True) for item in result.scalars().fetchall()]
 
     async def get_played_games_in_competition(self, competition_id: int) -> List[int]:
         stmt = select(Game.id).where(Game.competition_id == competition_id)

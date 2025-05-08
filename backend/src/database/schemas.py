@@ -62,6 +62,8 @@ class Round(Base):
         DateTime(timezone=True),
         server_default=func.now()
     )
+    player_1 = Column(Text, nullable=False)
+    player_2 = Column(Text, nullable=False)
     points_player_1 = Column(Integer, nullable=False)
     points_player_2 = Column(Integer, nullable=False)
     status_player_1 = Column(String, nullable=False)

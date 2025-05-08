@@ -39,6 +39,8 @@ INIT_COMMANDS = [
     """
     CREATE TABLE rounds (
         id SERIAL PRIMARY KEY,
+        player_1 TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        player_2 TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         points_player_1 INTEGER NOT NULL,
         points_player_2 INTEGER NOT NULL,

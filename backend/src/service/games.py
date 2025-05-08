@@ -35,6 +35,7 @@ class GameService:
             creator_name = creator.username
             game_dto = GameDTOExtended(
                 **game.model_dump(),
+                round_data=round_data,
                 competition_name=competition.name,
                 creator_name=creator_name
             )

@@ -53,7 +53,7 @@ async def get_all_competitions_previews_for_user(
 
 
 @router_competitions.get(
-    path="/previews",
+    path="/all",
     description="Get all competitions previews",
     tags=["competitions"],
     status_code=status.HTTP_200_OK,
