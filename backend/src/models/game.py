@@ -11,9 +11,8 @@ class EventType(Enum):
     ROUND_RESULT = "round_result"
 
 
-class GameDTO(BaseModel):
+class NewGame(BaseModel):
     competition_id: int
-    created_at: datetime
     player_1: str
     player_2: str
     rounds: list[int]
@@ -23,6 +22,9 @@ class GameDTO(BaseModel):
     rating_difference_player_2: int
     score_player_1: int
     score_player_2: int
+
+class GameDTO(NewGame):
+    created_at: datetime
 
 class GameDTOExtended(GameDTO):
     round_data: list[RoundDTO]

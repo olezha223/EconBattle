@@ -84,3 +84,5 @@ class Game(Base):
     status_player_2 = Column(String, nullable=False)
     rating_difference_player_1 = Column(Integer, nullable=False)
     rating_difference_player_2 = Column(Integer, nullable=False)
+    score_player_1 = Column(Integer, nullable=False)
+    score_player_2 = Column(Integer, nullable=False)

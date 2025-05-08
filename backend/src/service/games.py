@@ -1,7 +1,6 @@
 from typing import List
 
-from src.database.schemas import Game
-from src.models.game import GameDTO, GameDTOExtended
+from src.models.game import NewGame, GameDTOExtended
 from src.repository.competitions import CompetitionsRepo
 from src.repository.games import GamesRepo
 from src.repository.rounds import RoundsRepo
@@ -21,8 +20,8 @@ class GameService:
         self.competition_repo = competition_repo
         self.user_repo = user_repo
 
-    async def create_game(self, model: GameDTO) -> int:
-        return await self.game_repo.create(model, orm=Game)
+    async def create_game(self, model: NewGame) -> int:
+        return await self.game_repo.create_game(model)
 
     async def get_all(self, user_id: str) -> List[GameDTOExtended]:
         games = await self.game_repo.get_played_games_by_user(user_id=user_id)

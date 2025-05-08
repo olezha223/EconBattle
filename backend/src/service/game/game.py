@@ -2,7 +2,7 @@ import asyncio
 
 from starlette.websockets import WebSocket, WebSocketState, WebSocketDisconnect
 
-from src.models.game import EventType, GameDTO
+from src.models.game import EventType, NewGame
 from src.models.problems import TaskDTO, TaskWithoutAnswers
 from src.models.round import StatusEnum, RoundDTO
 from src.models.users import UserDTO, Player
@@ -96,7 +96,7 @@ class Game:
         await self._notify_players(
             event_type="Start Round",
             data={
-                "problems": [self.task_service.get_task_without_answers(p).model_dump() for p in problems],
+                "problems": [self.task_service.get_task_for_round(p).model_dump() for p in problems],
                 "time_limit": self.competition.round_time_in_seconds - 10
             }
         )
@@ -226,7 +226,7 @@ class Game:
         for pid, ws in self.sockets.items():
             await ws.send_json(self._get_final_msg(pid))
 
-        game_dto = GameDTO(
+        game_dto = NewGame(
             competition_id=self.competition_id,
             player_1=self.user_1_id,
             player_2=self.user_2_id,
@@ -235,6 +235,8 @@ class Game:
             status_player_2=self.player_final_info[self.user_2_id]['status'],
             rating_difference_player_1=self.player_final_info[self.user_1_id]['diff'],
             rating_difference_player_2=self.player_final_info[self.user_2_id]['diff'],
+            score_player_1=self.scores[self.user_1_id],
+            score_player_2=self.scores[self.user_2_id],
         )
         await self.game_service.create_game(game_dto)
         await self._update_rating()

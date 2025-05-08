@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select, insert, update
+from sqlalchemy import select, insert, update, and_
 
 from src.database.schemas import User
 from src.models.users import UserDTO, UserData
@@ -37,10 +37,9 @@ class UserRepo(RepoInterface):
         actual_user = await self.get_by_id(user_id)
         if actual_user is None:
             raise ValueError(f"User {user_id} not found")
-        stmt = update(User).where(User.username == username).values(username=username)
+        stmt = update(User).where(User.id == user_id).values(username=username)
         async with self.session_getter() as session:
             await session.execute(stmt)
-
 
     async def get_by_username(self, username: str) -> Optional[UserDTO]:
         async with self.session_getter() as session:

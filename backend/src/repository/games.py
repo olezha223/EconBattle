@@ -1,16 +1,19 @@
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import select, or_, and_, union_all
 
 from src.database.schemas import Game
-from src.models.game import GameDTO
+from src.models.game import NewGame, GameDTO
 from src.models.round import StatusEnum
 from src.repository import RepoInterface
 
 
 class GamesRepo(RepoInterface):
-    async def get_by_id(self, game_id: int) -> GameDTO:
-        return await self.get(object_id=game_id, orm_class=Game, model_class=GameDTO)
+    async def create_game(self, game_dto: NewGame) -> int:
+        return await self.create(model=game_dto, orm=Game)
+
+    async def get_by_id(self, game_id: int) -> Optional[GameDTO]:
+        return await self.get(object_id=game_id, orm_class=Game, model_class=NewGame)
 
     async def get_played_games_by_user(self, user_id: int) -> List[GameDTO]:
         stmt = select(Game.id).where(or_(Game.player_1 == user_id, Game.player_2 == user_id))

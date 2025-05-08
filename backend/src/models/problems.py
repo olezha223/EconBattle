@@ -52,3 +52,14 @@ class TaskPreview(BaseModel):
     used_in_competitions: int
     creator_name: str
     # TODO: добавить сюда поле сколько раз решили
+
+class TaskForGame(BaseModel):
+    id: int
+    creator_id: str
+    created_at: str
+    name: str
+    text: str
+    price: int
+    task_type: str
+    value: dict[str, Any]
+    answer_type: str

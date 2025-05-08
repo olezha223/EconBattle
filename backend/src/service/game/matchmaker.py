@@ -65,7 +65,7 @@ class MatchMaker:
             )
             self.games[(player_id_1, player_id_2)] = game
             print(f'Состояние переменной для игр на момент создания: {self.games}')
-            await asyncio.sleep(10)
+            await asyncio.sleep(1)
             await game.start()
 
             # удалить из активных соединений игроков

@@ -1,4 +1,4 @@
-from src.models.problems import TaskDTO, TaskWithoutAnswers, TaskFromAuthor, TaskPreview
+from src.models.problems import TaskDTO, TaskWithoutAnswers, TaskFromAuthor, TaskPreview, TaskForGame
 from src.repository.competitions import CompetitionsRepo
 from src.repository.tasks import TaskRepo
 from src.repository.users import UserRepo
@@ -11,10 +11,11 @@ class TaskService:
         self.competition_repo = competition_repo
 
     @staticmethod
-    def get_task_without_answers(task: TaskDTO) -> TaskWithoutAnswers:
+    def get_task_for_round(task: TaskDTO) -> TaskForGame:
         task_json = task.model_dump()
         del task_json['correct_value']
-        return TaskWithoutAnswers(**task_json)
+        task_json['created_at'] = task.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        return TaskForGame(**task_json)
 
     async def get(self, task_id: int) -> TaskDTO:
         task = await self.task_repo.get_task_by_id(task_id)
