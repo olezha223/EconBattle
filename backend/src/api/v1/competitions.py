@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
 from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition
-from src.service import CompetitionService, get_competition_service
+from src.service import CompetitionService, get_competition_service, get_user_service, UserService
 
 router_competitions = APIRouter(
     prefix="/competitions",
@@ -54,7 +54,11 @@ async def get_competition_by_id(
 async def get_all_competitions_previews_for_user(
         user_id: str = Query(..., description="Creator ID"),
         service: CompetitionService = Depends(get_competition_service),
+        user_service: UserService = Depends(get_user_service)
 ) -> List[CompetitionPreview]:
+    user = await user_service.get_user(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return await service.get_all_competitions_previews_for_user(user_id)
 
 
