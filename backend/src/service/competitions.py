@@ -1,13 +1,24 @@
 from typing import Optional
+
+from fastapi import HTTPException
+from starlette import status
+
 from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition
 from src.repository.competitions import CompetitionsRepo
 from src.repository.games import GamesRepo
+from src.repository.users import UserRepo
 
 
 class CompetitionService:
-    def __init__(self, competition_repo: CompetitionsRepo, games_repo: GamesRepo):
+    def __init__(
+            self,
+            competition_repo: CompetitionsRepo,
+            games_repo: GamesRepo,
+            user_repo: UserRepo,
+    ):
         self.competition_repo = competition_repo
         self.games_repo = games_repo
+        self.user_repo = user_repo
 
     async def get_competition(self, competition_id: int) -> Optional[CompetitionDTO]:
         return await self.competition_repo.get_by_id(competition_id)
@@ -16,6 +27,9 @@ class CompetitionService:
         return await self.competition_repo.create_competition(competition)
 
     async def get_all_competitions_created_by_user(self, user_id: str) -> list[CompetitionDTO]:
+        user = await self.user_repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         return await self.competition_repo.get_all_competitions_created_by_user(user_id)
 
     async def get_all_competitions(self) -> list[CompetitionDTO]:

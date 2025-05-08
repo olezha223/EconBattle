@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import select, insert
 
@@ -14,10 +14,8 @@ class CompetitionsRepo(RepoInterface):
             result = await session.execute(stmt)
             return result.scalar_one()
 
-    async def get_by_id(self, competition_id: int) -> CompetitionDTO:
+    async def get_by_id(self, competition_id: int) -> Optional[CompetitionDTO]:
         competition = await self.get(competition_id, orm_class=Competition, model_class=CompetitionDTO)
-        if not competition:
-            raise ValueError(f"Competition with id {competition_id} not found")
         return competition
 
     async def get_all_competitions_created_by_user(self, user_id: str) -> list[CompetitionDTO]:

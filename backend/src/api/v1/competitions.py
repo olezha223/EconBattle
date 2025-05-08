@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
 from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition
@@ -35,7 +35,13 @@ async def get_competition_by_id(
         competition_id: int = Query(..., description="ID of the competition to retrieve"),
         service: CompetitionService = Depends(get_competition_service),
 ) -> CompetitionDTO:
-    return await service.get_competition(competition_id)
+    competition = await service.get_competition(competition_id)
+    if not competition:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Competition not found",
+        )
+    return competition
 
 
 @router_competitions.get(

@@ -28,6 +28,7 @@ def get_competition_service():
     return CompetitionService(
         competition_repo=CompetitionsRepo(),
         games_repo=GamesRepo(),
+        user_repo=UserRepo(),
     )
 
 def get_game_service():
