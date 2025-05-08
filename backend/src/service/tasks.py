@@ -19,8 +19,6 @@ class TaskService:
 
     async def get(self, task_id: int) -> TaskDTO:
         task = await self.task_repo.get_task_by_id(task_id)
-        if task is None:
-            raise ValueError(f"Task with id {task_id} not found")
         return task
 
     async def create_task(self, task: TaskFromAuthor) -> int:

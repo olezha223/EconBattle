@@ -1,10 +1,10 @@
 from typing import List, Any
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
 from src.models.problems import TaskDTO, TaskFromAuthor, TaskPreview
-from src.service import get_task_service
+from src.service import get_task_service, UserService, get_user_service
 from src.service.tasks import TaskService
 
 router_problems = APIRouter(
@@ -36,6 +36,12 @@ async def get_problem(
         task_id: int = Query(..., description="ID of the task"),
         service: TaskService = Depends(get_task_service)
 ) -> TaskDTO:
+    task = await service.get(task_id)
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task not found",
+        )
     return await service.get(task_id=task_id)
 
 @router_problems.get(
@@ -47,8 +53,12 @@ async def get_problem(
 )
 async def get_all_problems_previews_for_user(
         user_id: str = Query(..., description="ID of the creator"),
-        service: TaskService = Depends(get_task_service)
+        service: TaskService = Depends(get_task_service),
+        user_service: UserService = Depends(get_user_service)
 ) -> List[TaskPreview]:
+    user = await user_service.get_user(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return await service.get_all_problems_previews_for_user(user_id)
 
 
@@ -61,8 +71,12 @@ async def get_all_problems_previews_for_user(
 )
 async def get_all_problems_previews_without_users(
         user_id: str = Query(..., description="ID of the creator"),
-        service: TaskService = Depends(get_task_service)
+        service: TaskService = Depends(get_task_service),
+        user_service: UserService = Depends(get_user_service)
 ) -> List[TaskPreview]:
+    user = await user_service.get_user(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return await service.get_all_problems_previews_without_users(user_id)
 
 
@@ -78,4 +92,9 @@ async def get_answer(
         service: TaskService = Depends(get_task_service)
 ) -> dict[str, Any]:
     task = await service.get(task_id=task_id)
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task not found",
+        )
     return task.correct_value
