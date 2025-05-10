@@ -42,12 +42,15 @@ class CompetitionService:
         for competition in competitions:
             games_played = await self.games_repo.get_played_games_in_competition(competition_id=competition.id)
             unique_players = await self.games_repo.get_unique_players(games_played)
+            creator = await self.user_repo.get_by_id(competition.creator_id)
             preview = CompetitionPreview(
                 id=competition.id,
                 name=competition.name,
                 created_at=competition.created_at,
                 games_played=len(games_played),
-                unique_players=len(unique_players)
+                unique_players=len(unique_players),
+                creator_name=creator.username,
+                creator_id=competition.creator_id,
             )
             result.append(preview)
         return result

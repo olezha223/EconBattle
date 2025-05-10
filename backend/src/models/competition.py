@@ -21,3 +21,5 @@ class CompetitionPreview(BaseModel):
     games_played: int
     unique_players: int
     created_at: datetime
+    creator_id: str
+    creator_name: str

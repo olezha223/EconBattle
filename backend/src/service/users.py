@@ -10,7 +10,7 @@ from src.repository.users import UserRepo
 
 
 def get_dates(end_date: datetime) -> list[datetime]:
-    start_date = datetime(2025, 5, 1)
+    start_date = datetime(2025, 2, 1)
     if end_date < start_date:
         return []
     delta = end_date - start_date
