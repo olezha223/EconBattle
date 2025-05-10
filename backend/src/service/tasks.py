@@ -32,6 +32,10 @@ class TaskService:
         tasks = await self.task_repo.get_all_problems_without_user(user_id)
         return await self._get_previews(tasks)
 
+    async def get_all_problems_previews(self) -> list[TaskPreview]:
+        tasks = await self.task_repo.get_all_problems()
+        return await self._get_previews(tasks)
+
     async def _get_previews(self, tasks: list[TaskDTO]) -> list[TaskPreview]:
         previews = []
         for task in tasks:

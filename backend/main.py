@@ -7,8 +7,14 @@ from dataclasses import asdict
 
 
 def main() -> Any:
-    app: Any = App(host='localhost',
-                   port=8000,
-                   **asdict(configuration.app)
-                   ).included_cors().included_routers(routers=[router_v1])
+    app: Any = App(
+        host='localhost',
+        port=8000,
+        **asdict(configuration.app)
+    ).included_cors(
+        allow_origins=["http://localhost:5173"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    ).included_routers(routers=[router_v1])
     return app

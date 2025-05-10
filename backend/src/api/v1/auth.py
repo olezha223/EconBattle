@@ -58,10 +58,24 @@ async def auth(request: Request):
     user = token.get('userinfo')
     # получить информацию о юзере
     if user:
-        request.session['user'] = dict(user)
-        user_info = await service.get_user(user_id=user.get("sub"))
+        user_data = dict(user)
+        request.session['user'] = user_data
+        user_info = await service.get_user(user_id=user_data.get("sub"))
         if not user_info:
-            await service.create_user(user_id=user.get("sub"), username=user.get("name"))
+            await service.create_user(
+                user_id=user_data.get("sub"),
+                username=user_data.get("name")
+            )
+        # Отправляем данные пользователя в opener
+        html = f"""
+        <script>
+            window.opener.postMessage({{
+                user: {json.dumps(user_data)}
+            }}, 'http://localhost:5173');
+            window.close();
+        </script>
+        """
+        return HTMLResponse(html)
     return RedirectResponse(url='/')
 
 

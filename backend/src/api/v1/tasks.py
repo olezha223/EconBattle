@@ -64,20 +64,15 @@ async def get_all_problems_previews_for_user(
 
 @router_problems.get(
     path="/all",
-    description="Get all problems previews without creator`s",
+    description="Get all problems previews",
     tags=["tasks"],
     status_code=status.HTTP_200_OK,
     name="Get all problems previews",
 )
-async def get_all_problems_previews_without_users(
-        user_id: str = Query(..., description="ID of the creator"),
+async def get_all_problems_previews(
         service: TaskService = Depends(get_task_service),
-        user_service: UserService = Depends(get_user_service)
 ) -> List[TaskPreview]:
-    user = await user_service.get_user(user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    return await service.get_all_problems_previews_without_users(user_id)
+    return await service.get_all_problems_previews()
 
 
 @router_problems.get(

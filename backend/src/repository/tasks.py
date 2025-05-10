@@ -39,11 +39,29 @@ class TaskRepo(RepoInterface):
         async with self.session_getter() as session:
             stmt = select(Task).where(Task.creator_id == user_id).order_by(Task.id)
             result = await session.execute(stmt)
-            return result.scalars().fetchall()
+            return [
+                TaskDTO.model_validate(
+                    task, from_attributes=True
+                ) for task in result.scalars().fetchall()
+            ]
 
     async def get_all_problems_without_user(self, user_id: str) -> List[TaskDTO]:
         async with self.session_getter() as session:
             stmt = select(Task).where(Task.creator_id != user_id).order_by(Task.id)
             result = await session.execute(stmt)
-            return result.scalars().fetchall()
+            return [
+                TaskDTO.model_validate(
+                    task, from_attributes=True
+                ) for task in result.scalars().fetchall()
+            ]
+
+    async def get_all_problems(self) -> List[TaskDTO]:
+        async with self.session_getter() as session:
+            stmt = select(Task).order_by(Task.id)
+            result = await session.execute(stmt)
+            return [
+                TaskDTO.model_validate(
+                    task, from_attributes=True
+                ) for task in result.scalars().fetchall()
+            ]
 
