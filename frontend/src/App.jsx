@@ -52,7 +52,7 @@ function App() {
       {gameState === 'lobby' && (
         <LobbyScreen 
           onConnect={(id) => {
-            const newWs = new WebSocket(`ws://localhost:8000/ws/${id}`)
+            const newWs = new WebSocket(`ws://localhost:8000/ws/?user_id=${id}&competition_id=2`)
             newWs.onopen = () => {
               setPlayerId(id)
               setGameState('waiting')

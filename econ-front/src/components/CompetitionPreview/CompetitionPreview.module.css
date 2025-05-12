@@ -1,0 +1,94 @@
+.preview {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 20px;
+  min-height: 120px; /* Добавим минимальную высоту для лучшего расположения */
+}
+
+.content {
+  position: relative;
+  padding-bottom: 40px; /* Место для кнопки */
+}
+
+.name {
+  margin: 0 0 10px 0;
+  color: #1a1a1a;
+  font-size: 1.2rem;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column; /* Меняем направление на вертикальное */
+  gap: 8px;
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 15px;
+}
+
+.time {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #4CAF50;
+  font-size: 0.9em;
+  padding: 6px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #f8f8f8;
+}
+
+.button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-weight: 500;
+}
+
+.button:hover {
+  background: #45a049;
+}
+
+.authorContainer {
+    margin: 8px 0;
+}
+
+.creatorLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    transition: all 0.2s;
+    background-color: #fff;
+}
+
+.creatorLink:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.creatorAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.creator {
+    font-size: 0.9em;
+    font-weight: 500;
+}

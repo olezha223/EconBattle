@@ -1,0 +1,114 @@
+.preview {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
+}
+
+.left {
+  flex: 1;
+}
+
+.right {
+  text-align: right;
+}
+
+.name {
+  margin: 0 0 8px 0;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+}
+
+.creator {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.stat {
+  margin-bottom: 8px;
+}
+
+.label {
+  color: #666;
+  margin-right: 10px;
+}
+
+.value {
+  color: #333;
+}
+
+.preview {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.preview:hover {
+  transform: translateY(-2px);
+}
+
+.creatorSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.creatorLink {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s;
+}
+
+.creatorLink:hover {
+  opacity: 0.8;
+}
+
+.creatorAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.creator {
+  font-weight: 500;
+  color: #2e7d32;
+}
+.authorContainer {
+    margin: 8px 0;
+}
+
+.creatorLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    transition: all 0.2s;
+    background-color: #fff;
+}
+
+.creatorLink:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.creatorAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.creator {
+    font-size: 0.9em;
+    font-weight: 500;
+}
