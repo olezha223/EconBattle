@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import styles from './GameApp.module.css';
 import RoundScreen from '../RoundScreen/RoundScreen.jsx';
 import ResultsScreen from "../ResultsScreen/ResultsScreen.jsx";
+import ScoreBoard from "../ScoreBoard/ScoreBoard.jsx";
 
 const getUserId = () => localStorage.getItem('user_id') || '';
 
@@ -17,6 +18,11 @@ export default function GameApp() {
   const [totalRounds, setTotalRounds] = useState(0);
   const [roundResults, setRoundResults] = useState([]);
   const [currentRound, setCurrentRound] = useState(0);
+  const [currentScores, setCurrentScores] = useState({
+    user: 0,
+    opponent: 0
+  });
+  const [finalScores, setFinalScores] = useState({ user: 0, opponent: 0 });
 
   const currentRoundRef = useRef(currentRound);
   currentRoundRef.current = currentRound;
@@ -65,6 +71,11 @@ export default function GameApp() {
           const userId = getUserId();
           const opponentId = Object.keys(data.scores).find(id => id !== userId);
 
+          setCurrentScores({
+            user: data.total_score[userId],
+            opponent: data.total_score[opponentId]
+          });
+
           const result = calculateResult(
             data.scores[userId],
             data.scores[opponentId]
@@ -81,11 +92,19 @@ export default function GameApp() {
           break;
         }
 
-        case 'game_end':
+        case 'game_end': {
+          const userId = getUserId();
+          const opponentId = Object.keys(data.final_scores).find(id => id !== userId);
+          setFinalScores({
+            user: data.final_scores[userId],
+            opponent: data.final_scores[opponentId]
+          });
+
           setGameResult(data);
           setGameState('game_end');
           ws.close();
           break;
+        }
 
         default:
           console.warn('Unknown message type:', data.type);
@@ -131,6 +150,7 @@ export default function GameApp() {
           totalRounds={totalRounds}
           currentRound={currentRound}
           roundResults={roundResults}
+          scores={currentScores}
         />
       )}
 
@@ -147,6 +167,7 @@ export default function GameApp() {
           totalRounds={totalRounds}
           currentRound={currentRound}
           roundResults={roundResults}
+          currentScores={currentScores} // Добавляем передачу счетов
           onContinue={() => setGameState('waiting')}
         />
       )}
@@ -154,8 +175,12 @@ export default function GameApp() {
       {gameState === 'game_end' && (
         <div className={styles.endScreen}>
           <h2>Игра завершена!</h2>
+          <ScoreBoard
+            userScore={finalScores.user}
+            opponentScore={finalScores.opponent}
+          />
           <p>Результат: {gameResult.status}</p>
-          <p>Счет: {gameResult.final_scores[getUserId()]}</p>
+          <p>Изменения рейтинга игрока: {gameResult.diff}</p>
           <a href="/" className={styles.button}>На главную</a>
         </div>
       )}

@@ -215,6 +215,7 @@ class Game:
         results = {
             "type": EventType.ROUND_RESULT.value,
             "scores": scores,
+            "total_score": self.scores,
             "total_wins": self.wins
         }
         for ws in self.sockets.values():

@@ -1,0 +1,56 @@
+.scoreContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.scoreItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scoreLabel {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.scoreValue {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.scoreSeparator {
+  font-size: 2rem;
+  margin: 0 10px;
+}
+
+.win .scoreValue:first-child {
+  color: #40c057;
+}
+
+.lose .scoreValue:first-child {
+  color: #fa5252;
+}
+
+.draw .scoreValue:first-child {
+  color: #ffd43b;
+}
+
+.win .scoreValue:last-child {
+  color: #fa5252;
+}
+
+.lose .scoreValue:last-child {
+  color: #40c057;
+}
+
+.draw .scoreValue:last-child {
+  color: #ffd43b;
+}
