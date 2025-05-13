@@ -1,0 +1,41 @@
+.container {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.dot {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dee2e6;
+  color: #495057;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.current {
+  box-shadow: 0 0 0 3px #4dabf7;
+}
+
+.win {
+  background: #40c057;
+  color: white;
+}
+
+.lose {
+  background: #fa5252;
+  color: white;
+}
+
+.draw {
+  background: #ffd43b;
+  color: #495057;
+}

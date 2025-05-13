@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './GameApp.module.css';
 import RoundScreen from '../RoundScreen/RoundScreen.jsx';
@@ -14,11 +14,23 @@ export default function GameApp() {
   const [results, setResults] = useState(null);
   const [opponent, setOpponent] = useState('');
   const [gameResult, setGameResult] = useState(null);
+  const [totalRounds, setTotalRounds] = useState(0);
+  const [roundResults, setRoundResults] = useState([]);
+  const [currentRound, setCurrentRound] = useState(0);
+
+  const currentRoundRef = useRef(currentRound);
+  currentRoundRef.current = currentRound;
 
   useEffect(() => {
     const ws = new WebSocket(
       `ws://localhost:8000/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
     );
+
+    const calculateResult = (userScore, opponentScore) => {
+      if (userScore > opponentScore) return 'win';
+      if (userScore < opponentScore) return 'lose';
+      return 'draw';
+    };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -37,15 +49,37 @@ export default function GameApp() {
           setTimeout(() => setGameState('round'), 3000);
           break;
 
+        case 'Game':
+          setTotalRounds(data.round_count);
+          setRoundResults(Array(data.round_count).fill(null));
+          setCurrentRound(0);
+          break;
+
         case 'Start Round':
           setRoundData(data);
           setGameState('round');
+          setCurrentRound(prev => prev + 1);
           break;
 
-        case 'round_result':
+        case 'round_result': {
+          const userId = getUserId();
+          const opponentId = Object.keys(data.scores).find(id => id !== userId);
+
+          const result = calculateResult(
+            data.scores[userId],
+            data.scores[opponentId]
+          );
+
+          setRoundResults(prev => {
+            const newResults = [...prev];
+            newResults[currentRoundRef.current - 1] = result;
+            return newResults;
+          });
+
           setResults(data);
           setGameState('results');
           break;
+        }
 
         case 'game_end':
           setGameResult(data);
@@ -60,8 +94,11 @@ export default function GameApp() {
 
     setSocket(ws);
 
-    return () => ws.close();
-  }, [competition_id]);
+    return () => {
+      ws.close();
+      setSocket(null);
+    }
+  }, [competition_id]); // Только competition_id в зависимостях
 
   const handleAnswersSubmit = (answers) => {
     socket.send(JSON.stringify({
@@ -91,6 +128,9 @@ export default function GameApp() {
         <RoundScreen
           roundData={roundData}
           onSubmit={handleAnswersSubmit}
+          totalRounds={totalRounds}
+          currentRound={currentRound}
+          roundResults={roundResults}
         />
       )}
 
@@ -104,6 +144,9 @@ export default function GameApp() {
       {gameState === 'results' && (
         <ResultsScreen
           results={results}
+          totalRounds={totalRounds}
+          currentRound={currentRound}
+          roundResults={roundResults}
           onContinue={() => setGameState('waiting')}
         />
       )}

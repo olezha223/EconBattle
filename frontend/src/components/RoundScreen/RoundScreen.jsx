@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
 import styles from './RoundScreen.module.css';
+import RoundIndicator from "../RoundIndicator/RoundIndicator.jsx";
 
-export default function RoundScreen({ roundData, onSubmit }) {
+export default function RoundScreen({
+  roundData,
+  onSubmit,
+  totalRounds,
+  currentRound,
+  roundResults
+}) {
   const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(roundData.time_limit);
 
@@ -22,6 +29,11 @@ export default function RoundScreen({ roundData, onSubmit }) {
   return (
     <div className={styles.roundContainer}>
       <div className={styles.timer}>Осталось времени: {timeLeft} сек.</div>
+      <RoundIndicator
+        total={totalRounds}
+        current={currentRound}
+        results={roundResults}
+      />
 
       {roundData.problems.map(problem => (
         <div key={problem.id} className={styles.problemCard}>

@@ -49,7 +49,13 @@ class Game:
     async def start(self):
         self.competition = await self.competition_service.get_competition(self.competition_id)
         try:
-            await self._notify_players("Game", data={"msg": "Идет процесс игры"})
+            await self._notify_players(
+                "Game",
+                data={
+                    "msg": "Идет процесс игры",
+                    "round_count": self.competition.max_rounds
+                }
+            )
             while self.current_round < self.competition.max_rounds:
                 print(f"Начинаем раунд {self.current_round}")
                 await self._start_round()
