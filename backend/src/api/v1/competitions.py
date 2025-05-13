@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
-from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition
+from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition, CompetitionDetailedDTO
 from src.service import CompetitionService, get_competition_service, get_user_service, UserService
 
 router_competitions = APIRouter(
@@ -34,7 +34,7 @@ async def create_competition(
 async def get_competition_by_id(
         competition_id: int = Query(..., description="ID of the competition to retrieve"),
         service: CompetitionService = Depends(get_competition_service),
-) -> CompetitionDTO:
+) -> CompetitionDetailedDTO:
     competition = await service.get_competition(competition_id)
     if not competition:
         raise HTTPException(

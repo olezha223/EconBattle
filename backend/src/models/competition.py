@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -14,6 +16,9 @@ class NewCompetition(BaseModel):
 class CompetitionDTO(NewCompetition):
     id: int
     created_at: datetime
+
+class CompetitionDetailedDTO(CompetitionDTO):
+    creator_name: str
 
 class CompetitionPreview(BaseModel):
     id: int

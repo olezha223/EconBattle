@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition
+from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition, CompetitionDetailedDTO
 from src.repository.competitions import CompetitionsRepo
 from src.repository.games import GamesRepo
 from src.repository.users import UserRepo
@@ -17,8 +17,14 @@ class CompetitionService:
         self.games_repo = games_repo
         self.user_repo = user_repo
 
-    async def get_competition(self, competition_id: int) -> Optional[CompetitionDTO]:
-        return await self.competition_repo.get_by_id(competition_id)
+    async def get_competition(self, competition_id: int) -> Optional[CompetitionDetailedDTO]:
+        competition = await self.competition_repo.get_by_id(competition_id)
+        if competition:
+            user = await self.user_repo.get_by_id(competition.creator_id)
+            return CompetitionDetailedDTO(
+                **competition.model_dump(),
+                creator_name=user.username
+            )
 
     async def create_competition(self, competition: NewCompetition) -> int:
         return await self.competition_repo.create_competition(competition)

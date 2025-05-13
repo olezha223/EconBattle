@@ -53,3 +53,22 @@
 .button:hover {
   background: #45a049;
 }
+
+.creatorLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.creatorLink:hover {
+  text-decoration: underline;
+}
+
+.creatorAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
