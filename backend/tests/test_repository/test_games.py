@@ -1,5 +1,5 @@
 from src.database.schemas import Game
-from src.models.game import GameDTO
+from src.models.game import NewGame
 from src.models.round import StatusEnum
 from tests.conftest import create_rounds, games_repo, game_1_dto, game_2_dto, create_games
 
@@ -23,10 +23,10 @@ async def test_get(create_rounds, games_repo, game_1_dto, game_2_dto):
     dto_id_2 = await games_repo.create(model=game_2_dto, orm=Game)
     assert dto_id_2 == 2
 
-    dto_1 = await games_repo.get(object_id=dto_id_1, orm_class=Game, model_class=GameDTO)
+    dto_1 = await games_repo.get(object_id=dto_id_1, orm_class=Game, model_class=NewGame)
     assert dto_1 == game_1_dto
 
-    dto_2 = await games_repo.get(object_id=dto_id_2, orm_class=Game, model_class=GameDTO)
+    dto_2 = await games_repo.get(object_id=dto_id_2, orm_class=Game, model_class=NewGame)
     assert dto_2 == game_2_dto
 
 

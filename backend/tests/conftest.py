@@ -6,7 +6,7 @@ import redis
 from sqlalchemy import text
 
 from src.config import configuration
-from src.models.game import GameDTO
+from src.models.game import NewGame
 from src.repository.game_queue.redis_queue import RedisQueue
 from src.service import UserService, TaskService
 from tests.utils.adapter import get_session_test
@@ -224,7 +224,7 @@ async def round_3_dto():
 
 @pytest.fixture
 async def game_1_dto():
-    return GameDTO(
+    return NewGame(
         competition_id=1,
         player_1='1',
         player_2='2',
@@ -237,7 +237,7 @@ async def game_1_dto():
 
 @pytest.fixture
 async def game_2_dto():
-    return GameDTO(
+    return NewGame(
         competition_id=1,
         player_1='1',
         player_2='2',
@@ -336,8 +336,8 @@ async def create_games(create_rounds, games_repo, game_1_dto, game_2_dto):
     assert dto_id_1 == 1
     assert dto_id_2 == 2
 
-    dto_1 = await games_repo.get(object_id=dto_id_1, orm_class=Game, model_class=GameDTO)
-    dto_2 = await games_repo.get(object_id=dto_id_2, orm_class=Game, model_class=GameDTO)
+    dto_1 = await games_repo.get(object_id=dto_id_1, orm_class=Game, model_class=NewGame)
+    dto_2 = await games_repo.get(object_id=dto_id_2, orm_class=Game, model_class=NewGame)
     assert dto_1 == game_1_dto
     assert dto_2 == game_2_dto
 
