@@ -173,18 +173,26 @@ class Game:
     async def _update_scores(self, scores: dict):
         """Обновление счетчиков побед"""
         max_score = max(scores.values())
+        max_players = [pid for pid, score in scores.items() if score == max_score and score > 0]
+
+        # Сбрасываем статусы
         status_player_1 = StatusEnum.TIE.value
         status_player_2 = StatusEnum.TIE.value
+
+        # Если есть один победитель
+        if len(max_players) == 1:
+            winner_id = max_players[0]
+            if winner_id == self.user_1_id:
+                status_player_1 = StatusEnum.WINNER.value
+                status_player_2 = StatusEnum.LOSER.value
+            else:
+                status_player_2 = StatusEnum.WINNER.value
+                status_player_1 = StatusEnum.LOSER.value
+            self.wins[winner_id] += 1
+
+        # Обновляем общие очки (даже при ничье)
         for pid, score in scores.items():
             self.scores[pid] += score
-            if score == max_score and score > 0:
-                if pid == self.user_1_id:
-                    status_player_1 = StatusEnum.WINNER.value
-                    status_player_2 = StatusEnum.LOSER.value
-                else:
-                    status_player_2 = StatusEnum.WINNER.value
-                    status_player_1 = StatusEnum.LOSER.value
-                self.wins[pid] += 1
 
         round_dto = RoundDTO(
             player_1=self.user_1_id,
@@ -215,14 +223,18 @@ class Game:
         }
 
     async def _end_game(self):
-        """Финализация игры и обновление рейтингов"""
-        winner_id = max(self.scores, key=self.scores.get)
-        if winner_id == self.user_1_id:
-            self.player_final_info[self.user_1_id] = {"status": StatusEnum.WINNER.value, "diff": 10}
-            self.player_final_info[self.user_2_id] = {"status": StatusEnum.LOSER.value, "diff": -10}
+        score_1 = self.scores[self.user_1_id]
+        score_2 = self.scores[self.user_2_id]
+
+        if score_1 == score_2:
+            # Ничья
+            self.player_final_info[self.user_1_id] = {"status": StatusEnum.TIE.value, "diff": 0}
+            self.player_final_info[self.user_2_id] = {"status": StatusEnum.TIE.value, "diff": 0}
         else:
-            self.player_final_info[self.user_1_id] = {"status": StatusEnum.LOSER.value, "diff": -10}
-            self.player_final_info[self.user_2_id] = {"status": StatusEnum.WINNER.value, "diff": 10}
+            winner_id = self.user_1_id if score_1 > score_2 else self.user_2_id
+            loser_id = self.user_2_id if winner_id == self.user_1_id else self.user_1_id
+            self.player_final_info[winner_id] = {"status": StatusEnum.WINNER.value, "diff": 10}
+            self.player_final_info[loser_id] = {"status": StatusEnum.LOSER.value, "diff": -10}
 
         # Отправка финальных результатов
         for pid, ws in self.sockets.items():
