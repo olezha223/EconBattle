@@ -28,6 +28,7 @@ class TaskFromAuthor(BaseModel):
     value: dict[str, Any]
     answer_type: str
     correct_value: dict[str, Any]
+    access_type: str
 
 
 class TaskWithoutAnswers(BaseModel):
@@ -43,6 +44,7 @@ class TaskWithoutAnswers(BaseModel):
 
 class TaskDTO(TaskWithoutAnswers):
     correct_value: dict[str, Any]
+    access_type: str
 
 class TaskPreview(BaseModel):
     id: int

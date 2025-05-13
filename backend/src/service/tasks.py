@@ -28,12 +28,14 @@ class TaskService:
         tasks = await self.task_repo.get_all_problems_for_user(user_id)
         return await self._get_previews(tasks)
 
-    async def get_all_problems_previews_without_users(self, user_id: str) -> list[TaskPreview]:
-        tasks = await self.task_repo.get_all_problems_without_user(user_id)
+    async def get_all_public_problems_previews_for_user(self, user_id: str) -> list[TaskPreview]:
+        tasks = await self.task_repo.get_all_problems_for_user(user_id)
+        tasks = [task for task in tasks if task.access_type == "public"]
         return await self._get_previews(tasks)
 
     async def get_all_problems_previews(self) -> list[TaskPreview]:
         tasks = await self.task_repo.get_all_problems()
+        tasks = [task for task in tasks if task.access_type == "public"]
         return await self._get_previews(tasks)
 
     async def _get_previews(self, tasks: list[TaskDTO]) -> list[TaskPreview]:

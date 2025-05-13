@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, Request
 from starlette import status
 
 from src.models.users import UserInfo
@@ -8,6 +8,15 @@ router_user = APIRouter(
     prefix="/users",
     tags=["users"]
 )
+
+async def get_current_user(request: Request):
+    user = request.session.get('user')
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+    return user
 
 @router_user.get(
     path="/info",

@@ -11,7 +11,7 @@ export const fetchUserTasks = async () => {
 }
 
 export const fetchPreviews = async (userId) => {
-  const response = await api.get('/tasks/previews', {
+  const response = await api.get('/tasks/previews-public', {
     params: { user_id: userId }
   })
   return response.data
