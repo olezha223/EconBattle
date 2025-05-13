@@ -75,8 +75,9 @@ export default function RoundScreen({ roundData, onSubmit }) {
       <button
         onClick={() => onSubmit(answers)}
         className={styles.submitButton}
+        disabled={timeLeft === 0}
       >
-        Отправить ответы
+        {timeLeft > 0 ? 'Отправить ответы' : 'Время вышло!'}
       </button>
     </div>
   );

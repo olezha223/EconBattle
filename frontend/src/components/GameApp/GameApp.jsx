@@ -68,6 +68,7 @@ export default function GameApp() {
       type: 'answers',
       answers: answers
     }));
+    setGameState('awaiting_opponent');
   };
 
   return (
@@ -91,6 +92,13 @@ export default function GameApp() {
           roundData={roundData}
           onSubmit={handleAnswersSubmit}
         />
+      )}
+
+      {gameState === 'awaiting_opponent' && (
+        <div className={styles.waiting}>
+          Ожидаем ответа соперника...
+          <div className={styles.loader}></div>
+        </div>
       )}
 
       {gameState === 'results' && (
