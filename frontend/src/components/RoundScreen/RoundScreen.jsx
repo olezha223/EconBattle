@@ -1,67 +1,83 @@
-import { useState } from 'react'
-import ProblemForm from "../ProblemForm/ProblemForm.jsx";
-import './RoundScreen.module.css'
+import { useState, useEffect } from 'react';
+import styles from './RoundScreen.module.css';
 
-function RoundScreen({ problems, onSubmit, timeLeft }) {
-  const [currentProblemIndex, setCurrentProblemIndex] = useState(0)
-  const [answers, setAnswers] = useState(Array(problems.length).fill(null))
+export default function RoundScreen({ roundData, onSubmit }) {
+  const [answers, setAnswers] = useState({});
+  const [timeLeft, setTimeLeft] = useState(roundData.time_limit);
 
-  const handleAnswerChange = (index, value) => {
-    const newAnswers = [...answers]
-    newAnswers[index] = value
-    setAnswers(newAnswers)
-  }
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  const handleNextProblem = () => {
-    if (currentProblemIndex < problems.length - 1) {
-      setCurrentProblemIndex(currentProblemIndex + 1)
-    }
-  }
-
-  const handlePrevProblem = () => {
-    if (currentProblemIndex > 0) {
-      setCurrentProblemIndex(currentProblemIndex - 1)
-    }
-  }
-
-  const handleSubmit = () => {
-    const formattedAnswers = {}
-    problems.forEach((problem, index) => {
-      formattedAnswers[problem.id] = answers[index] !== null ? [answers[index]] : []
-    })
-    onSubmit({ answers: formattedAnswers })
-  }
+  const handleAnswerChange = (problemId, value) => {
+    setAnswers(prev => ({
+      ...prev,
+      [problemId]: Array.isArray(value) ? value : [value]
+    }));
+  };
 
   return (
-    <div className="round-container">
-      <div className="progress-indicator">
-        Вопрос {currentProblemIndex + 1} из {problems.length}
-      </div>
+    <div className={styles.roundContainer}>
+      <div className={styles.timer}>Осталось времени: {timeLeft} сек.</div>
 
-      <ProblemForm
-        problem={problems[currentProblemIndex]}
-        answer={answers[currentProblemIndex]}
-        onAnswerChange={(value) => handleAnswerChange(currentProblemIndex, value)}
-      />
+      {roundData.problems.map(problem => (
+        <div key={problem.id} className={styles.problemCard}>
+          <h3>{problem.name}</h3>
+          <p>{problem.text}</p>
 
-      <div className="navigation-buttons">
-        <button
-          onClick={handlePrevProblem}
-          disabled={currentProblemIndex === 0}
-        >
-          Назад
-        </button>
+          {problem.task_type === 'single choice' && (
+            <div className={styles.options}>
+              {problem.value.answers.map((answer, index) => (
+                <label key={index}>
+                  <input
+                    type="radio"
+                    name={`problem-${problem.id}`}
+                    onChange={() => handleAnswerChange(problem.id, answer)}
+                  />
+                  {answer}
+                </label>
+              ))}
+            </div>
+          )}
 
-        {currentProblemIndex < problems.length - 1 ? (
-          <button onClick={handleNextProblem}>Следующий</button>
-        ) : (
-          <button onClick={handleSubmit} className="submit-button">
-            Отправить ответы
-          </button>
-        )}
-      </div>
+          {problem.task_type === 'multiple choice' && (
+            <div className={styles.options}>
+              {problem.value.answers.map((answer, index) => (
+                <label key={index}>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      const newAnswers = e.target.checked
+                        ? [...(answers[problem.id] || []), answer]
+                        : (answers[problem.id] || []).filter(a => a !== answer);
+                      handleAnswerChange(problem.id, newAnswers);
+                    }}
+                  />
+                  {answer}
+                </label>
+              ))}
+            </div>
+          )}
+
+          {['string', 'int'].includes(problem.task_type) && (
+            <input
+              type="text"
+              onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
+              className={styles.textInput}
+            />
+          )}
+        </div>
+      ))}
+
+      <button
+        onClick={() => onSubmit(answers)}
+        className={styles.submitButton}
+      >
+        Отправить ответы
+      </button>
     </div>
-  )
+  );
 }
-
-export default RoundScreen

@@ -1,88 +1,113 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import GameScreen from '../../components/GameScreen/GameScreen.jsx';
-import useWebSocket from '../../hooks/useWebSocket';
-import './GameApp.module.css'
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import styles from './GameApp.module.css';
+import RoundScreen from '../RoundScreen/RoundScreen.jsx';
+import ResultsScreen from "../ResultsScreen/ResultsScreen.jsx";
 
-function GameApp() {
+const getUserId = () => localStorage.getItem('user_id') || '';
+
+export default function GameApp() {
   const { competition_id } = useParams();
-  const navigate = useNavigate();
-  const [gameState, setGameState] = useState('waiting'); // Начальное состояние изменено на waiting
-  const [opponent, setOpponent] = useState(null);
-  const [playerId, setPlayerId] = useState('');
-  const [roundResults, setRoundResults] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [gameState, setGameState] = useState('connecting');
+  const [roundData, setRoundData] = useState(null);
+  const [results, setResults] = useState(null);
+  const [opponent, setOpponent] = useState('');
   const [gameResult, setGameResult] = useState(null);
-  const userId = localStorage.getItem('user_id');
-
-  const wsUrl = `ws://localhost:8000/ws/?user_id=${userId}&competition_id=${competition_id}`;
-  const { sendMessage, lastMessage } = useWebSocket(wsUrl);
 
   useEffect(() => {
-    // Автоматически подключаемся при монтировании компонента
-    setPlayerId(userId);
-  }, [userId]);
+    const ws = new WebSocket(
+      `ws://localhost:8000/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
+    );
 
-  useEffect(() => {
-    if (lastMessage) {
-      const message = JSON.parse(lastMessage.data);
-      switch(message.type) {
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      switch (data.type) {
+        case 'connected':
+          setGameState('waiting');
+          break;
+
+        case 'waiting':
+          setGameState('waiting');
+          break;
+
         case 'matched':
-          setOpponent(message.msg.split(': ')[1]);
-          setGameState('game');
+          setOpponent(data.msg.split(': ')[1]);
+          setGameState('matched');
+          setTimeout(() => setGameState('round'), 3000);
           break;
+
         case 'Start Round':
-          setGameState('game');
+          setRoundData(data);
+          setGameState('round');
           break;
+
         case 'round_result':
-          setRoundResults(prev => [...prev, message]);
+          setResults(data);
+          setGameState('results');
           break;
+
         case 'game_end':
-          setGameResult(message);
-          setGameState('finished');
+          setGameResult(data);
+          setGameState('game_end');
+          ws.close();
           break;
-        case 'Closing':
-          navigate('/competitions');
-          break;
+
+        default:
+          console.warn('Unknown message type:', data.type);
       }
-    }
-  }, [lastMessage, navigate]);
+    };
+
+    setSocket(ws);
+
+    return () => ws.close();
+  }, [competition_id]);
+
+  const handleAnswersSubmit = (answers) => {
+    socket.send(JSON.stringify({
+      type: 'answers',
+      answers: answers
+    }));
+  };
 
   return (
-    <div className="app-container">
+    <div className={styles.container}>
+      {gameState === 'connecting' && <div>Подключение...</div>}
+
       {gameState === 'waiting' && (
-        <GameScreen
-          gameState={gameState}
-          opponent={opponent}
-          playerId={playerId}
-          sendMessage={sendMessage}
+        <div className={styles.waiting}>
+          Ожидаем соперника...
+        </div>
+      )}
+
+      {gameState === 'matched' && (
+        <div className={styles.matched}>
+          Соперник найден! Информация о нем: {opponent}
+        </div>
+      )}
+
+      {gameState === 'round' && (
+        <RoundScreen
+          roundData={roundData}
+          onSubmit={handleAnswersSubmit}
         />
       )}
 
-      {gameState === 'game' && (
-        <GameScreen
-          gameState={gameState}
-          opponent={opponent}
-          playerId={playerId}
-          sendMessage={sendMessage}
-          lastMessage={lastMessage}
+      {gameState === 'results' && (
+        <ResultsScreen
+          results={results}
+          onContinue={() => setGameState('waiting')}
         />
       )}
 
-      {gameState === 'finished' && gameResult && (
-        <div className="result-container">
+      {gameState === 'game_end' && (
+        <div className={styles.endScreen}>
           <h2>Игра завершена!</h2>
-          <p>Статус: {gameResult.status}</p>
-          <p>Счёт: {gameResult.final_scores[userId]}</p>
-          <button
-            onClick={() => navigate('/competitions')}
-            className="return-button"
-          >
-            Вернуться к соревнованиям
-          </button>
+          <p>Результат: {gameResult.status}</p>
+          <p>Счет: {gameResult.final_scores[getUserId()]}</p>
+          <a href="/" className={styles.button}>На главную</a>
         </div>
       )}
     </div>
   );
 }
-
-export default GameApp;
