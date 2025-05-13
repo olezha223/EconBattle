@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
 import { fetchCompetitionDetails } from '../../services/api'
 import styles from './CompetitionDetailsPage.module.css'
 
 export default function CompetitionDetailsPage() {
   const { id } = useParams()
   const [competition, setCompetition] = useState(null)
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -21,6 +22,10 @@ export default function CompetitionDetailsPage() {
     }
     loadCompetition()
   }, [id])
+
+  const handleStartGame = () => {
+    navigate(`/game/${id}`)
+  }
 
   if (loading) return <div>Loading...</div>
   if (!competition) return <div>Competition not found</div>
@@ -60,7 +65,7 @@ export default function CompetitionDetailsPage() {
         </div>
       </div>
 
-      <button className={styles.button}>
+      <button className={styles.button} onClick={handleStartGame}>
         Начать!
       </button>
     </div>
