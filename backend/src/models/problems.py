@@ -46,6 +46,9 @@ class TaskDTO(TaskWithoutAnswers):
     correct_value: dict[str, Any]
     access_type: str
 
+class TaskDetailedDTO(TaskDTO):
+    creator_name: str
+
 class TaskPreview(BaseModel):
     id: int
     created_at: datetime

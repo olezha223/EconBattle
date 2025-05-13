@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
 from src.api.v1.users import get_current_user
-from src.models.problems import TaskDTO, TaskFromAuthor, TaskPreview
+from src.models.problems import TaskDTO, TaskFromAuthor, TaskPreview, TaskDetailedDTO
 from src.service import get_task_service, UserService, get_user_service
 from src.service.tasks import TaskService
 
@@ -38,7 +38,7 @@ async def get_problem(
         task_id: int = Query(..., description="ID of the task"),
         service: TaskService = Depends(get_task_service),
         current_user: dict = Depends(get_current_user),
-) -> TaskDTO:
+) -> TaskDetailedDTO:
     task = await service.get(task_id)
 
     if not task:

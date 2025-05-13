@@ -1,4 +1,6 @@
-from src.models.problems import TaskDTO, TaskWithoutAnswers, TaskFromAuthor, TaskPreview, TaskForGame
+from typing import Optional
+
+from src.models.problems import TaskDTO, TaskWithoutAnswers, TaskFromAuthor, TaskPreview, TaskForGame, TaskDetailedDTO
 from src.repository.competitions import CompetitionsRepo
 from src.repository.tasks import TaskRepo
 from src.repository.users import UserRepo
@@ -17,9 +19,14 @@ class TaskService:
         task_json['created_at'] = task.created_at.strftime('%Y-%m-%d %H:%M:%S')
         return TaskForGame(**task_json)
 
-    async def get(self, task_id: int) -> TaskDTO:
+    async def get(self, task_id: int) -> Optional[TaskDetailedDTO]:
         task = await self.task_repo.get_task_by_id(task_id)
-        return task
+        if task:
+            user = await self.user_repo.get_by_id(task.creator_id)
+            return TaskDetailedDTO(
+                **task.model_dump(),
+                creator_name=user.username
+            )
 
     async def create_task(self, task: TaskFromAuthor) -> int:
         return await self.task_repo.create_task(task)

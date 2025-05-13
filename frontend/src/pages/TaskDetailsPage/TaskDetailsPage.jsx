@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -76,6 +76,10 @@ export default function TaskDetailsPage() {
     return <div className={styles.error}>Задача не найдена</div>
   }
 
+  const handleAuthorClick = (e) => {
+    e.stopPropagation()
+  }
+
   const showAnswers = ['single choice', 'multiple choice'].includes(task.task_type) &&
                      task.value?.answers?.length > 0
 
@@ -88,7 +92,18 @@ export default function TaskDetailsPage() {
       <h1 className={styles.title}>{task.name}</h1>
 
       <div className={styles.meta}>
-        <span className={styles.creator}>Автор: {task.creator_id}</span>
+         <Link
+          to={`/user_page/${task.creator_id}`}
+          className={styles.creatorLink}
+          onClick={handleAuthorClick}
+        >
+          <img
+            src="/static/default-avatar.jpg"
+            alt="Аватар автора"
+            className={styles.creatorAvatar}
+          />
+          <span className={styles.creator}>Автор: {task.creator_name}</span>
+        </Link>
         <span className={styles.date}>
           Создано: {format(new Date(task.created_at), 'dd MMMM yyyy HH:mm', { locale: ru })}
         </span>
