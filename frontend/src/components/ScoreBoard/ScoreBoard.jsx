@@ -1,14 +1,8 @@
 import styles from './ScoreBoard.module.css';
 
-export default function ScoreBoard({ userScore, opponentScore }) {
-  const getStatus = () => {
-    if (userScore > opponentScore) return 'win';
-    if (userScore < opponentScore) return 'lose';
-    return 'draw';
-  };
-
+export default function ScoreBoard({ userScore, opponentScore, status}) {
   return (
-    <div className={`${styles.scoreContainer} ${styles[getStatus()]}`}>
+    <div className={`${styles.scoreContainer} ${styles[status]}`}>
       <div className={styles.scoreItem}>
         <span className={styles.scoreLabel}>Ваш счет</span>
         <span className={styles.scoreValue}>{userScore}</span>

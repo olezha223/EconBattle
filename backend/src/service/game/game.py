@@ -215,6 +215,7 @@ class Game:
         results = {
             "type": EventType.ROUND_RESULT.value,
             "scores": scores,
+            "statuses": {self.user_1_id: status_player_1, self.user_2_id: status_player_2},
             "total_score": self.scores,
             "total_wins": self.wins
         }

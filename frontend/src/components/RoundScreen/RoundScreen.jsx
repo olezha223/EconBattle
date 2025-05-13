@@ -8,7 +8,8 @@ export default function RoundScreen({
   onSubmit,
   totalRounds,
   currentRound,
-  roundResults, scores = { user: 0, opponent: 0 }
+  roundResults,
+  scores = { user: 0, opponent: 0, status: 'default'}
 }) {
   const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(roundData.time_limit);
@@ -33,6 +34,7 @@ export default function RoundScreen({
       <ScoreBoard
         userScore={scores.user}
         opponentScore={scores.opponent}
+        status={scores.status}
       />
       <div className={styles.timer}>Осталось времени: {timeLeft} сек.</div>
       <RoundIndicator

@@ -20,7 +20,8 @@ export default function GameApp() {
   const [currentRound, setCurrentRound] = useState(0);
   const [currentScores, setCurrentScores] = useState({
     user: 0,
-    opponent: 0
+    opponent: 0,
+    status: 'default',
   });
   const [finalScores, setFinalScores] = useState({ user: 0, opponent: 0 });
 
@@ -73,7 +74,8 @@ export default function GameApp() {
 
           setCurrentScores({
             user: data.total_score[userId],
-            opponent: data.total_score[opponentId]
+            opponent: data.total_score[opponentId],
+            status: data.statuses[userId]
           });
 
           const result = calculateResult(
@@ -127,6 +129,20 @@ export default function GameApp() {
     setGameState('awaiting_opponent');
   };
 
+  const renderGameResultHeader = () => {
+    if (!gameResult) return null;
+
+    const statusMap = {
+      'winner': { text: 'ПОБЕДА!', color: '#40c057' },
+      'loser': { text: 'ПОРАЖЕНИЕ', color: '#fa5252' },
+      'tie': { text: 'НИЧЬЯ', color: '#ffd43b' }
+    };
+
+    const { text, color } = statusMap[gameResult.status] || { text: 'Игра завершена', color: '#666' };
+
+    return <h2 style={{ color, fontSize: '3rem', margin: '20px 0' }}>{text}</h2>;
+  };
+
   return (
     <div className={styles.container}>
       {gameState === 'connecting' && <div>Подключение...</div>}
@@ -174,13 +190,15 @@ export default function GameApp() {
 
       {gameState === 'game_end' && (
         <div className={styles.endScreen}>
-          <h2>Игра завершена!</h2>
+          {renderGameResultHeader()}
           <ScoreBoard
             userScore={finalScores.user}
             opponentScore={finalScores.opponent}
+            status={gameResult.status}
           />
-          <p>Результат: {gameResult.status}</p>
-          <p>Изменения рейтинга игрока: {gameResult.diff}</p>
+          <div className={styles.finalStats}>
+            <p>Разница очков: {gameResult.diff}</p>
+          </div>
           <a href="/" className={styles.button}>На главную</a>
         </div>
       )}

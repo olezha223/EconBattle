@@ -24,6 +24,7 @@
 .scoreValue {
   font-size: 2rem;
   font-weight: bold;
+  color: #000; /* Цвет по умолчанию */
 }
 
 .scoreSeparator {
@@ -31,26 +32,28 @@
   margin: 0 10px;
 }
 
-.win .scoreValue:first-child {
-  color: #40c057;
+/* Стили для статусов */
+.winner .scoreItem:first-child .scoreValue {
+  color: #28a745;
 }
 
-.lose .scoreValue:first-child {
-  color: #fa5252;
+.winner .scoreItem:last-child .scoreValue {
+  color: #28a745;
 }
 
-.draw .scoreValue:first-child {
-  color: #ffd43b;
+
+.loser .scoreItem:first-child .scoreValue {
+  color: #dc3545;
 }
 
-.win .scoreValue:last-child {
-  color: #fa5252;
+.loser .scoreItem:last-child .scoreValue {
+  color: #dc3545;
 }
 
-.lose .scoreValue:last-child {
-  color: #40c057;
+.tie .scoreValue {
+  color: #ffc107;
 }
 
-.draw .scoreValue:last-child {
-  color: #ffd43b;
+.default .scoreValue {
+  color: #0e0b0b;
 }
