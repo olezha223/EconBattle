@@ -63,7 +63,7 @@ export default function TaskConstructorPage() {
         name: formData.name,
         text: formData.text,
         price: Number(formData.price),
-        task_type: formData.task_type.replace(' ', '_'),
+        task_type: formData.task_type,
         value: { answers },
         answer_type: formData.answer_type,
         correct_value: {
