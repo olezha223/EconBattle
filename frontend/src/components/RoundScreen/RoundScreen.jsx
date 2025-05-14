@@ -82,12 +82,30 @@ export default function RoundScreen({
             </div>
           )}
 
-          {['string', 'int'].includes(problem.task_type) && (
-            <input
-              type="text"
-              onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
-              className={styles.textInput}
-            />
+          {problem.task_type === 'string' && (
+            <div>
+              <input
+                type="text"
+                onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
+                className={styles.textInput}
+              />
+              <p className={styles.hint}>Введите строку</p>
+            </div>
+          )}
+
+          {problem.task_type === 'number' && (
+            <div>
+              <input
+                type="text"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const numberValue = parseFloat(value);
+                  handleAnswerChange(problem.id, isNaN(numberValue) ? '' : numberValue);
+                }}
+                className={styles.textInput}
+              />
+              <p className={styles.hint}>Дробные числа вводите через точку, например: 3.14</p>
+            </div>
           )}
         </div>
       ))}

@@ -90,3 +90,9 @@
   background: #a5d6a7;
   cursor: not-allowed;
 }
+
+.hint {
+  font-size: 0.875rem;
+  color: #718096;
+  margin-top: 0.5rem;
+}
