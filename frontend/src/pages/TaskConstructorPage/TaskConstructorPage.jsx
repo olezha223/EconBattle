@@ -7,6 +7,10 @@ import styles from './TaskConstructorPage.module.css'
 const API_URL = 'http://localhost:8000'
 const taskTypes = ['single choice', 'multiple choice', 'text', 'number']
 const answerTypes = ['string', 'float', 'int', 'list[int]', 'list[str]', 'list[float]']
+const accessTypes = [
+  { value: 'public', label: 'Публичный' },
+  { value: 'private', label: 'Приватный' }
+]
 
 export default function TaskConstructorPage() {
   const navigate = useNavigate()
@@ -17,7 +21,8 @@ export default function TaskConstructorPage() {
     task_type: 'single choice',
     value: {},
     answer_type: 'string',
-    correct_value: { input: '' }
+    correct_value: { input: '' },
+    access_type: 'public'
   })
   const [error, setError] = useState('')
 
@@ -70,7 +75,8 @@ export default function TaskConstructorPage() {
           answers: Array.isArray(parsedCorrectValue)
             ? parsedCorrectValue
             : [parsedCorrectValue]
-        }
+        },
+        access_type: formData.access_type
       }
 
       await axios.post(`${API_URL}/tasks/`, taskData, { withCredentials: true })
@@ -243,6 +249,29 @@ export default function TaskConstructorPage() {
                 ))}
               </select>
             </label>
+          </div>
+
+          <div className={styles.group}>
+            <label className={styles.label}>
+              Модификатор доступа *
+              <select
+                name="access_type"
+                value={formData.access_type}
+                onChange={handleInputChange}
+                className={styles.select}
+              >
+                {accessTypes.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {formData.access_type === 'public' ? (
+              <p className={styles.hint}>Все видят вашу задачу и ответ на нее</p>
+            ) : (
+              <p className={styles.hint}>Только вы можете использовать задачу</p>
+            )}
           </div>
         </div>
 
