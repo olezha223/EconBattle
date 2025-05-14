@@ -19,7 +19,6 @@ INIT_COMMANDS = [
         price INTEGER,
         task_type VARCHAR NOT NULL,
         value JSONB NOT NULL,
-        answer_type VARCHAR NOT NULL,
         correct_value JSONB NOT NULL,
         access_type VARCHAR NOT NULL DEFAULT 'public'
     );

@@ -5,8 +5,12 @@ import axios from 'axios'
 import styles from './TaskConstructorPage.module.css'
 
 const API_URL = 'http://localhost:8000'
-const taskTypes = ['single choice', 'multiple choice', 'text', 'number']
-const answerTypes = ['string', 'float', 'int', 'list[int]', 'list[str]', 'list[float]']
+const taskTypes = [
+  { value: 'single choice', label: 'Выбрать один вариант' },
+  { value: 'multiple choice', label: 'Множественный выбор' },
+  { value: 'string', label: 'Вписать строку' },
+  { value: 'number', label: 'Вписать число' }
+]
 const accessTypes = [
   { value: 'public', label: 'Публичный' },
   { value: 'private', label: 'Приватный' }
@@ -20,24 +24,29 @@ export default function TaskConstructorPage() {
     price: 0,
     task_type: 'single choice',
     value: {},
-    answer_type: 'string',
     correct_value: { input: '' },
     access_type: 'public'
   })
   const [error, setError] = useState('')
 
-  const parseValue = (value, type) => {
+  const parseValue = (value, taskType) => {
     try {
-      switch(type) {
-        case 'int': return parseInt(value)
-        case 'float': return parseFloat(value)
-        case 'list[int]': return JSON.parse(value).map(Number)
-        case 'list[str]': return JSON.parse(value)
-        case 'list[float]': return JSON.parse(value).map(parseFloat)
-        default: return value.toString()
+      switch(taskType) {
+        case 'single choice':
+          return [value.trim()]
+        case 'multiple choice':
+          return JSON.parse(value)
+        case 'string':
+          return [value.toString()]
+        case 'number':
+          const numValue = parseFloat(value)
+          if (isNaN(numValue)) throw new Error('Некорректное число')
+          return [numValue]
+        default:
+          throw new Error(`Неизвестный тип задачи: ${taskType}`)
       }
     } catch (e) {
-      throw new Error(`Некорректный формат для типа ${type}`)
+      throw new Error(`Ошибка формата: ${e.message}`)
     }
   }
 
@@ -46,35 +55,33 @@ export default function TaskConstructorPage() {
     setError('')
 
     try {
-      const answers = Object.values(formData.value)
-        .filter(v => v.trim() !== '')
-        .map(v => v.trim())
+      const taskType = formData.task_type
+      const isChoiceType = ['single choice', 'multiple choice'].includes(taskType)
 
-      if (['single choice', 'multiple choice'].includes(formData.task_type) && answers.length < 2) {
+      // Проверка вариантов ответов для типов с выбором
+      const answers = Object.values(formData.value).filter(v => v.trim() !== '')
+      if (isChoiceType && answers.length < 2) {
         throw new Error('Добавьте минимум 2 варианта ответа')
       }
 
+      // Проверка правильного ответа
       if (!formData.correct_value.input) {
         throw new Error('Введите правильный ответ')
       }
 
-      const parsedCorrectValue = parseValue(
-        formData.correct_value.input,
-        formData.answer_type
-      )
+      // Парсим значение ответа
+      const parsedCorrectValue = parseValue(formData.correct_value.input, taskType)
 
+      // Формируем данные для отправки
       const taskData = {
         creator_id: getUserId(),
         name: formData.name,
         text: formData.text,
         price: Number(formData.price),
-        task_type: formData.task_type,
-        value: { answers },
-        answer_type: formData.answer_type,
+        task_type: taskType,
+        value: isChoiceType ? { answers } : {},
         correct_value: {
-          answers: Array.isArray(parsedCorrectValue)
-            ? parsedCorrectValue
-            : [parsedCorrectValue]
+          answers: parsedCorrectValue
         },
         access_type: formData.access_type
       }
@@ -100,49 +107,61 @@ export default function TaskConstructorPage() {
   }
 
   const renderAnswerOptions = () => (
-  <div className={styles.section}>
-    <h3 className={styles.subtitle}>Варианты ответов</h3>
-    <div className={styles.options}>
-      {Object.keys(formData.value).map((key, index) => (
-        <div key={key} className={styles.optionItem}>
-          <input
-            type="text"
-            value={formData.value[key]}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              value: { ...prev.value, [key]: e.target.value }
-            }))}
-            className={styles.input}
-            placeholder={`Вариант ${index + 1}`}
-          />
-          <button
-            type="button"
-            className={styles.removeButton}
-            onClick={() => handleRemoveOption(key)}
-          >
-            ✕
-          </button>
-        </div>
-      ))}
-      <button
-        type="button"
-        className={styles.addButton}
-        onClick={() => setFormData(prev => ({
-          ...prev,
-          value: { ...prev.value, [Date.now()]: '' }
-        }))}
-      >
-        + Добавить вариант
-      </button>
+    <div className={styles.section}>
+      <h3 className={styles.subtitle}>Варианты ответов</h3>
+      <div className={styles.options}>
+        {Object.keys(formData.value).map((key, index) => (
+          <div key={key} className={styles.optionItem}>
+            <input
+              type="text"
+              value={formData.value[key]}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                value: { ...prev.value, [key]: e.target.value }
+              }))}
+              className={styles.input}
+              placeholder={`Вариант ${index + 1}`}
+            />
+            <button
+              type="button"
+              className={styles.removeButton}
+              onClick={() => handleRemoveOption(key)}
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className={styles.addButton}
+          onClick={() => setFormData(prev => ({
+            ...prev,
+            value: { ...prev.value, [Date.now()]: '' }
+          }))}
+        >
+          + Добавить вариант
+        </button>
+      </div>
     </div>
-  </div>
-)
+  )
 
   const renderCorrectAnswerInput = () => {
-    const isListType = formData.answer_type.startsWith('list')
-    const placeholder = isListType
-      ? 'Введите в формате JSON, например: [1, "два", 3]'
-      : 'Введите значение'
+    const taskType = formData.task_type
+    let placeholder = ''
+    let hint = null
+
+    if (taskType === 'single choice') {
+      placeholder = 'Введите верный вариант ответа'
+      hint = 'Введите точную текстовую формулировку правильного варианта'
+    } else if (taskType === 'multiple choice') {
+      placeholder = 'Введите JSON-массив выбранных вариантов, например: ["Вариант 1", "Вариант 3"]'
+      hint = 'Используйте JSON-формат для списка выбранных вариантов'
+    } else if (taskType === 'string') {
+      placeholder = 'Введите строку'
+    } else if (taskType === 'number') {
+      placeholder = 'Введите число'
+      hint = 'Дробные числа вводите через точку, например: 3.14'
+    }
 
     return (
       <div className={styles.section}>
@@ -157,11 +176,7 @@ export default function TaskConstructorPage() {
           className={styles.input}
           placeholder={placeholder}
         />
-        {isListType && (
-          <p className={styles.hint}>
-            Используйте JSON-формат для списка значений
-          </p>
-        )}
+        {hint && <p className={styles.hint}>{hint}</p>}
       </div>
     )
   }
@@ -224,27 +239,9 @@ export default function TaskConstructorPage() {
                 onChange={handleInputChange}
                 className={styles.select}
               >
-                {taskTypes.map(type => (
-                  <option key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className={styles.group}>
-            <label className={styles.label}>
-              Тип ответа *
-              <select
-                name="answer_type"
-                value={formData.answer_type}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                {answerTypes.map(type => (
-                  <option key={type} value={type}>
-                    {type.replace('list', 'Список ')}
+                {taskTypes.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
                   </option>
                 ))}
               </select>

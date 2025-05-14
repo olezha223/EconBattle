@@ -33,7 +33,6 @@ class Task(Base):
     text = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
     task_type = Column(String, nullable=False)
-    answer_type = Column(String, nullable=False)
     value = Column(JSON, nullable=False)
     correct_value = Column(JSON, nullable=False)
     access_type = Column(String, nullable=False, default='public')

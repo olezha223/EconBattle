@@ -2,7 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 
 class TaskTypeEnum(str, Enum):
     MULTIPLE_CHOICE = 'MULTIPLE_CHOICE'
@@ -26,7 +27,6 @@ class TaskFromAuthor(BaseModel):
     price: int
     task_type: str
     value: dict[str, Any]
-    answer_type: str
     correct_value: dict[str, Any]
     access_type: str
 
@@ -40,7 +40,6 @@ class TaskWithoutAnswers(BaseModel):
     price: int
     task_type: str
     value: dict[str, Any]
-    answer_type: str
 
 class TaskDTO(TaskWithoutAnswers):
     correct_value: dict[str, Any]
@@ -67,4 +66,3 @@ class TaskForGame(BaseModel):
     price: int
     task_type: str
     value: dict[str, Any]
-    answer_type: str

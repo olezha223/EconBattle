@@ -7,21 +7,34 @@ import styles from './TaskDetailsPage.module.css'
 
 const API_URL = 'http://localhost:8000'
 
+// Массив типов задач
+const taskTypes = [
+  { value: 'single choice', label: 'Выбрать один вариант' },
+  { value: 'multiple choice', label: 'Множественный выбор' },
+  { value: 'string', label: 'Вписать строку' },
+  { value: 'number', label: 'Вписать число' }
+];
+
+const taskTypeLabels = taskTypes.reduce((acc, type) => {
+  acc[type.value] = type.label;
+  return acc;
+}, {});
+
 const formatValue = (value, type) => {
-  if (!value?.answers) return 'Нет данных'
+  if (!value?.answers) return 'Нет данных';
 
   if (Array.isArray(value.answers)) {
     return value.answers.map((item, index) => (
       <li key={index} className={styles.listItem}>
         {JSON.stringify(item)}
       </li>
-    ))
+    ));
   }
-  return JSON.stringify(value.answers)
-}
+  return JSON.stringify(value.answers);
+};
 
 const formatCorrectValue = (correctValue) => {
-  if (!correctValue?.answers) return 'Нет данных'
+  if (!correctValue?.answers) return 'Нет данных';
 
   if (Array.isArray(correctValue.answers)) {
     return (
@@ -32,56 +45,59 @@ const formatCorrectValue = (correctValue) => {
           </li>
         ))}
       </ul>
-    )
+    );
   }
-  return <div className={styles.singleAnswer}>{JSON.stringify(correctValue.answers)}</div>
-}
-
+  return <div className={styles.singleAnswer}>{JSON.stringify(correctValue.answers)}</div>;
+};
 
 export default function TaskDetailsPage() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [task, setTask] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [showAnswer, setShowAnswer] = useState(false)
-  const [error, setError] = useState('')
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [task, setTask] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchTask = async () => {
       try {
         const response = await axios.get(`${API_URL}/tasks/`, {
           params: { task_id: id },
-          withCredentials: true
-        })
-        setTask(response.data)
+          withCredentials: true,
+        });
+        setTask(response.data);
       } catch (err) {
-        setError('Не удалось загрузить задачу')
-        console.error('Error fetching task:', err)
+        setError('Не удалось загрузить задачу');
+        console.error('Error fetching task:', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchTask()
-  }, [id])
+    };
+    fetchTask();
+  }, [id]);
 
   if (loading) {
-    return <div className={styles.loading}>Загрузка задачи...</div>
+    return <div className={styles.loading}>Загрузка задачи...</div>;
   }
 
   if (error) {
-    return <div className={styles.error}>{error}</div>
+    return <div className={styles.error}>{error}</div>;
   }
 
   if (!task) {
-    return <div className={styles.error}>Задача не найдена</div>
+    return <div className={styles.error}>Задача не найдена</div>;
   }
 
   const handleAuthorClick = (e) => {
-    e.stopPropagation()
-  }
+    e.stopPropagation();
+  };
 
-  const showAnswers = ['single choice', 'multiple choice'].includes(task.task_type) &&
-                     task.value?.answers?.length > 0
+  const showAnswers =
+    ['single choice', 'multiple choice'].includes(task.task_type) &&
+    task.value?.answers?.length > 0;
+
+  // Получаем русское название типа задачи
+  const taskTypeLabel = taskTypeLabels[task.task_type] || task.task_type;
 
   return (
     <div className={styles.container}>
@@ -92,7 +108,7 @@ export default function TaskDetailsPage() {
       <h1 className={styles.title}>{task.name}</h1>
 
       <div className={styles.meta}>
-         <Link
+        <Link
           to={`/user_page/${task.creator_id}`}
           className={styles.creatorLink}
           onClick={handleAuthorClick}
@@ -118,24 +134,18 @@ export default function TaskDetailsPage() {
         <div className={styles.detailsGrid}>
           <div className={styles.detailItem}>
             <span className={styles.detailLabel}>Тип задачи:</span>
-            <span className={styles.detailValue}>{task.task_type}</span>
+            <span className={styles.detailValue}>{taskTypeLabel}</span>
           </div>
           <div className={styles.detailItem}>
             <span className={styles.detailLabel}>Сложность:</span>
             <span className={styles.detailValue}>{task.price} баллов</span>
           </div>
-          <div className={styles.detailItem}>
-            <span className={styles.detailLabel}>Тип ответа:</span>
-            <span className={styles.detailValue}>{task.answer_type}</span>
-          </div>
         </div>
 
         {showAnswers && (
           <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Варианты ответов</h2>
-            <ul className={styles.answersList}>
-                {formatValue(task.value, task.task_type)}
-            </ul>
+            <h2 className={styles.sectionTitle}>Варианты ответов</h2>
+            <ul className={styles.answersList}>{formatValue(task.value, task.task_type)}</ul>
           </div>
         )}
 
@@ -149,12 +159,10 @@ export default function TaskDetailsPage() {
           </button>
 
           {showAnswer && (
-            <div className={styles.answerContent}>
-              {formatCorrectValue(task.correct_value)}
-            </div>
+            <div className={styles.answerContent}>{formatCorrectValue(task.correct_value)}</div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
