@@ -49,7 +49,6 @@ class Competition(Base):
     creator_id = Column(Text, ForeignKey('users.id'), nullable=False)
 
     # настройки игры
-    max_players = Column(Integer, nullable=False)
     max_rounds = Column(Integer, nullable=False)
     round_time_in_seconds = Column(Integer, nullable=False)
     tasks_markup = Column(JSON, nullable=False)

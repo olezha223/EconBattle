@@ -9,7 +9,6 @@ export default function CompetitionConstructorPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    max_players: 10,
     max_rounds: 5,
     round_time_in_seconds: 60,
     tasks_markup: {
@@ -70,7 +69,6 @@ export default function CompetitionConstructorPage() {
       const competitionData = {
         ...formData,
         creator_id: localStorage.getItem('user_id'),
-        max_players: Number(formData.max_players),
         max_rounds: Number(formData.max_rounds),
         round_time_in_seconds: Number(formData.round_time_in_seconds)
       };
@@ -143,22 +141,6 @@ export default function CompetitionConstructorPage() {
         </div>
 
         <div className={styles.grid}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
-              Макс. игроков *
-              <input
-                type="number"
-                name="max_players"
-                value={formData.max_players}
-                onChange={handleInputChange}
-                className={styles.input}
-                min="2"
-                max="100"
-                required
-              />
-            </label>
-          </div>
-
           <div className={styles.formGroup}>
             <label className={styles.label}>
               Макс. раундов *
