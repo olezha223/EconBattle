@@ -30,9 +30,7 @@ INIT_COMMANDS = [
         name VARCHAR NOT NULL,
         creator_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         -- competition settings
-        max_players INTEGER NOT NULL,
         max_rounds INTEGER NOT NULL,
-        round_time_in_seconds INTEGER NOT NULL,
         tasks_markup JSONB NOT NULL
     );
     """,

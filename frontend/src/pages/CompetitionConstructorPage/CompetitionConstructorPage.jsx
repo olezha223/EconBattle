@@ -10,9 +10,8 @@ export default function CompetitionConstructorPage() {
   const [formData, setFormData] = useState({
     name: '',
     max_rounds: 5,
-    round_time_in_seconds: 60,
     tasks_markup: {
-      '1': [] // Храним ключи раундов как строки
+      '1': { tasks: [], time_limit: 60 }
     }
   });
   const [currentRound, setCurrentRound] = useState('1');
@@ -26,7 +25,7 @@ export default function CompetitionConstructorPage() {
       ...prev,
       tasks_markup: {
         ...prev.tasks_markup,
-        [nextRound]: []
+        [nextRound]: { tasks: [], time_limit: 60 }
       }
     }));
     setCurrentRound(nextRound);
@@ -43,7 +42,10 @@ export default function CompetitionConstructorPage() {
       ...prev,
       tasks_markup: {
         ...prev.tasks_markup,
-        [round]: [...(prev.tasks_markup[round] || []), parseInt(taskId)]
+        [round]: {
+          ...prev.tasks_markup[round],
+          tasks: [...prev.tasks_markup[round].tasks, parseInt(taskId)]
+        }
       }
     }));
     setTaskInputs(prev => ({ ...prev, [round]: '' }));
@@ -51,12 +53,15 @@ export default function CompetitionConstructorPage() {
   };
 
   const handleRemoveTask = (round, index) => {
-    const updatedTasks = formData.tasks_markup[round].filter((_, i) => i !== index);
+    const updatedTasks = formData.tasks_markup[round].tasks.filter((_, i) => i !== index);
     setFormData(prev => ({
       ...prev,
       tasks_markup: {
         ...prev.tasks_markup,
-        [round]: updatedTasks
+        [round]: {
+          ...prev.tasks_markup[round],
+          tasks: updatedTasks
+        }
       }
     }));
   };
@@ -70,7 +75,6 @@ export default function CompetitionConstructorPage() {
         ...formData,
         creator_id: localStorage.getItem('user_id'),
         max_rounds: Number(formData.max_rounds),
-        round_time_in_seconds: Number(formData.round_time_in_seconds)
       };
 
       await axios.post(`${API_URL}/competitions/`, competitionData, {
@@ -121,6 +125,19 @@ export default function CompetitionConstructorPage() {
     }));
   };
 
+  const handleRoundTimeChange = (round, value) => {
+    setFormData(prev => ({
+      ...prev,
+      tasks_markup: {
+        ...prev.tasks_markup,
+        [round]: {
+          ...prev.tasks_markup[round],
+          time_limit: Number(value)
+        }
+      }
+    }));
+  };
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Создание нового соревнования</h1>
@@ -143,7 +160,7 @@ export default function CompetitionConstructorPage() {
         <div className={styles.grid}>
           <div className={styles.formGroup}>
             <label className={styles.label}>
-              Макс. раундов *
+              Число раундов *
               <input
                 type="number"
                 name="max_rounds"
@@ -152,22 +169,6 @@ export default function CompetitionConstructorPage() {
                 className={styles.input}
                 min="1"
                 max="20"
-                required
-              />
-            </label>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
-              Время раунда (сек) *
-              <input
-                type="number"
-                name="round_time_in_seconds"
-                value={formData.round_time_in_seconds}
-                onChange={handleInputChange}
-                className={styles.input}
-                min="10"
-                max="3600"
                 required
               />
             </label>
@@ -195,8 +196,23 @@ export default function CompetitionConstructorPage() {
                       )}
                     </div>
 
+                    <div className={styles.timeInputContainer}>
+                      <label className={styles.label}>
+                        Время раунда (сек) *
+                        <input
+                          type="number"
+                          value={formData.tasks_markup[round].time_limit}
+                          onChange={(e) => handleRoundTimeChange(round, e.target.value)}
+                          className={styles.timeInput}
+                          min="10"
+                          max="3600"
+                          required
+                        />
+                      </label>
+                    </div>
+
                     <div className={styles.tasksList}>
-                      {formData.tasks_markup[round].map((taskId, index) => (
+                      {formData.tasks_markup[round].tasks.map((taskId, index) => (
                         <div key={`${round}-${taskId}`} className={styles.taskItem}>
                           <span>Задача #{taskId}</span>
                           <button

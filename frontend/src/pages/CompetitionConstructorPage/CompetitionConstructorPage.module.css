@@ -233,3 +233,21 @@
 .removeButton:hover {
   background: #feb2b2;
 }
+
+.timeInputContainer {
+  margin-bottom: 1rem;
+}
+
+.timeInput {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #cbd5e0;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.timeInput:focus {
+  border-color: #48bb78;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+}

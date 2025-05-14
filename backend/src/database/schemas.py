@@ -50,7 +50,6 @@ class Competition(Base):
 
     # настройки игры
     max_rounds = Column(Integer, nullable=False)
-    round_time_in_seconds = Column(Integer, nullable=False)
     tasks_markup = Column(JSON, nullable=False)
 
 

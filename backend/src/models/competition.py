@@ -3,14 +3,16 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+class Round(BaseModel):
+    tasks_markup: list[int] = []
+    time_limit: int = 60
 
 class NewCompetition(BaseModel):
     name: str
     creator_id: str
     # settings
     max_rounds: int
-    round_time_in_seconds: int
-    tasks_markup: dict[int, list[int]]
+    tasks_markup: dict[str, Round]
 
 class CompetitionDTO(NewCompetition):
     id: int
