@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 class Round(BaseModel):
-    tasks_markup: list[int] = []
+    tasks: list[int] = []
     time_limit: int = 60
 
 class NewCompetition(BaseModel):
