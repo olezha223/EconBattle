@@ -9,7 +9,6 @@ export default function CompetitionConstructorPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    max_rounds: 5,
     tasks_markup: {
       '1': { tasks: [], time_limit: 60 }
     }
@@ -74,7 +73,7 @@ export default function CompetitionConstructorPage() {
       const competitionData = {
         ...formData,
         creator_id: localStorage.getItem('user_id'),
-        max_rounds: Number(formData.max_rounds),
+        max_rounds: Object.keys(formData.tasks_markup).length, // Автоматический расчет
       };
 
       await axios.post(`${API_URL}/competitions/`, competitionData, {
@@ -155,24 +154,6 @@ export default function CompetitionConstructorPage() {
               required
             />
           </label>
-        </div>
-
-        <div className={styles.grid}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>
-              Число раундов *
-              <input
-                type="number"
-                name="max_rounds"
-                value={formData.max_rounds}
-                onChange={handleInputChange}
-                className={styles.input}
-                min="1"
-                max="20"
-                required
-              />
-            </label>
-          </div>
         </div>
 
         <div className={styles.formGroup}>
