@@ -57,6 +57,8 @@ class TaskService:
                 name=task.name,
                 used_in_competitions=len(used_in_competitions),
                 creator_name=creator.username,
+                price=task.price,
+                access_type=task.access_type,
             )
             previews.append(preview)
         return previews

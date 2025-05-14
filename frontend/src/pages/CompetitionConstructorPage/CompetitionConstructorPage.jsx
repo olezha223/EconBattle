@@ -1,22 +1,76 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import MiniPreview from './MiniPreview';
 import styles from './CompetitionConstructorPage.module.css';
 
 const API_URL = 'http://localhost:8000';
+
+const TaskSelectorModal = ({ tasks, onClose, onSelect }) => (
+  <div className={styles.modalOverlay}>
+    <div className={styles.modalContent}>
+      <div className={styles.modalHeader}>
+        <h3>Выберите задачу</h3>
+        <button className={styles.closeButton} onClick={onClose}>×</button>
+      </div>
+      <div className={styles.previewsContainer}>
+        {tasks.map(task => (
+          <MiniPreview
+            key={task.id}
+            task={task}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 export default function CompetitionConstructorPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    tasks_markup: {
-      '1': { tasks: [], time_limit: 60 }
-    }
+    tasks_markup: { '1': { tasks: [], time_limit: 60 } }
   });
   const [currentRound, setCurrentRound] = useState('1');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [taskInputs, setTaskInputs] = useState({ '1': '' });
+  const [showTaskSelector, setShowTaskSelector] = useState(false);
+  const [tasksPreviews, setTasksPreviews] = useState([]);
+
+  const loadTasks = async (source) => {
+    try {
+      let url = `${API_URL}/tasks/all`;
+      if (source === 'my') {
+        const userId = localStorage.getItem('user_id');
+        url = `${API_URL}/tasks/previews/?user_id=${userId}`;
+      }
+
+      const response = await axios.get(url, { withCredentials: true });
+      setTasksPreviews(response.data);
+    } catch (err) {
+      setError('Ошибка загрузки задач');
+    }
+  };
+
+  const handleTaskSourceSelect = (source) => {
+    setShowTaskSelector(true);
+    loadTasks(source);
+  };
+
+  const handleAddTask = (taskId) => {
+    setFormData(prev => ({
+      ...prev,
+      tasks_markup: {
+        ...prev.tasks_markup,
+        [currentRound]: {
+          ...prev.tasks_markup[currentRound],
+          tasks: [...prev.tasks_markup[currentRound].tasks, taskId]
+        }
+      }
+    }));
+    setShowTaskSelector(false);
+  };
 
   const handleAddRound = () => {
     const nextRound = String(Number(currentRound) + 1);
@@ -28,27 +82,6 @@ export default function CompetitionConstructorPage() {
       }
     }));
     setCurrentRound(nextRound);
-  };
-
-  const handleAddTask = (round) => {
-    const taskId = taskInputs[round];
-    if (!taskId || isNaN(taskId)) {
-      setError('Введите корректный ID задачи');
-      return;
-    }
-
-    setFormData(prev => ({
-      ...prev,
-      tasks_markup: {
-        ...prev.tasks_markup,
-        [round]: {
-          ...prev.tasks_markup[round],
-          tasks: [...prev.tasks_markup[round].tasks, parseInt(taskId)]
-        }
-      }
-    }));
-    setTaskInputs(prev => ({ ...prev, [round]: '' }));
-    setError('');
   };
 
   const handleRemoveTask = (round, index) => {
@@ -73,7 +106,7 @@ export default function CompetitionConstructorPage() {
       const competitionData = {
         ...formData,
         creator_id: localStorage.getItem('user_id'),
-        max_rounds: Object.keys(formData.tasks_markup).length, // Автоматический расчет
+        max_rounds: Object.keys(formData.tasks_markup).length,
       };
 
       await axios.post(`${API_URL}/competitions/`, competitionData, {
@@ -106,13 +139,6 @@ export default function CompetitionConstructorPage() {
         ...prev,
         tasks_markup: updatedMarkup
       };
-    });
-
-    // Очищаем связанный ввод
-    setTaskInputs(prev => {
-      const newInputs = { ...prev };
-      delete newInputs[roundToRemove];
-      return newInputs;
     });
   };
 
@@ -208,22 +234,25 @@ export default function CompetitionConstructorPage() {
                     </div>
 
                     <div className={styles.addTaskContainer}>
-                      <input
-                        type="number"
-                        value={taskInputs[round] || ''}
-                        onChange={(e) => setTaskInputs(prev => ({
-                          ...prev,
-                          [round]: e.target.value
-                        }))}
-                        placeholder="Введите ID задачи"
-                        className={styles.taskInput}
-                      />
                       <button
                         type="button"
-                        className={styles.addTaskButton}
-                        onClick={() => handleAddTask(round)}
+                        className={styles.sourceButton}
+                        onClick={() => {
+                          setCurrentRound(round);
+                          handleTaskSourceSelect('my');
+                        }}
                       >
-                        Добавить задачу
+                        Добавить из моих задач
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.sourceButton}
+                        onClick={() => {
+                          setCurrentRound(round);
+                          handleTaskSourceSelect('all');
+                        }}
+                      >
+                        Добавить из общего банка
                       </button>
                     </div>
                   </div>
@@ -241,6 +270,14 @@ export default function CompetitionConstructorPage() {
             </button>
           </div>
         </div>
+
+        {showTaskSelector && (
+          <TaskSelectorModal
+            tasks={tasksPreviews}
+            onClose={() => setShowTaskSelector(false)}
+            onSelect={handleAddTask}
+          />
+        )}
 
         {error && <div className={styles.error}>{error}</div>}
 

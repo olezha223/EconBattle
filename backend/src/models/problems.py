@@ -50,11 +50,15 @@ class TaskDetailedDTO(TaskDTO):
 
 class TaskPreview(BaseModel):
     id: int
+    # блок инфы про автора
     created_at: datetime
     creator_id: str
+    # блок инфы про задачу
     name: str
     used_in_competitions: int
     creator_name: str
+    price: int
+    access_type: str
     # TODO: добавить сюда поле сколько раз решили
 
 class TaskForGame(BaseModel):
