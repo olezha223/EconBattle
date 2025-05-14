@@ -93,13 +93,13 @@ class Game:
     async def _get_problems_for_round(self) -> list[TaskWithoutAnswers]:
         tasks = [
             await self.task_service.get(task_id) for task_id in
-            self.competition.tasks_markup[self.current_round + 1].tasks
+            self.competition.tasks_markup[str(self.current_round + 1)].tasks
         ]
         return tasks
 
     async def _start_round(self):
         problems = await self._get_problems_for_round()
-        time_limit = self.competition.tasks_markup[self.current_round + 1].time_limit
+        time_limit = self.competition.tasks_markup[str(self.current_round + 1)].time_limit
         await self._notify_players(
             event_type="Start Round",
             data={
