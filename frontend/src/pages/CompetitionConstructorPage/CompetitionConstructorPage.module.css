@@ -280,6 +280,21 @@
   gap: 6px;
 }
 
+.stat .label {
+  font-size: 0.9em;
+  color: #666;
+  display: inline;
+  margin-bottom: 0;
+}
+
+.stat .value {
+  font-size: 0.9em;
+  color: #444;
+  font-weight: 500;
+  display: inline;
+}
+
+
 .label {
   font-size: 0.9em;
   color: #666;
