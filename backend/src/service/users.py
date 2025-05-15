@@ -40,8 +40,13 @@ class UserService:
     async def update_username(self, username: str, user_id: str) -> None:
         return await self.user_repo.update_username(user_id, username)
 
-    async def create_user(self, user_id: str, username: str) -> str:
-        return await self.user_repo.create_with_username(user_id=user_id, username=username)
+    async def create_user(
+            self,
+            user_id: str,
+            username: str,
+            picture: str,
+    ) -> str:
+        return await self.user_repo.create_with_username(user_id=user_id, username=username, picture=picture)
 
     async def get_user(self, user_id: str) -> Optional[UserData]:
         return await self.user_repo.get_by_id(user_id)

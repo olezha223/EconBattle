@@ -17,6 +17,7 @@ class User(Base):
         server_default=func.now()
     )
     username = Column(Text, nullable=False)
+    picture = Column(Text, nullable=False, default='/static/default-avatar.jpg')
     student_rating = Column(Integer, default=1000, nullable=False)
     teacher_rating = Column(Integer, default=1000, nullable=False)
 

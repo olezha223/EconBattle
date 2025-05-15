@@ -25,7 +25,8 @@ class TaskService:
             user = await self.user_repo.get_by_id(task.creator_id)
             return TaskDetailedDTO(
                 **task.model_dump(),
-                creator_name=user.username
+                creator_name=user.username,
+                picture=user.picture
             )
 
     async def create_task(self, task: TaskFromAuthor) -> int:
@@ -59,6 +60,7 @@ class TaskService:
                 creator_name=creator.username,
                 price=task.price,
                 access_type=task.access_type,
+                picture=creator.picture
             )
             previews.append(preview)
         return previews

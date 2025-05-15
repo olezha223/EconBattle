@@ -47,6 +47,7 @@ class TaskDTO(TaskWithoutAnswers):
 
 class TaskDetailedDTO(TaskDTO):
     creator_name: str
+    picture: str
 
 class TaskPreview(BaseModel):
     id: int
@@ -57,6 +58,7 @@ class TaskPreview(BaseModel):
     name: str
     used_in_competitions: int
     creator_name: str
+    picture: str
     price: int
     access_type: str
     # TODO: добавить сюда поле сколько раз решили

@@ -23,7 +23,8 @@ class CompetitionService:
             user = await self.user_repo.get_by_id(competition.creator_id)
             return CompetitionDetailedDTO(
                 **competition.model_dump(),
-                creator_name=user.username
+                creator_name=user.username,
+                picture=user.picture
             )
 
     async def create_competition(self, competition: NewCompetition) -> int:
@@ -57,6 +58,7 @@ class CompetitionService:
                 unique_players=len(unique_players),
                 creator_name=creator.username,
                 creator_id=competition.creator_id,
+                picture=creator.picture
             )
             result.append(preview)
         return result

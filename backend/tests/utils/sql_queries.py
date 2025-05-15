@@ -5,6 +5,7 @@ INIT_COMMANDS = [
         id TEXT PRIMARY KEY,
         created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         username TEXT NOT NULL,
+        picture TEXT NOT NULL,
         student_rating INTEGER NOT NULL DEFAULT 1000,
         teacher_rating INTEGER NOT NULL DEFAULT 1000
     );

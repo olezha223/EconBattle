@@ -49,8 +49,13 @@ class UserRepo(RepoInterface):
             if scalar:
                 return UserDTO.model_validate(scalar, from_attributes=True)
 
-    async def create_with_username(self, username: str, user_id: str) -> str:
+    async def create_with_username(
+            self,
+            username: str,
+            user_id: str,
+            picture: str,
+    ) -> str:
         get_result = await self.get_by_id(user_id)
         if get_result:
             return get_result.id
-        return await self.create(model=UserDTO(username=username, id=user_id), orm=User)
+        return await self.create(model=UserDTO(username=username, id=user_id, picture=picture), orm=User)

@@ -64,7 +64,8 @@ async def auth(request: Request):
         if not user_info:
             await service.create_user(
                 user_id=user_data.get("sub"),
-                username=user_data.get("name")
+                username=user_data.get("name"),
+                picture=user_data.get("picture")
             )
         # Отправляем данные пользователя в opener
         html = f"""
