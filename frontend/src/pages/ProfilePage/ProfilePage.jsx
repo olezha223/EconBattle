@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './ProfilePage.module.css';
+import {getUserId} from "../../services/api.js";
 
 const API_URL = 'http://localhost:8000';
 
@@ -9,6 +10,8 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -129,6 +132,32 @@ export default function ProfilePage() {
     </div>
   );
 
+  const handleUsernameUpdate = async () => {
+    if (!newUsername.trim()) {
+      setError('Имя не может быть пустым');
+      return;
+    }
+
+    try {
+      await axios.put(`${API_URL}/users/update_username`, null, {
+        withCredentials: true,
+        params: {
+          user_id: getUserId(),
+          username: newUsername
+        },
+        headers: {
+          'accept': 'application/json'
+        }
+      });
+
+      setUserData(prev => ({ ...prev, username: newUsername }));
+      setIsEditing(false);
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Ошибка при изменении имени');
+    }
+  };
+
   if (loading) return <div className={styles.loading}>Загрузка...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
@@ -140,7 +169,51 @@ export default function ProfilePage() {
           alt="Аватар"
           className={styles.profileAvatar}
         />
-        <h1>{userData.username}</h1>
+        <div className={styles.nameContainer}>
+          <h1>{userData?.username}</h1>
+          <button
+            onClick={() => {
+              setIsEditing(true);
+              setNewUsername(userData?.username);
+            }}
+            className={styles.editButton}
+            aria-label="Изменить имя"
+          >
+            <svg className={styles.editIcon} viewBox="0 0 24 24">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1.01 1.01 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+          </button>
+        </div>
+
+        {isEditing && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <h3>Изменить имя пользователя</h3>
+              <input
+                type="text"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                className={styles.nameInput}
+                maxLength={30}
+              />
+              <div className={styles.modalActions}>
+                <button
+                  onClick={handleUsernameUpdate}
+                  className={styles.saveButton}
+                >
+                  Сохранить
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className={styles.cancelButton}
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles.profileInfo}>
           <div className={styles.infoItem}>
             <span>Рейтинг студента</span>

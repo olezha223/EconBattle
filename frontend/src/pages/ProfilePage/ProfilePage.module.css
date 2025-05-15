@@ -206,3 +206,218 @@
   margin-bottom: 1rem;
   border: 3px solid #2e7d32;
 }
+
+/* Добавляем новые стили для редактирования имени */
+.usernameContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.editButton {
+  padding: 5px 15px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.editButton:hover {
+  background-color: #e0e0e0;
+}
+
+.usernameEditContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.usernameInput {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  width: 250px;
+}
+
+.editButtons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.saveButton {
+  padding: 8px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  background-color: #45a049;
+}
+
+.cancelButton {
+  padding: 8px 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  background-color: #da190b;
+}
+
+/* Стили для кнопки редактирования */
+.nameContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: opacity 0.2s;
+}
+
+.editButton:hover {
+  opacity: 0.7;
+}
+
+.editIcon {
+  width: 20px;
+  height: 20px;
+  fill: #666;
+}
+
+/* Стили модального окна */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nameInput {
+  width: 100%;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  background: #4CAF50;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background: #f44336;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Обновленные стили для центрирования */
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.nameWrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.nameContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8f9fa;
+  padding: 8px 20px;
+  border-radius: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.username {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #2d3436;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.editButton:hover {
+  transform: scale(1.1);
+}
+
+.editIcon {
+  width: 20px;
+  height: 20px;
+  fill: #636e72;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 480px) {
+  .nameContainer {
+    padding: 6px 15px;
+  }
+
+  .username {
+    font-size: 1.5rem;
+  }
+
+  .editIcon {
+    width: 18px;
+    height: 18px;
+  }
+}
