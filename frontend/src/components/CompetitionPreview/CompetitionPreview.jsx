@@ -10,7 +10,8 @@ export default function CompetitionPreview({
   unique_players,
   created_at,
   creator_id,
-  creator_name
+  creator_name, picture
+
 }) {
   const navigate = useNavigate()
 
@@ -45,7 +46,7 @@ export default function CompetitionPreview({
             onClick={handleAuthorClick}
           >
             <img
-              src="/static/default-avatar.jpg"
+              src={picture}
               alt="Аватар автора"
               className={styles.creatorAvatar}
             />
