@@ -1,6 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { formatTimeAgo } from '../../utils/timeUtils'
 import styles from './CompetitionPreview.module.css'
+import {getUserId} from "../../services/api.js";
 
 export default function CompetitionPreview({
   id,
@@ -22,9 +23,15 @@ export default function CompetitionPreview({
     navigate(`/game/${id}`);
   };
 
-
   const handleAuthorClick = (e) => {
     e.stopPropagation()
+  }
+
+  // Определяем путь для профиля автора
+  const getAuthorProfilePath = () => {
+    return creator_id.toString() === getUserId()
+      ? '/profile' // Путь к своему профилю
+      : `/user_page/${creator_id}` // Путь к чужому профилю
   }
 
   return (
@@ -33,7 +40,7 @@ export default function CompetitionPreview({
         <h3 className={styles.name}>{name}</h3>
         <div className={styles.authorContainer}>
           <Link
-            to={`/user_page/${creator_id}`}
+            to={getAuthorProfilePath()}
             className={styles.creatorLink}
             onClick={handleAuthorClick}
           >
