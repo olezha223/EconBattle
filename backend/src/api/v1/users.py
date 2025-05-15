@@ -44,7 +44,14 @@ async def update_username(
         user_id: str = Query(..., title="User ID"),
         username: str = Query(..., title="New username"),
         service: UserService = Depends(get_user_service),
+        current_user: dict = Depends(get_current_user),
 ) -> None:
+    if user_id != current_user['sub']:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can't rename other user",
+        )
+
     user = await service.get_user(user_id)
     if not user:
         raise HTTPException(
