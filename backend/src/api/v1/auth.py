@@ -75,7 +75,7 @@ async def auth(request: Request):
         <script>
             window.opener.postMessage({{
                 user: {json.dumps(user_data)}
-            }}, 'http://localhost:5173');
+            }}, 'http://localhost');
             window.close();
         </script>
         """
