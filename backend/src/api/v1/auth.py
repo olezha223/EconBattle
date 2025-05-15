@@ -75,7 +75,7 @@ async def auth(request: Request):
         <script>
             window.opener.postMessage({{
                 user: {json.dumps(user_data)}
-            }}, 'http://localhost');
+            }}, 'http://econ-battle.ru');
             window.close();
         </script>
         """
