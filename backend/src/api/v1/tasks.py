@@ -22,8 +22,14 @@ router_problems = APIRouter(
 )
 async def create_problem(
         task: TaskFromAuthor,
-        service: TaskService = Depends(get_task_service)
+        service: TaskService = Depends(get_task_service),
+        current_user: dict = Depends(get_current_user),
 ) -> int:
+    if task.creator_id != current_user['sub']:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can't create new task not with your author id",
+        )
     return await service.create_task(task)
 
 

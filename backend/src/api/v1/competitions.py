@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
+from src.api.v1.users import get_current_user
 from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition, CompetitionDetailedDTO
 from src.service import CompetitionService, get_competition_service, get_user_service, UserService
 
@@ -21,7 +22,13 @@ router_competitions = APIRouter(
 async def create_competition(
         competition: NewCompetition,
         service: CompetitionService = Depends(get_competition_service),
+        current_user: dict = Depends(get_current_user),
 ) -> int:
+    if competition.creator_id != current_user['sub']:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can't create new competition not with your author id",
+        )
     return await service.create_competition(competition)
 
 @router_competitions.get(
