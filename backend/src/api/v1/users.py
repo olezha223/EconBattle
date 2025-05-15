@@ -59,3 +59,21 @@ async def update_username(
             detail="User not found",
         )
     return await service.update_username(user_id, username)
+
+
+@router_user.get(
+    path="/picture",
+    description="Get profile picture",
+    name="Get profile picture"
+)
+async def get_user_picture(
+        user_id: str = Query(..., title="User ID"),
+        service: UserService = Depends(get_user_service),
+) -> str:
+    user = await service.get_user(user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return user.picture

@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+const API_URL = 'http://localhost:8000';
+
 export const getUserId = () => localStorage.getItem('user_id')
 
 export const fetchUserTasks = async () => {
@@ -54,3 +56,11 @@ export const fetchCompetitionDetails = async (competitionId) => {
   return response.data
 }
 
+export const fetchPictureUrl = async () => {
+  const response = await axios.get(`${API_URL}/users/picture`, {
+    params: { user_id: getUserId() },
+    headers: { accept: 'application/json' },
+    withCredentials: true
+  });
+  return response.data;
+};
