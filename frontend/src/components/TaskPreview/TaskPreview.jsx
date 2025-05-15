@@ -2,7 +2,17 @@ import { Link, useNavigate } from 'react-router-dom'
 import { formatTimeAgo } from '../../utils/timeUtils'
 import styles from './TaskPreview.module.css'
 
-export default function TaskPreview({ id, name, creator_name, creator_id, created_at, used_in_competitions }) {
+export default function TaskPreview(
+    {
+        id,
+        name,
+        creator_name,
+        creator_id,
+        created_at,
+        used_in_competitions,
+        picture
+    }
+) {
     const navigate = useNavigate()
 
     const handleContainerClick = () => {
@@ -24,7 +34,7 @@ export default function TaskPreview({ id, name, creator_name, creator_id, create
                         onClick={handleAuthorClick}
                     >
                         <img
-                            src="/static/default-avatar.jpg"
+                            src={picture}
                             alt="Аватар автора"
                             className={styles.creatorAvatar}
                         />
