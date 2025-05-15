@@ -1,18 +1,12 @@
-import hashlib
-import hmac
 import os
 import logging
-from pathlib import Path
-from typing import Optional, Union
 
 from dotenv import load_dotenv
 from dataclasses import dataclass, field
 from sqlalchemy.engine import URL
 
-BASE_DIR = Path(__file__).parent.parent
 
-
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), '../../.env')
 
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
@@ -20,20 +14,20 @@ if os.path.exists(dotenv_path):
 
 @dataclass(frozen=True)
 class AuthConfig:
-    client_id: str = os.getenv('CLIENT_ID', 'example')
-    client_secret: str = os.getenv('CLIENT_SECRET', 'example')
+    client_id: str = os.getenv('GOOGLE_CLIENT_ID', 'example')
+    client_secret: str = os.getenv('GOOGLE_CLIENT_SECRET', 'example')
 
 
 @dataclass
 class DatabaseConfig:
     """Database connection variables."""
 
-    name: Optional[str] = 'econ-battle'  # os.getenv('DBNAME')
-    test_name: Optional[str] = 'test'  # os.getenv('TEST_DBNAME')
-    user: Optional[str] = 'postgres'
-    password: Optional[str] = 'postgres'
-    port: int = 5432
-    host: str = 'localhost'
+    name: str = os.getenv('DBNAME', 'example')
+    test_name: str = os.getenv('TEST_DBNAME', 'example')
+    user: str = os.getenv("POSTGRES_USER", "example")
+    password: str = os.getenv("POSTGRES_PASSWORD", "example")
+    port: int = os.getenv("POSTGRES_PORT", 5432)
+    host: str = os.getenv("POSTGRES_HOST", "localhost")
 
     driver: str = 'asyncpg'
     database_system: str = 'postgresql'
@@ -65,19 +59,18 @@ class DatabaseConfig:
 
 @dataclass
 class AppConfig:
-    """Bot configuration."""
+    """App configuration."""
 
-    title = "MiniApp python hse"
-    description = "Наше приложение"
+    title = "Курсовая работа"
+    description = "Многопользовательская игра"
     version = "1.0"
     root_path = ""
 
 @dataclass
 class RedisConf:
-    redis_host: str = 'localhost'
-    redis_port: int = 6379
+    redis_host: str = os.getenv('REDIS_HOST', 'localhost')
+    redis_port: int = os.getenv('REDIS_PORT', 6379)
     redis_db: int = 0
-    name: str = "active_players"
 
 @dataclass
 class Configuration:

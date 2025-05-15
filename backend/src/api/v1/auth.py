@@ -1,17 +1,20 @@
 import json
 from fastapi import APIRouter, Query
-from starlette.config import Config
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
+
+from src.config import configuration
 from src.service import get_user_service
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 
-oauth = OAuth(config=Config(env_file='.env'))
+oauth = OAuth()
 oauth.register(
     name='google',
     server_metadata_url=CONF_URL,
+    client_id=configuration.auth.client_id,
+    client_secret=configuration.auth.client_secret,
     client_kwargs={
         'scope': 'openid email profile'
     }
