@@ -11,13 +11,13 @@ export default function LoginPage() {
       try {
         // Открываем окно авторизации
         window.open(
-          'http://localhost:8000/login',
-          '_blank',
-          'width=500,height=600'
+            'http://econ-battle.ru/api/login',
+            '_blank',
+            'width=500,height=600'
         )
 
         window.addEventListener('message', (event) => {
-          if (event.origin !== 'http://localhost:8000') return
+          if (!['http://econ-battle.ru', 'http://frontend:5173'].includes(event.origin)) return
 
           if (event.data.user) {
             localStorage.setItem('user_id', event.data.user.sub)

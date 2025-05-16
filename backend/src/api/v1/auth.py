@@ -67,7 +67,7 @@ async def auth(request: Request):
         <script>
             window.opener.postMessage({{
                 user: {json.dumps(user_data)}
-            }}, 'http://econ-battle.ru');
+            }}, 'http://frontend:5173');
             window.close();
         </script>
         """
