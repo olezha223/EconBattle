@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import CompetitionPreview from '../../components/CompetitionPreview/CompetitionPreview';
-import { getUserId } from '../../services/api';
-import axios from 'axios';
+import {fetchUserCompetitions, getUserId} from '../../services/api';
 import styles from './MyCompetitionsPage.module.css';
 
-const API_URL = 'http://localhost:8000';
 
 export default function MyCompetitionsPage() {
   const [competitions, setCompetitions] = useState([]);
@@ -15,29 +13,21 @@ export default function MyCompetitionsPage() {
   useEffect(() => {
     const fetchCompetitions = async () => {
       try {
-        const userId = getUserId();
-        if (!userId) throw new Error('User not authenticated');
+        const userId = getUserId()
+        if (!userId) throw new Error('User not authenticated')
 
-        const response = await axios.get(
-          `${API_URL}/competitions/previews`,
-          {
-            params: { user_id: userId },
-            withCredentials: true
-          }
-        );
-
-        setCompetitions(response.data);
+        const data = await fetchUserCompetitions(userId)
+        setCompetitions(data)
       } catch (err) {
-        setError(err.response?.data?.detail || 'Ошибка загрузки соревнований');
+        setError(err.response?.data?.detail || 'Ошибка загрузки соревнований')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchCompetitions();
-  }, []);
+    fetchCompetitions()
+  }, [])
 
-  // Остальная часть компонента без изменений
   if (loading) return <div className={styles.loading}>Загрузка...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 

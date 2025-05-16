@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUserId } from '../../services/api'
-import axios from 'axios'
+import {createTask, getUserId} from '../../services/api'
 import styles from './TaskConstructorPage.module.css'
 
-const API_URL = 'http://localhost:8000'
 const taskTypes = [
   { value: 'single choice', label: 'Выбрать один вариант' },
   { value: 'multiple choice', label: 'Множественный выбор' },
@@ -38,10 +36,11 @@ export default function TaskConstructorPage() {
           return JSON.parse(value)
         case 'string':
           return [value.toString()]
-        case 'number':
+        case 'number': {
           const numValue = parseFloat(value)
           if (isNaN(numValue)) throw new Error('Некорректное число')
           return [numValue]
+        }
         default:
           throw new Error(`Неизвестный тип задачи: ${taskType}`)
       }
@@ -86,7 +85,7 @@ export default function TaskConstructorPage() {
         access_type: formData.access_type
       }
 
-      await axios.post(`${API_URL}/tasks/`, taskData, { withCredentials: true })
+      await createTask(taskData);
       navigate('/tasks')
     } catch (err) {
       setError(err.response?.data?.detail || err.message)

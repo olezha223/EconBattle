@@ -15,6 +15,7 @@ import UserPage from "./pages/UserPage/UserPage.jsx";
 import UserTasksPage from "./pages/TasksPage/UserTasksPage.jsx";
 import UserCompetitionsPage from "./pages/CompetitionsPage/UserCompetitionsPage.jsx";
 import GameApp from "./components/GameApp/GameApp.jsx";
+import {getUserId} from "./services/api.js";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -22,7 +23,7 @@ function App() {
 
   useEffect(() => {
     const checkAuth = () => {
-      const userId = localStorage.getItem('user_id')
+      const userId = getUserId()
       setIsAuthenticated(!!userId)
       setLoading(false)
     }

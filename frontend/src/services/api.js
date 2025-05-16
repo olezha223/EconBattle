@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8000';
+const api = axios.create({
+  baseURL: 'http://localhost:8000',
+  withCredentials: true
+})
 
 export const getUserId = () => localStorage.getItem('user_id')
 
@@ -30,23 +33,10 @@ export const fetchAllTasks = async () => {
   const response = await api.get('/tasks/all')
   return response.data
 }
-const api = axios.create({
-  baseURL: 'http://localhost:8000',
-  withCredentials: true
-})
 
 export const fetchCompetitions = async () => {
   const response = await api.get('/competitions/all')
   return response.data
-}
-
-export const createUser = async (userData) => {
-  return api.post('/user', null, {
-    params: {
-      user_id: userData.sub,
-      username: userData.name
-    }
-  })
 }
 
 export const fetchCompetitionDetails = async (competitionId) => {
@@ -57,10 +47,53 @@ export const fetchCompetitionDetails = async (competitionId) => {
 }
 
 export const fetchPictureUrl = async () => {
-  const response = await axios.get(`${API_URL}/users/picture`, {
-    params: { user_id: getUserId() },
-    headers: { accept: 'application/json' },
-    withCredentials: true
+  const response = await api.get(`/users/picture`, {
+    params: { user_id: getUserId() }
   });
+  return response.data;
+};
+
+
+export const fetchUserInfo = async (userId) => {
+  const response = await api.get('/users/info', {
+    params: { user_id: userId }
+  })
+  return response.data
+}
+
+export const fetchTaskDetails = async (taskId) => {
+  const response = await api.get('/tasks/', {
+    params: { task_id: taskId }
+  })
+  return response.data
+}
+
+export const createTask = async (taskData) => {
+  const response = await api.post('/tasks/', taskData);
+  return response.data;
+};
+
+export const updateUsername = async (userId, newUsername) => {
+  const response = await api.put('/users/update_username', null, {
+    params: {
+      user_id: userId,
+      username: newUsername
+    },
+    headers: {
+      'accept': 'application/json'
+    }
+  })
+  return response.data
+}
+
+export const fetchUserTasksPreviews = async () => {
+  const response = await api.get('/tasks/previews', {
+    params: { user_id: getUserId() }
+  });
+  return response.data;
+};
+
+export const createCompetition = async (competitionData) => {
+  const response = await api.post('/competitions/', competitionData);
   return response.data;
 };

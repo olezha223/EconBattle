@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import TaskPreview from '../../components/TaskPreview/TaskPreview.jsx'
-import {fetchPreviews} from '../../services/api' // Предположим что есть такой метод в API
+import {fetchPreviews} from '../../services/api'
 import styles from './TasksPage.module.css'
 
 
 export default function UserTasksPage() {
   const [userTasks, setUserTasks] = useState([])
   const [loading, setLoading] = useState(true)
-  const { userId } = useParams() // Получаем ID пользователя из URL
+  const { userId } = useParams()
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchPreviews(userId) // Запрос задач конкретного пользователя
+        const data = await fetchPreviews(userId)
         setUserTasks(data)
       } catch (error) {
         console.error('Error loading user tasks:', error)

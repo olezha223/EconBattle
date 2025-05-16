@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import axios from 'axios'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import styles from './TaskDetailsPage.module.css'
+import {fetchTaskDetails} from "../../services/api.js";
 
-const API_URL = 'http://localhost:8000'
 
-// Массив типов задач
 const taskTypes = [
   { value: 'single choice', label: 'Выбрать один вариант' },
   { value: 'multiple choice', label: 'Множественный выбор' },
@@ -61,11 +59,8 @@ export default function TaskDetailsPage() {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const response = await axios.get(`${API_URL}/tasks/`, {
-          params: { task_id: id },
-          withCredentials: true,
-        });
-        setTask(response.data);
+        const data = await fetchTaskDetails(id); // Используем вынесенную функцию
+        setTask(data);
       } catch (err) {
         setError('Не удалось загрузить задачу');
         console.error('Error fetching task:', err);

@@ -4,8 +4,7 @@ import styles from './GameApp.module.css';
 import RoundScreen from '../RoundScreen/RoundScreen.jsx';
 import ResultsScreen from "../ResultsScreen/ResultsScreen.jsx";
 import ScoreBoard from "../ScoreBoard/ScoreBoard.jsx";
-
-const getUserId = () => localStorage.getItem('user_id') || '';
+import {getUserId} from "../../services/api.js";
 
 export default function GameApp() {
   const { competition_id } = useParams();

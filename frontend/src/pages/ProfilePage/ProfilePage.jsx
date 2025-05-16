@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import styles from './ProfilePage.module.css';
-import {getUserId} from "../../services/api.js";
+import {fetchUserInfo, getUserId, updateUsername} from "../../services/api.js";
 
-const API_URL = 'http://localhost:8000';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -17,12 +15,10 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = localStorage.getItem('user_id');
-        const response = await axios.get(`${API_URL}/users/info?user_id=${userId}`, {
-          withCredentials: true
-        });
-        setUserData(response.data);
-      } catch (err) {
+        const userId = getUserId();
+        const data = await fetchUserInfo(userId);
+        setUserData(data);
+      } catch {
         setError('Ошибка загрузки данных профиля');
       } finally {
         setLoading(false);
@@ -134,29 +130,19 @@ export default function ProfilePage() {
 
   const handleUsernameUpdate = async () => {
     if (!newUsername.trim()) {
-      setError('Имя не может быть пустым');
-      return;
+      setError('Имя не может быть пустым')
+      return
     }
 
     try {
-      await axios.put(`${API_URL}/users/update_username`, null, {
-        withCredentials: true,
-        params: {
-          user_id: getUserId(),
-          username: newUsername
-        },
-        headers: {
-          'accept': 'application/json'
-        }
-      });
-
-      setUserData(prev => ({ ...prev, username: newUsername }));
-      setIsEditing(false);
-      setError('');
+      await updateUsername(getUserId(), newUsername)
+      setUserData(prev => ({ ...prev, username: newUsername }))
+      setIsEditing(false)
+      setError('')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Ошибка при изменении имени');
+      setError(err.response?.data?.detail || 'Ошибка при изменении имени')
     }
-  };
+  }
 
   if (loading) return <div className={styles.loading}>Загрузка...</div>;
   if (error) return <div className={styles.error}>{error}</div>;

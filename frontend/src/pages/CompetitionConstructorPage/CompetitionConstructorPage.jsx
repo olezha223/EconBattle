@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import MiniPreview from './MiniPreview';
 import styles from './CompetitionConstructorPage.module.css';
+import {createCompetition, fetchAllTasks, fetchUserTasksPreviews, getUserId} from "../../services/api.js";
 
-const API_URL = 'http://localhost:8000';
 
 const TaskSelectorModal = ({ tasks, onClose, onSelect }) => (
   <div className={styles.modalOverlay}>
@@ -40,16 +39,17 @@ export default function CompetitionConstructorPage() {
 
   const loadTasks = async (source) => {
     try {
-      let url = `${API_URL}/tasks/all`;
+      let tasksData;
+
       if (source === 'my') {
-        const userId = localStorage.getItem('user_id');
-        url = `${API_URL}/tasks/previews/?user_id=${userId}`;
+        tasksData = await fetchUserTasksPreviews();
+      } else {
+        tasksData = await fetchAllTasks();
       }
 
-      const response = await axios.get(url, { withCredentials: true });
-      setTasksPreviews(response.data);
+      setTasksPreviews(tasksData);
     } catch (err) {
-      setError('Ошибка загрузки задач');
+      setError(err.message || 'Ошибка загрузки задач');
     }
   };
 
@@ -105,14 +105,11 @@ export default function CompetitionConstructorPage() {
     try {
       const competitionData = {
         ...formData,
-        creator_id: localStorage.getItem('user_id'),
+        creator_id: getUserId(), // Используем функцию из API-файла
         max_rounds: Object.keys(formData.tasks_markup).length,
       };
 
-      await axios.post(`${API_URL}/competitions/`, competitionData, {
-        withCredentials: true
-      });
-
+      await createCompetition(competitionData);
       navigate('/competitions');
     } catch (err) {
       setError(err.response?.data?.detail || 'Ошибка при создании соревнования');

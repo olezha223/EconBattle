@@ -9,9 +9,8 @@ export default function LoginPage() {
   useEffect(() => {
     const handleLogin = async () => {
       try {
-        // Открываем окно авторизации (переменная нужна для открытия окна)
-        // eslint-disable-next-line no-unused-vars
-        const authWindow = window.open(
+        // Открываем окно авторизации
+        window.open(
           'http://localhost:8000/login',
           '_blank',
           'width=500,height=600'
