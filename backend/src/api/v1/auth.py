@@ -40,7 +40,7 @@ async def homepage(request: Request):
 
 @router_auth.get('/login')
 async def login(request: Request):
-    redirect_uri = 'htpp://econ-battle.ru/api/auth'
+    redirect_uri = 'http://econ-battle.ru/api/auth'
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
