@@ -24,14 +24,6 @@ router_auth = APIRouter()
 
 service = get_user_service()
 
-@router_auth.post(
-    path='/user',
-)
-async def create_new_user(
-        user_id: str =  Query(..., title='User ID'),
-        username: str = Query(..., title='Username'),
-) -> None:
-    return await service.create_user(user_id=user_id, username=username)
 
 @router_auth.get('/')
 async def homepage(request: Request):
@@ -48,7 +40,7 @@ async def homepage(request: Request):
 
 @router_auth.get('/login')
 async def login(request: Request):
-    redirect_uri = 'http://localhost:8000/auth'
+    redirect_uri = 'htpp://econ-battle.ru/api/auth'
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
