@@ -41,20 +41,20 @@ function App() {
         />
 
         {isAuthenticated && (
-          <Route element={<Layout />}>
-            <Route path="/competitions" element={<CompetitionsPage />} />
-            <Route path="/competitions/:id" element={<CompetitionDetailsPage />} />
-            <Route path="/competitions_constructor" element={<CompetitionConstructorPage />} />
-            <Route path="/user_page/:userId" element={<UserPage />} />
-            <Route path="/tasks" element={<TasksPage />} />
-            <Route path="/tasks/:id" element={<TaskDetailsPage />} />
-            <Route path="/tasks_constructor" element={<TaskConstructorPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/my_tasks" element={<MyTasksPage />} />
-            <Route path="/my_competitions" element={<MyCompetitionsPage />} />
-            <Route path="/user_tasks/:userId" element={<UserTasksPage />} />
-            <Route path="/user_competitions/:userId" element={<UserCompetitionsPage />} />
-            <Route path="/game/:competition_id" element={<GameApp />} />
+          <Route path="/" element={<Layout />}>
+            <Route path="competitions" element={<CompetitionsPage />} />
+            <Route path="competitions/:id" element={<CompetitionDetailsPage />} />
+            <Route path="competitions_constructor" element={<CompetitionConstructorPage />} />
+            <Route path="user_page/:userId" element={<UserPage />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="tasks/:id" element={<TaskDetailsPage />} />
+            <Route path="tasks_constructor" element={<TaskConstructorPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="my_tasks" element={<MyTasksPage />} />
+            <Route path="my_competitions" element={<MyCompetitionsPage />} />
+            <Route path="user_tasks/:userId" element={<UserTasksPage />} />
+            <Route path="user_competitions/:userId" element={<UserCompetitionsPage />} />
+            <Route path="game/:competition_id" element={<GameApp />} />
           </Route>
         )}
       </Routes>
