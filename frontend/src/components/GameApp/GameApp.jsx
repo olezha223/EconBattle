@@ -29,7 +29,7 @@ export default function GameApp() {
 
   useEffect(() => {
     const ws = new WebSocket(
-      `ws://localhost:8000/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
+      `ws://econ-battle.ru/api/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
     );
 
     const calculateResult = (userScore, opponentScore) => {
