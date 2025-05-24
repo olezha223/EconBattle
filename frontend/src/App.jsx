@@ -37,7 +37,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={isAuthenticated ? <Navigate to="profile" /> : <LoginPage />}
+          element={isAuthenticated ? <Navigate to="competitions" /> : <LoginPage />}
         />
 
         {isAuthenticated && (
