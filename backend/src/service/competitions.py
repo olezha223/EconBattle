@@ -68,5 +68,5 @@ class CompetitionService:
 def get_max_time(tasks_markup: dict) -> int:
     result = 0
     for task in tasks_markup.values():
-        result += task.get("time_limit", 0)
+        result += task.time_limit
     return result
