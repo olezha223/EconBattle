@@ -41,7 +41,7 @@ class CompetitionsRepo(RepoInterface):
         result = []
         for competition in all_competitions:
             for round_obj in competition.tasks_markup.values():
-                if task_id in round_obj.tasks:
+                if task_id in round_obj.get("tasks", []):
                     result.append(competition)
         return result
 
