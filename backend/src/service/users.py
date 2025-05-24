@@ -94,7 +94,7 @@ class UserService:
             tie_count=tie_count,
             # статистика как составителя задач
             tasks_created=len(await self.task_repo.get_created_tasks(user_id)),
-            mean_task_difficulty=mean_task_difficulty,
+            mean_task_difficulty=round(mean_task_difficulty, 1),
             # статистика как организатора соревнований
             competitions_created=len(await self.competitions_repo.get_all_competitions_created_by_user(user_id)),
             games_played=len(await self.games_repo.get_played_games_by_user(user_id)),
