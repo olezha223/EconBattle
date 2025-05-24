@@ -21,6 +21,7 @@ class CompetitionDTO(NewCompetition):
 class CompetitionDetailedDTO(CompetitionDTO):
     creator_name: str
     picture: str
+    max_time: int
 
 class CompetitionPreview(BaseModel):
     id: int

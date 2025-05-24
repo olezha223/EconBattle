@@ -63,9 +63,9 @@ export default function CompetitionDetailsPage() {
         </div>
 
         <div className={styles.item}>
-          <span className={styles.label}>Время раунда:</span>
+          <span className={styles.label}>Максимальная длительность игры:</span>
           <span className={styles.value}>
-            {competition.round_time_in_seconds} сек.
+            {competition.max_time} сек.
           </span>
         </div>
 

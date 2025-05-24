@@ -24,7 +24,8 @@ class CompetitionService:
             return CompetitionDetailedDTO(
                 **competition.model_dump(),
                 creator_name=user.username,
-                picture=user.picture
+                picture=user.picture,
+                max_time=get_max_time(competition.tasks_markup)
             )
 
     async def create_competition(self, competition: NewCompetition) -> int:
@@ -62,3 +63,10 @@ class CompetitionService:
             )
             result.append(preview)
         return result
+
+
+def get_max_time(tasks_markup: dict) -> int:
+    result = 0
+    for task in tasks_markup.values():
+        result += task.get("time_limit", 0)
+    return result
