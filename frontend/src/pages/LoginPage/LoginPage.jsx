@@ -22,7 +22,7 @@ export default function LoginPage() {
           if (event.data.user) {
             localStorage.setItem('user_id', event.data.user.sub)
             localStorage.setItem('username', event.data.user.name)
-            navigate('/competitions')
+            navigate('competitions')
           }
         }, false)
       } catch (error) {
