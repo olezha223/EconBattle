@@ -1,13 +1,9 @@
 from starlette.websockets import WebSocket
-
-from src.models.users import Player
 from src.service import get_user_service
 from src.service.game.connection_manager import ConnectionManager
 import asyncio
 
-
-class SinglePlayerGame:
-    pass
+from src.service.game.single_player_game import SinglePlayerGame
 
 
 class SingleMatchMaker:
@@ -19,9 +15,10 @@ class SingleMatchMaker:
     async def add_player(self, websocket: WebSocket, player_id: str, competition_id: int):
         self.manager.add_connection(player_id, websocket)
         # начать игру
-        user_1 = await self.user_service.get_user(player_id)
+        user = await self.user_service.get_user(player_id)
         game = SinglePlayerGame(
-            player1=Player(user=user_1, websocket=websocket),
+            user=user,
+            websocket=websocket,
             competition_id=competition_id
         )
         self.games[player_id] = game
