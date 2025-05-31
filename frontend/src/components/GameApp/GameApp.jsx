@@ -168,7 +168,9 @@ export default function GameApp() {
 
   return (
     <div className={styles.container}>
-      {gameState === 'connecting' && <div>Подключение...</div>}
+      {gameState === 'connecting' && (
+        <div>Подключение..., При долгом ожидании, обновите страницу.</div>
+      )}
 
       {gameState === 'waiting' && (
         <div className={styles.waiting}>
