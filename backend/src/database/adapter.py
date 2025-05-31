@@ -9,7 +9,7 @@ from src.config import configuration
 
 async_engine: AsyncEngine = _create_async_engine(
     url=configuration.db.build_connection_str(),
-    echo=configuration.debug,
+    echo=False, #configuration.debug,
     pool_pre_ping=True
 )
 

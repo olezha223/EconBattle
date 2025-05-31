@@ -24,6 +24,9 @@ class MatchMaker:
                 return True
         return False
 
+    def is_player_connected(self, player_id: str) -> bool:
+        return player_id in self.manager.active_connections
+
     async def add_player(self, websocket: WebSocket, player_id: str, competition_id: int):
         # добавить игрока в активные соединения
         self.manager.add_connection(player_id, websocket)
@@ -82,3 +85,7 @@ class MatchMaker:
                 pass
             self.manager.remove_connection(player_id)
             self.game_queue.remove_player(competition_id, player_id)
+
+    def handle_disconnect(self, competition_id: int, player_id: str):
+        self.manager.remove_connection(player_id)
+        self.game_queue.remove_player(competition_id, player_id)
