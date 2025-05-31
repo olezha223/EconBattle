@@ -114,9 +114,33 @@ export default function GameApp() {
 
     setSocket(ws);
 
+    // === Добавляем обработчик beforeunload ===
+    const handleBeforeUnload = (e) => {
+      // Показываем стандартное окно подтверждения
+      e.preventDefault();
+      e.returnValue = '';
+      // Пытаемся отправить сообщение о выходе
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        try {
+          ws.send(JSON.stringify({ type: 'user exit' }));
+        } catch (err) {}
+      }
+      // returnValue нужен для показа диалога
+      return '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // === Отправляем сообщение при размонтировании ===
     return () => {
+      // Сообщаем о выходе при размонтировании
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        try {
+          ws.send(JSON.stringify({ type: 'user exit' }));
+        } catch (err) {}
+      }
       ws.close();
       setSocket(null);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     }
   }, [competition_id]); // Только competition_id в зависимостях
 
