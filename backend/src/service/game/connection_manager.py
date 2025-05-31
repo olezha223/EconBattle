@@ -1,9 +1,5 @@
 from fastapi import WebSocket
 
-from src.repository.game_queue.interface import QueueInterface
-from src.repository.game_queue.python_list import PythonQueue
-from src.repository.game_queue.redis_queue import RedisQueue
-
 
 class ConnectionManager:
     def __init__(self):
