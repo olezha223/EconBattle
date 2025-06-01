@@ -33,53 +33,30 @@ class MatchMaker:
         # добавить игроку в очередь для данного соревнования
         self.game_queue.insert_player(competition_id, player_id)
 
-        user_exit_event = asyncio.Event()
-
-        async def listen_user_exit():
-            while True:
-                try:
-                    data = await websocket.receive_json()
-                    if data.get("type") == "user exit":
-                        user_exit_event.set()
-                        break
-                except Exception:
-                    break
-
-        listener_task = asyncio.create_task(listen_user_exit())
         start_waiting_time = time.time()
-        try:
-            while (
-                self.game_queue.get_len(competition_id) <= 1 and
-                time.time() - start_waiting_time < 3000 and
-                self.manager.active_connections.get(player_id, False)
-            ):
-                await asyncio.sleep(2)
-                if user_exit_event.is_set():
-                    self.handle_disconnect(competition_id, player_id)
-                    try:
-                        await websocket.close()
-                    except Exception as e:
-                        pass
-                    return
-                if not self._search_in_games(player_id):
-                    try:
-                        await websocket.send_json({"type": "waiting", "msg": f"For {time.time() - start_waiting_time} sec."})
-                    except RuntimeError:
-                        continue
-                else:
-                    continue
-            if self.game_queue.get_len(competition_id) >= 2:
-                await self.create_game(competition_id)
-            else:
-                print(f"Отработал выход из очереди для: {player_id}")
+        while (
+            self.game_queue.get_len(competition_id) <= 1 and
+            time.time() - start_waiting_time < 3000 and
+            self.manager.active_connections.get(player_id, False)
+        ):
+            await asyncio.sleep(2)
+            if not self._search_in_games(player_id):
                 try:
-                    await self.manager.active_connections[player_id].close()
-                except (RuntimeError, KeyError):
-                    pass
-                self.manager.remove_connection(player_id)
-                self.game_queue.remove_player(competition_id, player_id)
-        finally:
-            listener_task.cancel()
+                    await websocket.send_json({"type": "waiting", "msg": f"For {time.time() - start_waiting_time} sec."})
+                except RuntimeError:
+                    continue
+            else:
+                continue
+        if self.game_queue.get_len(competition_id) >= 2:
+            await self.create_game(competition_id)
+        else:
+            print(f"Отработал выход из очереди для: {player_id}")
+            try:
+                await self.manager.active_connections[player_id].close()
+            except (RuntimeError, KeyError):
+                pass
+            self.manager.remove_connection(player_id)
+            self.game_queue.remove_player(competition_id, player_id)
 
 
     async def create_game(self, competition_id: int):
