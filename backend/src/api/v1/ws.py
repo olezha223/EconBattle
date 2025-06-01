@@ -20,6 +20,7 @@ async def websocket_endpoint(
     try:
         if match_maker.is_player_connected(player_id):
             await websocket.close(reason="Duplicate player")
+            return
         await websocket.send_json({"type": "connected", "msg": f"Игрок {player_id} подключен"})
         await match_maker.add_player(websocket, player_id, competition_id)
     except WebSocketDisconnect:
