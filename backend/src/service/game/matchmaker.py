@@ -50,7 +50,6 @@ class MatchMaker:
         if self.game_queue.get_len(competition_id) >= 2:
             await self.create_game(competition_id)
         else:
-            print(f"Отработал выход из очереди для: {player_id}")
             try:
                 await self.manager.active_connections[player_id].close()
             except (RuntimeError, KeyError):
@@ -77,14 +76,11 @@ class MatchMaker:
             competition_id=competition_id
         )
         self.games[(player_id_1, player_id_2)] = game
-        print(f'Состояние переменной для игр на момент создания: {self.games}')
         await asyncio.sleep(1)
         await game.start()
-
+        del self.games[(player_id_1, player_id_2)]
         self.manager.remove_connection(player_id_1)
         self.manager.remove_connection(player_id_2)
-        print("Состояние очереди игроков:", self.game_queue.get_all(competition_id))
-        print("Активные соединения:", self.manager.active_connections)
 
     def handle_disconnect(self, competition_id: int, player_id: str):
         self.manager.remove_connection(player_id)
