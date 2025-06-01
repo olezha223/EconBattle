@@ -16,23 +16,21 @@ class MatchMaker:
         self.manager = ConnectionManager()
         self.user_service = get_user_service()
         self.game_queue: QueueInterface = RedisQueue()
+        self.active_players: set[str] = set()
 
     def is_player_connected(self, player_id: str) -> bool:
         return player_id in self.manager.active_connections
 
+    def is_not_playing(self, player_id: str) -> bool:
+        return player_id not in self.active_players
+
     async def add_player(self, websocket: WebSocket, player_id: str, competition_id: int):
         self.handle_connect(websocket, player_id, competition_id)
-
-        start_waiting_time = time.time()
-        while (
-            self.game_queue.get_len(competition_id) <= 1 and
-            time.time() - start_waiting_time < 3000 and
-            self.manager.active_connections.get(player_id, False)
-        ):
-            await asyncio.sleep(2)
         if self.game_queue.get_len(competition_id) >= 2:
             await self.create_game(competition_id)
         else:
+            while self.is_player_connected(player_id):
+                await asyncio.sleep(0.1)
             try:
                 await websocket.send_json({"type": "search time limit reached"})
                 await websocket.close()
@@ -44,6 +42,9 @@ class MatchMaker:
     async def create_game(self, competition_id: int):
         player_id_1 = self.game_queue.pop(competition_id)
         player_id_2 = self.game_queue.pop(competition_id)
+
+        self.active_players.add(player_id_1)
+        self.active_players.add(player_id_2)
 
         player_1 = self.manager.get_connection(player_id_1)
         await player_1.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_2}"})
@@ -62,6 +63,9 @@ class MatchMaker:
         await game.start()
         self.manager.remove_connection(player_id_1)
         self.manager.remove_connection(player_id_2)
+
+        self.active_players.remove(player_id_1)
+        self.active_players.remove(player_id_2)
 
     def handle_connect(self, websocket: WebSocket, player_id: str, competition_id: int):
         self.manager.add_connection(player_id, websocket)
