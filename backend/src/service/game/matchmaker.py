@@ -69,32 +69,7 @@ class MatchMaker:
                 else:
                     continue
             if self.game_queue.get_len(competition_id) >= 2:
-                print(f"{player_id} создает мэтч")
-                player_id_1 = self.game_queue.pop(competition_id)
-                player_id_2 = self.game_queue.pop(competition_id)
-
-                player_1 = self.manager.get_connection(player_id_1)
-                await player_1.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_2}"})
-
-                player_2 = self.manager.get_connection(player_id_2)
-                await player_2.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_1}"})
-
-                user_1 = await self.user_service.get_user(player_id_1)
-                user_2 = await self.user_service.get_user(player_id_2)
-                game = Game(
-                    player1=Player(user=user_1, websocket=player_1),
-                    player2=Player(user=user_2, websocket=player_2),
-                    competition_id=competition_id
-                )
-                self.games[(player_id_1, player_id_2)] = game
-                print(f'Состояние переменной для игр на момент создания: {self.games}')
-                await asyncio.sleep(1)
-                await game.start()
-
-                self.manager.remove_connection(player_id_1)
-                self.manager.remove_connection(player_id_2)
-                print("Состояние очереди игроков:", self.game_queue.get_all(competition_id))
-                print("Активные соединения:", self.manager.active_connections)
+                await self.create_game(competition_id)
             else:
                 print(f"Отработал выход из очереди для: {player_id}")
                 try:
@@ -105,6 +80,34 @@ class MatchMaker:
                 self.game_queue.remove_player(competition_id, player_id)
         finally:
             listener_task.cancel()
+
+
+    async def create_game(self, competition_id: int):
+        player_id_1 = self.game_queue.pop(competition_id)
+        player_id_2 = self.game_queue.pop(competition_id)
+
+        player_1 = self.manager.get_connection(player_id_1)
+        await player_1.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_2}"})
+
+        player_2 = self.manager.get_connection(player_id_2)
+        await player_2.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_1}"})
+
+        user_1 = await self.user_service.get_user(player_id_1)
+        user_2 = await self.user_service.get_user(player_id_2)
+        game = Game(
+            player1=Player(user=user_1, websocket=player_1),
+            player2=Player(user=user_2, websocket=player_2),
+            competition_id=competition_id
+        )
+        self.games[(player_id_1, player_id_2)] = game
+        print(f'Состояние переменной для игр на момент создания: {self.games}')
+        await asyncio.sleep(1)
+        await game.start()
+
+        self.manager.remove_connection(player_id_1)
+        self.manager.remove_connection(player_id_2)
+        print("Состояние очереди игроков:", self.game_queue.get_all(competition_id))
+        print("Активные соединения:", self.manager.active_connections)
 
     def handle_disconnect(self, competition_id: int, player_id: str):
         self.manager.remove_connection(player_id)
