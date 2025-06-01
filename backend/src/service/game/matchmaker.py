@@ -16,22 +16,12 @@ class MatchMaker:
         self.manager = ConnectionManager()
         self.user_service = get_user_service()
         self.game_queue: QueueInterface = RedisQueue()
-        self.games: dict[tuple[str, str], Game] = dict()
-
-    def _search_in_games(self, player_id: str) -> bool:
-        for key in self.games.keys():
-            if player_id in key:
-                return True
-        return False
 
     def is_player_connected(self, player_id: str) -> bool:
         return player_id in self.manager.active_connections
 
     async def add_player(self, websocket: WebSocket, player_id: str, competition_id: int):
-        # добавить игрока в активные соединения
-        self.manager.add_connection(player_id, websocket)
-        # добавить игроку в очередь для данного соревнования
-        self.game_queue.insert_player(competition_id, player_id)
+        self.handle_connect(websocket, player_id, competition_id)
 
         start_waiting_time = time.time()
         while (
@@ -40,22 +30,15 @@ class MatchMaker:
             self.manager.active_connections.get(player_id, False)
         ):
             await asyncio.sleep(2)
-            if not self._search_in_games(player_id):
-                try:
-                    await websocket.send_json({"type": "waiting", "msg": f"For {time.time() - start_waiting_time} sec."})
-                except RuntimeError:
-                    continue
-            else:
-                continue
         if self.game_queue.get_len(competition_id) >= 2:
             await self.create_game(competition_id)
         else:
             try:
-                await self.manager.active_connections[player_id].close()
+                await websocket.send_json({"type": "search time limit reached"})
+                await websocket.close()
             except (RuntimeError, KeyError):
                 pass
-            self.manager.remove_connection(player_id)
-            self.game_queue.remove_player(competition_id, player_id)
+            self.handle_disconnect(competition_id, player_id)
 
 
     async def create_game(self, competition_id: int):
@@ -75,12 +58,14 @@ class MatchMaker:
             player2=Player(user=user_2, websocket=player_2),
             competition_id=competition_id
         )
-        self.games[(player_id_1, player_id_2)] = game
         await asyncio.sleep(1)
         await game.start()
-        del self.games[(player_id_1, player_id_2)]
         self.manager.remove_connection(player_id_1)
         self.manager.remove_connection(player_id_2)
+
+    def handle_connect(self, websocket: WebSocket, player_id: str, competition_id: int):
+        self.manager.add_connection(player_id, websocket)
+        self.game_queue.insert_player(competition_id, player_id)
 
     def handle_disconnect(self, competition_id: int, player_id: str):
         self.manager.remove_connection(player_id)
