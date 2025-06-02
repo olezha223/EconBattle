@@ -9,6 +9,7 @@ import {getUserId} from "../../services/api.js";
 export default function GameApp() {
   const { competition_id } = useParams();
   const [socket, setSocket] = useState(null);
+  const shouldWarnOnUnloadRef = useRef(true);
   const [gameState, setGameState] = useState('connecting');
   const [roundData, setRoundData] = useState(null);
   const [results, setResults] = useState(null);
@@ -132,6 +133,7 @@ export default function GameApp() {
           });
 
           setGameResult(data);
+          shouldWarnOnUnloadRef.current = false;
           setGameState('game_end');
           ws.close();
           break;
@@ -149,16 +151,17 @@ export default function GameApp() {
   useEffect(() => {
     const ws = connectToGame();
 
-    // === Добавляем обработчик beforeunload ===
     const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = '';
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        try {
-          ws.send(JSON.stringify({ type: 'user exit' }));
-        } catch (err) {}
+      if (shouldWarnOnUnloadRef.current) {
+        e.preventDefault();
+        e.returnValue = '';
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          try {
+            ws.send(JSON.stringify({ type: 'user exit' }));
+          } catch (err) {console.log(err)}
+        }
+        return '';
       }
-      return '';
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
 
@@ -166,9 +169,10 @@ export default function GameApp() {
       if (ws && ws.readyState === WebSocket.OPEN) {
         try {
           ws.send(JSON.stringify({ type: 'user exit' }));
-        } catch (err) {}
+        } catch (err) {console.log(err)}
+        ws.close();
       }
-      ws.close();
+
       setSocket(null);
       if (timerRef.current) {
         clearInterval(timerRef.current);
