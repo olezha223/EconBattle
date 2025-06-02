@@ -29,10 +29,24 @@ class MatchMaker:
         if self.game_queue.get_len(competition_id) >= 2:
             await self.create_game(competition_id)
         else:
-            while self.is_player_connected(player_id):
-                await asyncio.sleep(0.1)
+            start_time_waiting = time.time()
+            while True:
+                if time.time() - start_time_waiting >= 60: break
+                if not self.is_not_playing(player_id): break
+                if not self.is_player_connected(player_id): break
+                await asyncio.sleep(0.3)
+            if not self.is_not_playing(player_id):
+                while True:
+                    if not self.is_player_connected(player_id): break
+                    await asyncio.sleep(0.3)
+            else:
+                try:
+                    await websocket.send_json({"type": "search time limit reached"})
+                    await websocket.close()
+                except (RuntimeError, KeyError):
+                    pass
+                self.handle_disconnect(competition_id, player_id)
             try:
-                await websocket.send_json({"type": "search time limit reached"})
                 await websocket.close()
             except (RuntimeError, KeyError):
                 pass
