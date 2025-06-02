@@ -23,11 +23,29 @@ export default function GameApp() {
     status: 'default',
   });
   const [finalScores, setFinalScores] = useState({ user: 0, opponent: 0 });
+  const [waitingTime, setWaitingTime] = useState(60);
+  const timerRef = useRef(null);
 
   const currentRoundRef = useRef(currentRound);
   currentRoundRef.current = currentRound;
 
-  useEffect(() => {
+  const startWaitingTimer = () => {
+    setWaitingTime(60);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    timerRef.current = setInterval(() => {
+      setWaitingTime(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const connectToGame = () => {
     const ws = new WebSocket(
       `ws://econ-battle.ru/api/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
     );
@@ -43,15 +61,27 @@ export default function GameApp() {
       switch (data.type) {
         case 'connected':
           setGameState('waiting');
+          startWaitingTimer();
           break;
 
         case 'waiting':
           setGameState('waiting');
+          startWaitingTimer();
+          break;
+
+        case 'search time limit reached':
+          setGameState('no_opponent');
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
           break;
 
         case 'matched':
           setOpponent(data.msg.split(': ')[1]);
           setGameState('matched');
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
           setTimeout(() => setGameState('round'), 3000);
           break;
 
@@ -113,26 +143,26 @@ export default function GameApp() {
     };
 
     setSocket(ws);
+    return ws;
+  };
+
+  useEffect(() => {
+    const ws = connectToGame();
 
     // === Добавляем обработчик beforeunload ===
     const handleBeforeUnload = (e) => {
-      // Показываем стандартное окно подтверждения
       e.preventDefault();
       e.returnValue = '';
-      // Пытаемся отправить сообщение о выходе
       if (ws && ws.readyState === WebSocket.OPEN) {
         try {
           ws.send(JSON.stringify({ type: 'user exit' }));
         } catch (err) {}
       }
-      // returnValue нужен для показа диалога
       return '';
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // === Отправляем сообщение при размонтировании ===
     return () => {
-      // Сообщаем о выходе при размонтировании
       if (ws && ws.readyState === WebSocket.OPEN) {
         try {
           ws.send(JSON.stringify({ type: 'user exit' }));
@@ -140,9 +170,19 @@ export default function GameApp() {
       }
       ws.close();
       setSocket(null);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
       window.removeEventListener('beforeunload', handleBeforeUnload);
     }
-  }, [competition_id]); // Только competition_id в зависимостях
+  }, [competition_id]);
+
+  const handleRetry = () => {
+    if (socket) {
+      socket.close();
+    }
+    connectToGame();
+  };
 
   const handleAnswersSubmit = (answers) => {
     socket.send(JSON.stringify({
@@ -174,7 +214,18 @@ export default function GameApp() {
 
       {gameState === 'waiting' && (
         <div className={styles.waiting}>
-          Ожидаем соперника...
+          <div>Ожидаем соперника...</div>
+          <div className={styles.timer}>Осталось времени: {waitingTime} сек</div>
+        </div>
+      )}
+
+      {gameState === 'no_opponent' && (
+        <div className={styles.noOpponent}>
+          <h2>Не удалось найти соперника</h2>
+          <p>К сожалению, за отведенное время не удалось найти подходящего соперника.</p>
+          <button onClick={handleRetry} className={styles.button}>
+            Попробовать снова
+          </button>
         </div>
       )}
 
