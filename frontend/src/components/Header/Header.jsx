@@ -18,7 +18,7 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
-        <Link to="/competitions">Экон контест</Link>
+        <Link to="/competitions">Экономические бои</Link>
       </div>
 
       <nav className={styles.nav}>
