@@ -4,14 +4,15 @@ import styles from './CompetitionPreview.module.css'
 import {getUserId} from "../../services/api.js";
 
 export default function CompetitionPreview({
-  id,
-  name,
-  games_played,
-  unique_players,
-  created_at,
-  creator_id,
-  creator_name, picture
-
+    id,
+    name,
+    games_played,
+    unique_players,
+    created_at,
+    creator_id,
+    creator_name,
+    picture,
+    mean_task_difficulty
 }) {
   const navigate = useNavigate()
 
@@ -56,6 +57,7 @@ export default function CompetitionPreview({
         <div className={styles.stats}>
           <span>Игр сыграно: {games_played}</span>
           <span>Уникальных игроков: {unique_players}</span>
+          <span>Средняя сложность задач: {mean_task_difficulty}</span>
         </div>
         <button className={styles.button} onClick={handleStartButtonClick}>
           Начать!

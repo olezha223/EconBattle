@@ -75,6 +75,16 @@ export default function CompetitionDetailsPage() {
             {new Date(competition.created_at).toLocaleDateString()}
           </span>
         </div>
+
+        <div className={styles.item}>
+          <span className={styles.label}>Средняя сложность задач:</span>
+          <span className={styles.value}>{competition.mean_task_difficulty}</span>
+        </div>
+
+        <div className={styles.item}>
+          <span className={styles.label}>Процент правильно решенных задач в игре:</span>
+          <span className={styles.value}>{competition.percent_of_correct}%</span>
+        </div>
       </div>
 
       <button className={styles.button} onClick={handleStartGame}>
