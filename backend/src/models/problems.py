@@ -61,7 +61,7 @@ class TaskPreview(BaseModel):
     picture: str
     price: int
     access_type: str
-    # TODO: добавить сюда поле сколько раз решили
+    correct_percent: float
 
 class TaskForGame(BaseModel):
     id: int

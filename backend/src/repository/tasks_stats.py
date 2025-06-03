@@ -15,3 +15,14 @@ class TasksStatsRepo(RepoInterface):
             stmt = select(TasksStats).where(TasksStats.task_id.in_(task_ids))
             res = await session.execute(stmt)
             return len(res.scalars().all())
+
+    async def get_correct_percent(self, task_id: int) -> int:
+        async with self.session_getter() as session:
+            stmt_all = select(TasksStats.id).where(TasksStats.task_id == task_id)
+            stmt_correct = stmt_all.where(TasksStats.result == 'correct')
+            res = await session.execute(stmt_all)
+            res_correct = await session.execute(stmt_correct)
+            count_all = len(res.scalars().all())
+            if count_all == 0:
+                return 0
+            return (len(res_correct.scalars().all()) / count_all) * 100

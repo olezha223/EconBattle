@@ -1,8 +1,9 @@
 from typing import Optional
 
-from src.models.problems import TaskDTO, TaskWithoutAnswers, TaskFromAuthor, TaskPreview, TaskForGame, TaskDetailedDTO
+from src.models.problems import TaskDTO, TaskFromAuthor, TaskPreview, TaskForGame, TaskDetailedDTO
 from src.repository.competitions import CompetitionsRepo
 from src.repository.tasks import TaskRepo
+from src.repository.tasks_stats import TasksStatsRepo
 from src.repository.users import UserRepo
 
 
@@ -11,6 +12,7 @@ class TaskService:
         self.task_repo = task_repo
         self.user_repo = user_repo
         self.competition_repo = competition_repo
+        self.tasks_stats_repo = TasksStatsRepo()
 
     @staticmethod
     def get_task_for_round(task: TaskDTO) -> TaskForGame:
@@ -51,6 +53,7 @@ class TaskService:
         for task in tasks:
             creator = await self.user_repo.get_by_id(task.creator_id)
             used_in_competitions = await self.competition_repo.get_competitions_with_task(task.id)
+            correct_percent = await self.tasks_stats_repo.get_correct_percent(task.id)
             preview = TaskPreview(
                 created_at=task.created_at,
                 id=task.id,
@@ -60,7 +63,8 @@ class TaskService:
                 creator_name=creator.username,
                 price=task.price,
                 access_type=task.access_type,
-                picture=creator.picture
+                picture=creator.picture,
+                correct_percent=correct_percent
             )
             previews.append(preview)
         return previews
