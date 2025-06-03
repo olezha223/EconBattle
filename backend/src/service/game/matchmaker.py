@@ -94,7 +94,7 @@ class MatchMaker:
             player2=Player(user=user_2, websocket=player_2),
             competition_id=competition_id
         )
-        time.sleep(6)
+        # time.sleep(6)
         await asyncio.sleep(1)
         await game.start()
         self.manager.remove_connection(player_id_1)
