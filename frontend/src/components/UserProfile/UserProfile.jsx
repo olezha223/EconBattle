@@ -77,7 +77,7 @@ const UserProfile = ({ userData }) => {
     );
   };
 
-  const StatsBlock = ({ title, stats, links }) => ( // Изменили пропс с buttons на links
+  const StatsBlock = ({ title, stats, links }) => (
   <div className={styles.statsBlock}>
     <h3>{title}</h3>
     <div className={styles.statsContent}>
@@ -89,7 +89,7 @@ const UserProfile = ({ userData }) => {
       ))}
     </div>
     <div className={styles.statsButtons}>
-      {links.map((link, index) => ( // Изменили buttons на links
+      {links.map((link, index) => (
         <Link
           key={index}
           to={link.to}
@@ -156,7 +156,8 @@ const UserProfile = ({ userData }) => {
           stats={{
             'Создано задач': userData.tasks_created,
             'Создано соревнований': userData.competitions_created,
-            'Средняя сложность': userData.mean_task_difficulty
+            'Средняя сложность': userData.mean_task_difficulty,
+            'Сколько раз игроки решали задачи': userData.tasks_popularity_count
           }}
           links={[
             {
