@@ -237,7 +237,7 @@ export default function GameApp() {
       {gameState === 'matched' && (
         <div className={styles.matched}>
           <h2 className={styles.matchedTitle}>Соперник найден!</h2>
-          
+          <Opponent opponent={opponent} />
         </div>
       )}
 
