@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './Opponent.module.css';
 
 export default function Opponent({ opponent }) {
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     if (countdown <= 0) return;
