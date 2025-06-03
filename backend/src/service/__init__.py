@@ -2,11 +2,13 @@ from src.repository.competitions import CompetitionsRepo
 from src.repository.games import GamesRepo
 from src.repository.rounds import RoundsRepo
 from src.repository.tasks import TaskRepo
+from src.repository.tasks_stats import TasksStatsRepo
 from src.repository.users import UserRepo
 from src.service.competitions import CompetitionService
 from src.service.games import GameService
 from src.service.rounds import RoundService
 from src.service.tasks import TaskService
+from src.service.tasks_stats import TaskStatsService
 from src.service.users import UserService
 
 def get_user_service():
@@ -42,4 +44,9 @@ def get_game_service():
 def get_round_service():
     return RoundService(
         round_repo=RoundsRepo(),
+    )
+
+def get_task_stats_service():
+    return TaskStatsService(
+        tasks_stats_repo=TasksStatsRepo(),
     )

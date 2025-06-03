@@ -87,3 +87,16 @@ class Game(Base):
     rating_difference_player_2 = Column(Integer, nullable=False)
     score_player_1 = Column(Integer, nullable=False)
     score_player_2 = Column(Integer, nullable=False)
+
+
+class TasksStats(Base):
+    __tablename__ = 'tasks_stats'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+
+    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    user_id = Column(Text, ForeignKey("users.id"), nullable=False)
+    result = Column(Text, nullable=False)

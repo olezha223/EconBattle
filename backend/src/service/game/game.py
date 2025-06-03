@@ -6,7 +6,8 @@ from src.models.game import EventType, NewGame
 from src.models.problems import TaskDTO, TaskWithoutAnswers
 from src.models.round import StatusEnum, RoundDTO
 from src.models.users import UserDTO, Player
-from src.service import get_task_service, get_game_service, get_competition_service, get_user_service, get_round_service
+from src.service import get_task_service, get_game_service, get_competition_service, get_user_service, \
+    get_round_service, get_task_stats_service
 
 
 class Game:
@@ -16,6 +17,7 @@ class Game:
         self.competition_service = get_competition_service()
         self.user_service = get_user_service()
         self.round_service = get_round_service()
+        self.tasks_stats_service = get_task_stats_service()
 
         self.user_1_id = player1.user.id
         self.user_2_id = player2.user.id
@@ -112,7 +114,7 @@ class Game:
         answers = await self._collect_answers(timeout=time_limit)
 
         print(answers)
-        scores = self._calculate_scores(answers, problems)
+        scores = await self._calculate_scores(answers, problems)
         print(scores)
         await self._update_scores(scores)
 
@@ -161,13 +163,14 @@ class Game:
             except (WebSocketDisconnect, RuntimeError):
                 return player_id, {}
 
-    def _calculate_scores(self, answers: dict, problems: list[TaskDTO]) -> dict:
+    async def _calculate_scores(self, answers: dict, problems: list[TaskDTO]) -> dict:
         """Расчет очков за раунд"""
         scores = {pid: 0 for pid in self.players}
         for pid, user_answer in answers.items():
             for problem in problems:
                 problem_id = problem.id
                 answer_list = user_answer.get(str(problem_id), None)
+                await self.tasks_stats_service.create(pid, problem, answer_list)
                 if answer_list:
                     # print("----")
                     # print(problem.correct_value.get("answers", []))
