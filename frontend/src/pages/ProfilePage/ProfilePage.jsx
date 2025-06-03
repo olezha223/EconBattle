@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ProfilePage.module.css';
 import {fetchUserInfo, getUserId, updateUsername} from "../../services/api.js";
-import ActivityGrid from '../../components/ActivityGrid/ActivityGrid';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -27,6 +26,81 @@ export default function ProfilePage() {
 
     fetchUserData();
   }, []);
+
+  const renderActivityGrid = () => {
+    if (!userData?.user_activity) return null;
+
+    // Получаем и сортируем все даты
+    const dates = Object.keys(userData.user_activity)
+      .sort((a, b) => new Date(a) - new Date(b));
+
+    // Создаем матрицу недель
+    const weeks = [];
+    let currentWeek = [];
+
+    dates.forEach(date => {
+      const day = new Date(date).getDay(); // 0-6 (воскресенье-суббота)
+      const adjustedDay = day === 0 ? 6 : day - 1; // преобразуем к 0-6 (понедельник-воскресенье)
+
+      if (adjustedDay === 0 && currentWeek.length > 0) {
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+
+      currentWeek[adjustedDay] = {
+        date,
+        activity: userData.user_activity[date]
+      };
+    });
+
+    if (currentWeek.length > 0) weeks.push(currentWeek);
+
+    // Находим максимальную активность для цветов
+    const maxActivity = Math.max(...Object.values(userData.user_activity));
+
+    return (
+      <div className={styles.activityContainer}>
+        {/* Легенда дней недели */}
+        <div className={styles.weekDaysLegend}>
+          {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, index) => (
+            <div key={index} className={styles.weekDay}>{day}</div>
+          ))}
+        </div>
+
+        {/* Сетка активности */}
+        <div className={styles.weeksGrid}>
+          {weeks.map((week, weekIndex) => (
+            <div key={weekIndex} className={styles.weekColumn}>
+              {Array(7).fill().map((_, dayIndex) => {
+                const dayData = week[dayIndex];
+                const activity = dayData?.activity || 0;
+                const intensity = activity > 0 ? activity / maxActivity : 0;
+
+                return (
+                  <div
+                    key={dayIndex}
+                    className={styles.dayCell}
+                    data-tooltip={dayData ?
+                      `${new Date(dayData.date).toLocaleDateString('ru-RU')}: ${activity} активностей` :
+                      'Нет данных'}
+                  >
+                    <div
+                      className={styles.activitySquare}
+                      style={{
+                        backgroundColor: activity > 0
+                          ? `rgba(46, 160, 67, ${0.2 + intensity * 0.8})`
+                          : '#ebedf0'
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const StatsBlock = ({ title, stats, buttons }) => (
     <div className={styles.statsBlock}>
@@ -145,7 +219,7 @@ export default function ProfilePage() {
 
       <div className={styles.activitySection}>
         <h2>Активность</h2>
-        <ActivityGrid userActivity={userData?.user_activity} />
+        {renderActivityGrid()}
       </div>
 
       <div className={styles.statsContainer}>
