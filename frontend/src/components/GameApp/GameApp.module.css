@@ -96,3 +96,26 @@
   margin: 10px 0;
   color: #444;
 }
+
+.matched {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 40px;
+  text-align: center;
+}
+
+.matchedTitle {
+  font-size: 2.2rem;
+  color: #4299e1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}

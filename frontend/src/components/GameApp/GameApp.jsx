@@ -5,6 +5,7 @@ import RoundScreen from '../RoundScreen/RoundScreen.jsx';
 import ResultsScreen from "../ResultsScreen/ResultsScreen.jsx";
 import ScoreBoard from "../ScoreBoard/ScoreBoard.jsx";
 import {getUserId} from "../../services/api.js";
+import Opponent from "../Opponent/Opponent.jsx";
 
 export default function GameApp() {
   const { competition_id } = useParams();
@@ -13,7 +14,7 @@ export default function GameApp() {
   const [gameState, setGameState] = useState('connecting');
   const [roundData, setRoundData] = useState(null);
   const [results, setResults] = useState(null);
-  const [opponent, setOpponent] = useState('');
+  const [opponent, setOpponent] = useState(null);
   const [gameResult, setGameResult] = useState(null);
   const [totalRounds, setTotalRounds] = useState(0);
   const [roundResults, setRoundResults] = useState([]);
@@ -78,7 +79,7 @@ export default function GameApp() {
           break;
 
         case 'matched':
-          setOpponent(data.msg.split(': ')[1]);
+          setOpponent(data.msg);
           setGameState('matched');
           if (timerRef.current) {
             clearInterval(timerRef.current);
@@ -235,7 +236,8 @@ export default function GameApp() {
 
       {gameState === 'matched' && (
         <div className={styles.matched}>
-          Соперник найден! Информация о нем: {opponent}
+          <h2 className={styles.matchedTitle}>Соперник найден!</h2>
+          <Opponent opponent={opponent} />
         </div>
       )}
 
