@@ -61,13 +61,34 @@ class MatchMaker:
         self.active_players.add(player_id_2)
 
         player_1 = self.manager.get_connection(player_id_1)
-        await player_1.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_2}"})
-
         player_2 = self.manager.get_connection(player_id_2)
-        await player_2.send_json({"type": "matched", "msg": f"Ваш соперник: {player_id_1}"})
 
         user_1 = await self.user_service.get_user(player_id_1)
         user_2 = await self.user_service.get_user(player_id_2)
+        await player_1.send_json({
+            "type": "matched",
+            "msg": {
+                "id": user_2.id,
+                "username": user_2.username,
+                "picture": user_2.picture,
+                "student_rating": user_2.student_rating,
+                "teacher_rating": user_2.teacher_rating,
+                "created_at": user_2.created_at.isoformat()
+            }
+        })
+
+        # Для второго игрока отправляем данные первого
+        await player_2.send_json({
+            "type": "matched",
+            "msg": {
+                "id": user_1.id,
+                "username": user_1.username,
+                "picture": user_1.picture,
+                "student_rating": user_1.student_rating,
+                "teacher_rating": user_1.teacher_rating,
+                "created_at": user_1.created_at.isoformat()
+            }
+        })
         game = Game(
             player1=Player(user=user_1, websocket=player_1),
             player2=Player(user=user_2, websocket=player_2),
