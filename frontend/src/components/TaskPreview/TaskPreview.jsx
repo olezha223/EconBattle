@@ -9,6 +9,7 @@ export default function TaskPreview(
         creator_name,
         creator_id,
         created_at,
+        correct_percent,
         used_in_competitions,
         picture
     }
@@ -50,6 +51,7 @@ export default function TaskPreview(
                 <div className={styles.stat}>
                     <span className={styles.label}>Использовано:</span>
                     <span className={styles.value}>{used_in_competitions} раз</span>
+                    <span className={styles.value}>{correct_percent}% успешно решили</span>
                 </div>
             </div>
         </div>
