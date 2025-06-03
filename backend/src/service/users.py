@@ -6,6 +6,7 @@ from src.models.users import UserInfo, UserData
 from src.repository.competitions import CompetitionsRepo
 from src.repository.games import GamesRepo
 from src.repository.tasks import TaskRepo
+from src.repository.tasks_stats import TasksStatsRepo
 from src.repository.users import UserRepo
 
 
@@ -24,12 +25,14 @@ class UserService:
             user_repo: UserRepo,
             games_repo: GamesRepo,
             task_repo: TaskRepo,
-            competitions_repo: CompetitionsRepo
+            competitions_repo: CompetitionsRepo,
+            tasks_stats_repo: TasksStatsRepo
     ):
         self.user_repo = user_repo
         self.games_repo = games_repo
         self.task_repo = task_repo
         self.competitions_repo = competitions_repo
+        self.tasks_stats_repo = tasks_stats_repo
 
     async def update_student_rating(self, rating_difference: int, user_id: int) -> None:
         await self.user_repo.update_student_rating(rating_difference, user_id)
@@ -78,6 +81,12 @@ class UserService:
 
         return result
 
+    async def get_all_tasks_count(self, user_id: str) -> int:
+        task_ids = [
+            task.id for task in await self.task_repo.get_all_problems_for_user(user_id=user_id)
+        ]
+        return await self.tasks_stats_repo.get_all_tasks_count(task_ids=task_ids)
+
     async def get_user_info(self, user_id: int) -> UserInfo:
         user_base_info = await self.get_user(user_id)
         loses_count = await self.games_repo.get_status_count(user_id, StatusEnum.LOSER.value)
@@ -95,6 +104,7 @@ class UserService:
             # статистика как составителя задач
             tasks_created=len(await self.task_repo.get_created_tasks(user_id)),
             mean_task_difficulty=round(mean_task_difficulty, 1),
+            tasks_popularity_count=await self.get_all_tasks_count(user_id),
             # статистика как организатора соревнований
             competitions_created=len(await self.competitions_repo.get_all_competitions_created_by_user(user_id)),
             games_played=len(await self.games_repo.get_played_games_by_user(user_id)),

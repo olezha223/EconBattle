@@ -16,7 +16,8 @@ def get_user_service():
         user_repo=UserRepo(),
         games_repo=GamesRepo(),
         task_repo=TaskRepo(),
-        competitions_repo=CompetitionsRepo()
+        competitions_repo=CompetitionsRepo(),
+        tasks_stats_repo=TasksStatsRepo(),
     )
 
 def get_task_service():

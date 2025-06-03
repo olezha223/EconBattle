@@ -24,6 +24,7 @@ class UserInfo(UserData):
     # статистика как составителя задач
     tasks_created: int
     mean_task_difficulty: float
+    tasks_popularity_count: int
 
     # статистика как организатора соревнований
     competitions_created: int
