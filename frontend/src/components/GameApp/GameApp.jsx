@@ -84,7 +84,6 @@ export default function GameApp() {
           if (timerRef.current) {
             clearInterval(timerRef.current);
           }
-          setTimeout(() => setGameState('round'), 3000);
           break;
 
         case 'Game':

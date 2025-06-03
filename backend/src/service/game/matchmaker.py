@@ -89,13 +89,15 @@ class MatchMaker:
                 "created_at": user_1.created_at.isoformat()
             }
         })
+
+        await asyncio.sleep(5)
+
         game = Game(
             player1=Player(user=user_1, websocket=player_1),
             player2=Player(user=user_2, websocket=player_2),
             competition_id=competition_id
         )
-        # time.sleep(6)
-        await asyncio.sleep(1)
+
         await game.start()
         self.manager.remove_connection(player_id_1)
         self.manager.remove_connection(player_id_2)

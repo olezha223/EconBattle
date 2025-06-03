@@ -1,6 +1,24 @@
+import { useEffect, useState } from 'react';
 import styles from './Opponent.module.css';
 
 export default function Opponent({ opponent }) {
+  const [countdown, setCountdown] = useState(5);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
   if (!opponent) return null;
 
   return (
@@ -32,6 +50,17 @@ export default function Opponent({ opponent }) {
             <span className={styles.statValue}>{opponent.teacher_rating}</span>
           </div>
         </div>
+      </div>
+
+      <div className={styles.countdown}>
+        <div className={styles.countdownText}>
+          {countdown > 0
+            ? `Матч начнется через ${countdown}`
+            : "Ожидаем начала раунда..."}
+        </div>
+        {countdown === 0 && (
+          <div className={styles.loader}></div>
+        )}
       </div>
     </div>
   );
