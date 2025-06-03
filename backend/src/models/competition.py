@@ -22,6 +22,8 @@ class CompetitionDetailedDTO(CompetitionDTO):
     creator_name: str
     picture: str
     max_time: int
+    mean_task_difficulty: float
+    percent_of_correct: float
 
 class CompetitionPreview(BaseModel):
     id: int
@@ -32,3 +34,4 @@ class CompetitionPreview(BaseModel):
     creator_id: str
     creator_name: str
     picture: str
+    mean_task_difficulty: float

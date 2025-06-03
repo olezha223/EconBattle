@@ -3,6 +3,7 @@ from typing import Optional
 from src.models.competition import CompetitionDTO, CompetitionPreview, NewCompetition, CompetitionDetailedDTO
 from src.repository.competitions import CompetitionsRepo
 from src.repository.games import GamesRepo
+from src.repository.tasks import TaskRepo
 from src.repository.users import UserRepo
 
 
@@ -16,17 +17,23 @@ class CompetitionService:
         self.competition_repo = competition_repo
         self.games_repo = games_repo
         self.user_repo = user_repo
+        self.task_repo = TaskRepo()
 
     async def get_competition(self, competition_id: int) -> Optional[CompetitionDetailedDTO]:
         competition = await self.competition_repo.get_by_id(competition_id)
         if competition:
             user = await self.user_repo.get_by_id(competition.creator_id)
+            mean_task_difficulty = await self.task_repo.get_mean_task_difficulty_for_competition(competition.tasks_markup)
+            percent_of_correct = await self.task_repo.get_correct_percentage(competition.tasks_markup)
             return CompetitionDetailedDTO(
                 **competition.model_dump(),
                 creator_name=user.username,
                 picture=user.picture,
-                max_time=get_max_time(competition.tasks_markup)
+                max_time=get_max_time(competition.tasks_markup),
+                mean_task_difficulty=mean_task_difficulty,
+                percent_of_correct=percent_of_correct
             )
+        return None
 
     async def create_competition(self, competition: NewCompetition) -> int:
         return await self.competition_repo.create_competition(competition)
@@ -51,6 +58,7 @@ class CompetitionService:
             games_played = await self.games_repo.get_played_games_in_competition(competition_id=competition.id)
             unique_players = await self.games_repo.get_unique_players(games_played)
             creator = await self.user_repo.get_by_id(competition.creator_id)
+            mean_task_difficulty = await self.task_repo.get_mean_task_difficulty_for_competition(competition.tasks_markup)
             preview = CompetitionPreview(
                 id=competition.id,
                 name=competition.name,
@@ -59,7 +67,8 @@ class CompetitionService:
                 unique_players=len(unique_players),
                 creator_name=creator.username,
                 creator_id=competition.creator_id,
-                picture=creator.picture
+                picture=creator.picture,
+                mean_task_difficulty=mean_task_difficulty
             )
             result.append(preview)
         return result
