@@ -51,7 +51,10 @@ export default function TaskPreview(
                 <div className={styles.stat}>
                     <span className={styles.label}>Использовано:</span>
                     <span className={styles.value}>{used_in_competitions} раз</span>
-                    <span className={styles.value}>{correct_percent}% успешно решили</span>
+                </div>
+                <div className={styles.stat}>
+                    <span className={styles.label}>Успешно решили:</span>
+                    <span className={styles.value}>{correct_percent}% игроков</span>
                 </div>
             </div>
         </div>
