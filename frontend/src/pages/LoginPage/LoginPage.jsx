@@ -15,7 +15,7 @@ export default function LoginPage() {
       <div className={styles.content}>
         <h1 className={styles.title}>Добро пожаловать!</h1>
         <p className={styles.description}>
-          Это приложение для преподавателей и студентов для отработки навыков решения задач по экономическим моделям!
+          Это приложение для преподавателей и студентов для отработки навыков решения задач по экономическим моделям.
         </p>
 
         <button onClick={handleLogin} className={styles.loginButton}>
