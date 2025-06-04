@@ -30,6 +30,7 @@ class TaskService:
                 creator_name=user.username,
                 picture=user.picture
             )
+        return None
 
     async def create_task(self, task: TaskFromAuthor) -> int:
         return await self.task_repo.create_task(task)

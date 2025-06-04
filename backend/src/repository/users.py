@@ -48,6 +48,7 @@ class UserRepo(RepoInterface):
             scalar = result.scalar_one_or_none()
             if scalar:
                 return UserDTO.model_validate(scalar, from_attributes=True)
+            return None
 
     async def create_with_username(
             self,
