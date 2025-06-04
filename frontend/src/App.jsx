@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import {BrowserRouter, Routes, Route, Navigate, useLocation} from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import CompetitionsPage from './pages/CompetitionsPage/CompetitionsPage.jsx'
 import LoginPage from './pages/LoginPage/LoginPage.jsx'
@@ -15,28 +15,36 @@ import UserPage from "./pages/UserPage/UserPage.jsx";
 import UserTasksPage from "./pages/TasksPage/UserTasksPage.jsx";
 import UserCompetitionsPage from "./pages/CompetitionsPage/UserCompetitionsPage.jsx";
 import GameApp from "./components/GameApp/GameApp.jsx";
-import {getUserId} from "./services/api.js";
 import AuthSuccessPage from "./pages/AuthSuccessPage/AuthSuccessPage.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const location = useLocation()
 
   useEffect(() => {
     const checkAuth = () => {
-      const userId = getUserId()
+      const userId = localStorage.getItem('user_id')
       setIsAuthenticated(!!userId)
       setLoading(false)
     }
+
+    // Проверяем аутентификацию при монтировании и при изменении пути
     checkAuth()
+
+    // Синхронизация между вкладками
+    const handleStorage = () => {
+      const userId = localStorage.getItem('user_id')
+      setIsAuthenticated(!!userId)
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
   }, [])
 
-  const ProtectedRoute = ({ children }) => {
-    if (!isAuthenticated) {
-      return <Navigate to="/" replace />
-    }
-    return children
-  }
+  useEffect(() => {
+    const userId = localStorage.getItem('user_id')
+    setIsAuthenticated(!!userId)
+  }, [location.pathname])
 
   if (loading) return <div>Loading...</div>
 
@@ -48,7 +56,9 @@ function App() {
           element={isAuthenticated ? <Navigate to="/competitions" replace /> : <LoginPage />}
         />
 
-        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route path="/auth-success" element={<AuthSuccessPage setIsAuthenticated={setIsAuthenticated} />} />
+
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated}><Layout /></ProtectedRoute>}>
           <Route path="competitions" element={<CompetitionsPage />} />
           <Route path="competitions/:id" element={<CompetitionDetailsPage />} />
           <Route path="competitions_constructor" element={<CompetitionConstructorPage />} />
@@ -69,6 +79,15 @@ function App() {
       </Routes>
     </BrowserRouter>
   )
+}
+
+const ProtectedRoute = ({ isAuthenticated, children }) => {
+  const location = useLocation()
+
+  if (!isAuthenticated) {
+    return <Navigate to={`/?redirect=${encodeURIComponent(location.pathname)}`} replace />
+  }
+  return children
 }
 
 export default App

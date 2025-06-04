@@ -39,7 +39,8 @@ async def homepage(request: Request):
 
 
 @router_auth.get('/login')
-async def login(request: Request):
+async def login(request: Request, redirect_after: str = Query('/')):
+    request.session['redirect_after'] = redirect_after
     redirect_uri = 'http://econ-battle.ru/api/auth'
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
@@ -63,10 +64,10 @@ async def auth(request: Request):
                 username=user_data.get("name"),
                 picture=user_data.get("picture")
             )
-
+        redirect_after = request.session.get('redirect_after', '/')
+        redirect_url = f'http://econ-battle.ru/auth-success?sub={user_data["sub"]}&name={user_data["name"]}&redirect={redirect_after}'
         # Перенаправляем на фронтенд с токеном в URL
-        return RedirectResponse(
-            url=f'http://econ-battle.ru/auth-success?sub={user_data["sub"]}&name={user_data["name"]}')
+        return RedirectResponse(url=redirect_url)
 
     return RedirectResponse(url='http://econ-battle.ru/login?error=AuthFailed')
 
