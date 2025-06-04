@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import {getUserId} from "../../services/api.js";
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -28,8 +29,12 @@ export default function AuthCallbackPage() {
       if (decoded.picture) {
         localStorage.setItem('picture', decoded.picture);
       }
+      console.log(getUserId())
       window.dispatchEvent(new Event('storage'));
-      navigate(returnTo);
+      setTimeout(() => {
+        navigate(returnTo);
+      }, 100);
+      console.log(getUserId())
     } catch (error) {
       console.error('Ошибка обработки авторизации:', error);
       navigate('/login', { state: { error: "Ошибка авторизации" } });
