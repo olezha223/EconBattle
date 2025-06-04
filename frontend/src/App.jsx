@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route, Navigate, useLocation} from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import CompetitionsPage from './pages/CompetitionsPage/CompetitionsPage.jsx'
 import LoginPage from './pages/LoginPage/LoginPage.jsx'
@@ -19,17 +19,8 @@ import {getUserId} from "./services/api.js";
 import AuthCallbackPage from "./components/AuthCallback/AuthCallback.jsx";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
-  )
-}
-
-function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
-  const location = useLocation()
 
   useEffect(() => {
     const checkAuth = () => {
@@ -37,45 +28,46 @@ function AppContent() {
       setIsAuthenticated(!!userId)
       setLoading(false)
     }
-
     checkAuth()
+  }, [])
 
-    const handleStorageChange = () => checkAuth()
-    window.addEventListener('storage', handleStorageChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
+  const ProtectedRoute = ({ children }) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/" replace />
     }
-  }, [location])
+    return children
+  }
 
   if (loading) return <div>Loading...</div>
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={isAuthenticated ? <Navigate to="/competitions" replace /> : <LoginPage />}
-      />
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={isAuthenticated ? <Navigate to="/competitions" replace /> : <LoginPage />}
+        />
 
-      <Route element={isAuthenticated ? <Layout /> : <Navigate to="/" replace />}>
-        <Route path="competitions" element={<CompetitionsPage />} />
-        <Route path="competitions/:id" element={<CompetitionDetailsPage />} />
-        <Route path="competitions_constructor" element={<CompetitionConstructorPage />} />
-        <Route path="user_page/:userId" element={<UserPage />} />
-        <Route path="tasks" element={<TasksPage />} />
-        <Route path="tasks/:id" element={<TaskDetailsPage />} />
-        <Route path="tasks_constructor" element={<TaskConstructorPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="my_tasks" element={<MyTasksPage />} />
-        <Route path="my_competitions" element={<MyCompetitionsPage />} />
-        <Route path="user_tasks/:userId" element={<UserTasksPage />} />
-        <Route path="user_competitions/:userId" element={<UserCompetitionsPage />} />
-        <Route path="game/:competition_id" element={<GameApp />} />
-        <Route path="/auth-callback" element={<AuthCallbackPage />} />
-      </Route>
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="competitions" element={<CompetitionsPage />} />
+          <Route path="competitions/:id" element={<CompetitionDetailsPage />} />
+          <Route path="competitions_constructor" element={<CompetitionConstructorPage />} />
+          <Route path="user_page/:userId" element={<UserPage />} />
+          <Route path="tasks" element={<TasksPage />} />
+          <Route path="tasks/:id" element={<TaskDetailsPage />} />
+          <Route path="tasks_constructor" element={<TaskConstructorPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="my_tasks" element={<MyTasksPage />} />
+          <Route path="my_competitions" element={<MyCompetitionsPage />} />
+          <Route path="user_tasks/:userId" element={<UserTasksPage />} />
+          <Route path="user_competitions/:userId" element={<UserCompetitionsPage />} />
+          <Route path="game/:competition_id" element={<GameApp />} />
+          <Route path="/auth-callback" element={<AuthCallbackPage />} />
+        </Route>
 
-      <Route path="*" element={isAuthenticated ? <div>404 Not Found</div> : <Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={isAuthenticated ? <div>404 Not Found</div> : <Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
