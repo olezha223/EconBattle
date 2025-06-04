@@ -16,11 +16,11 @@ import UserTasksPage from "./pages/TasksPage/UserTasksPage.jsx";
 import UserCompetitionsPage from "./pages/CompetitionsPage/UserCompetitionsPage.jsx";
 import GameApp from "./components/GameApp/GameApp.jsx";
 import AuthSuccessPage from "./pages/AuthSuccessPage/AuthSuccessPage.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
-function App() {
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
-  const location = useLocation()
 
   useEffect(() => {
     const checkAuth = () => {
@@ -44,21 +44,24 @@ function App() {
   useEffect(() => {
     const userId = localStorage.getItem('user_id')
     setIsAuthenticated(!!userId)
-  }, [location.pathname])
+  }, [])
 
   if (loading) return <div>Loading...</div>
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={isAuthenticated ? <Navigate to="/competitions" replace /> : <LoginPage />}
-        />
+    <Routes>
+      <Route
+        path="/"
+        element={isAuthenticated ? <Navigate to="/competitions" replace /> : <LoginPage />}
+      />
 
-        <Route path="/auth-success" element={<AuthSuccessPage setIsAuthenticated={setIsAuthenticated} />} />
+      <Route path="/auth-success" element={<AuthSuccessPage setIsAuthenticated={setIsAuthenticated} />} />
 
-        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated}><Layout /></ProtectedRoute>}>
+      <Route element={
+        <ProtectedRoute isAuthenticated={isAuthenticated}>
+          <Layout />
+        </ProtectedRoute>
+      }>
           <Route path="competitions" element={<CompetitionsPage />} />
           <Route path="competitions/:id" element={<CompetitionDetailsPage />} />
           <Route path="competitions_constructor" element={<CompetitionConstructorPage />} />
@@ -73,21 +76,17 @@ function App() {
           <Route path="user_competitions/:userId" element={<UserCompetitionsPage />} />
           <Route path="game/:competition_id" element={<GameApp />} />
           <Route path="/auth-success" element={<AuthSuccessPage />} />
-        </Route>
-
-        <Route path="*" element={isAuthenticated ? <div>404 Not Found</div> : <Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+      </Route>
+    </Routes>
   )
 }
 
-const ProtectedRoute = ({ isAuthenticated, children }) => {
-  const location = useLocation()
-
-  if (!isAuthenticated) {
-    return <Navigate to={`/?redirect=${encodeURIComponent(location.pathname)}`} replace />
-  }
-  return children
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  )
 }
 
 export default App
