@@ -34,6 +34,6 @@ class App(FastAPI):
             allow_headers=allow_headers
         )
 
-        self.add_middleware(SessionMiddleware, secret_key="tunk-tunk-tunk-sahur", same_site="none")
+        self.add_middleware(SessionMiddleware, secret_key="tunk-tunk-tunk-sahur")
 
         return self
