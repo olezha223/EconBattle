@@ -14,6 +14,8 @@ if os.path.exists(dotenv_path):
 
 @dataclass(frozen=True)
 class AuthConfig:
+    JWT_SECRET: str = os.getenv('JWT_SECRET', "example")
+    JWT_ALGORITHM = "HS256"
     client_id: str = os.getenv('GOOGLE_CLIENT_ID', 'example')
     client_secret: str = os.getenv('GOOGLE_CLIENT_SECRET', 'example')
 
