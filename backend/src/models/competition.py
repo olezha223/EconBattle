@@ -1,18 +1,30 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 
 class Round(BaseModel):
-    tasks: list[int] = []
-    time_limit: int = 60
+    tasks: list[int] = Field(..., max_length=50)
+    time_limit: int = Field(60, gt=0, lt=3000)
 
 class NewCompetition(BaseModel):
-    name: str
-    creator_id: str
+    name: str = Field(..., min_length=1, max_length=50)
+    creator_id: str = Field(...)
     # settings
-    max_rounds: int
-    tasks_markup: dict[str, Round]
+    max_rounds: int = Field(..., gt=0, le=30)
+    tasks_markup: dict[str, Round] = Field(..., examples=[
+        {
+            "1": {
+                "tasks": [
+                    18,
+                    19,
+                    20
+                ],
+                "time_limit": 60
+            }
+        },
+    ])
 
 class CompetitionDTO(NewCompetition):
     id: int

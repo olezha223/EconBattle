@@ -4,6 +4,10 @@ import MiniPreview from './MiniPreview';
 import styles from './CompetitionConstructorPage.module.css';
 import {createCompetition, fetchAllTasks, fetchUserTasksPreviews, getUserId} from "../../services/api.js";
 
+const MAX_NAME_LENGTH = 50;
+const MAX_ROUNDS = 30;
+const MAX_TASKS_PER_ROUND = 50;
+const MAX_TIME_LIMIT = 3000;
 
 const TaskSelectorModal = ({ tasks, onClose, onSelect }) => (
   <div className={styles.modalOverlay}>
@@ -59,6 +63,14 @@ export default function CompetitionConstructorPage() {
   };
 
   const handleAddTask = (taskId) => {
+    // Проверка максимального количества задач в раунде
+    const currentTasksCount = formData.tasks_markup[currentRound].tasks.length;
+    if (currentTasksCount >= MAX_TASKS_PER_ROUND) {
+      setError(`Нельзя добавить более ${MAX_TASKS_PER_ROUND} задач в один раунд`);
+      setShowTaskSelector(false);
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       tasks_markup: {
@@ -73,6 +85,13 @@ export default function CompetitionConstructorPage() {
   };
 
   const handleAddRound = () => {
+    // Проверка максимального количества раундов
+    const roundsCount = Object.keys(formData.tasks_markup).length;
+    if (roundsCount >= MAX_ROUNDS) {
+      setError(`Нельзя создать более ${MAX_ROUNDS} раундов`);
+      return;
+    }
+
     const nextRound = String(Number(currentRound) + 1);
     setFormData(prev => ({
       ...prev,
@@ -105,7 +124,7 @@ export default function CompetitionConstructorPage() {
     try {
       const competitionData = {
         ...formData,
-        creator_id: getUserId(), // Используем функцию из API-файла
+        creator_id: getUserId(),
         max_rounds: Object.keys(formData.tasks_markup).length,
       };
 
@@ -141,6 +160,13 @@ export default function CompetitionConstructorPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Ограничение длины названия
+    if (name === 'name' && value.length > MAX_NAME_LENGTH) {
+      setError(`Название не может превышать ${MAX_NAME_LENGTH} символов`);
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -148,13 +174,16 @@ export default function CompetitionConstructorPage() {
   };
 
   const handleRoundTimeChange = (round, value) => {
+    // Проверка максимального времени
+    const timeValue = Math.min(Number(value), MAX_TIME_LIMIT);
+
     setFormData(prev => ({
       ...prev,
       tasks_markup: {
         ...prev.tasks_markup,
         [round]: {
           ...prev.tasks_markup[round],
-          time_limit: Number(value)
+          time_limit: timeValue
         }
       }
     }));
@@ -175,6 +204,8 @@ export default function CompetitionConstructorPage() {
               onChange={handleInputChange}
               className={styles.input}
               required
+              maxLength={MAX_NAME_LENGTH}
+              placeholder={`Максимум ${MAX_NAME_LENGTH} символов`}
             />
           </label>
         </div>
@@ -209,10 +240,11 @@ export default function CompetitionConstructorPage() {
                           onChange={(e) => handleRoundTimeChange(round, e.target.value)}
                           className={styles.timeInput}
                           min="10"
-                          max="3600"
+                          max={MAX_TIME_LIMIT}
                           required
                         />
                       </label>
+                      <p className={styles.hint}>Максимум: {MAX_TIME_LIMIT} секунд</p>
                     </div>
 
                     <div className={styles.tasksList}>
@@ -230,6 +262,10 @@ export default function CompetitionConstructorPage() {
                       ))}
                     </div>
 
+                    <div className={styles.taskCounter}>
+                      Задач: {formData.tasks_markup[round].tasks.length}/{MAX_TASKS_PER_ROUND}
+                    </div>
+
                     <div className={styles.addTaskContainer}>
                       <button
                         type="button"
@@ -238,6 +274,7 @@ export default function CompetitionConstructorPage() {
                           setCurrentRound(round);
                           handleTaskSourceSelect('my');
                         }}
+                        disabled={formData.tasks_markup[round].tasks.length >= MAX_TASKS_PER_ROUND}
                       >
                         Добавить из моих задач
                       </button>
@@ -248,6 +285,7 @@ export default function CompetitionConstructorPage() {
                           setCurrentRound(round);
                           handleTaskSourceSelect('all');
                         }}
+                        disabled={formData.tasks_markup[round].tasks.length >= MAX_TASKS_PER_ROUND}
                       >
                         Добавить из общего банка
                       </button>
@@ -262,9 +300,13 @@ export default function CompetitionConstructorPage() {
               type="button"
               className={styles.addRoundButton}
               onClick={handleAddRound}
+              disabled={Object.keys(formData.tasks_markup).length >= MAX_ROUNDS}
             >
               Добавить раунд
             </button>
+            <div className={styles.roundCounter}>
+              Раундов: {Object.keys(formData.tasks_markup).length}/{MAX_ROUNDS}
+            </div>
           </div>
         </div>
 
