@@ -24,11 +24,19 @@ async def create_problem(
         task: TaskFromAuthor,
         service: TaskService = Depends(get_task_service),
         current_user: dict = Depends(get_current_user),
+        user_service: UserService = Depends(get_user_service),
 ) -> int:
-    if task.creator_id != current_user['sub']:
+    creator = task.creator_id
+    if creator != current_user['sub']:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can't create new task not with your author id",
+        )
+    user = await user_service.get_user(creator)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
         )
     return await service.create_task(task)
 

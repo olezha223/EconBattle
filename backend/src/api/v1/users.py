@@ -11,7 +11,7 @@ router_user = APIRouter(
 
 async def get_current_user(request: Request):
     user = request.session.get('user')
-
+    # если пользователь нам делает нужный запрос не авторизовавшись, мы не можем это позволить
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
