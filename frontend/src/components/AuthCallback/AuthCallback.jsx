@@ -16,10 +16,8 @@ export default function AuthCallbackPage() {
     }
 
     try {
-      // Декодируем JWT без проверки подписи (только для фронтенда)
       const decoded = jwtDecode(userToken);
 
-      // Проверяем срок действия
       const now = Date.now() / 1000;
       if (decoded.exp < now) {
         throw new Error("Токен просрочен");
@@ -30,8 +28,7 @@ export default function AuthCallbackPage() {
       if (decoded.picture) {
         localStorage.setItem('picture', decoded.picture);
       }
-
-      // Перенаправляем на исходную страницу
+      window.dispatchEvent(new Event('storage'));
       navigate(returnTo);
     } catch (error) {
       console.error('Ошибка обработки авторизации:', error);

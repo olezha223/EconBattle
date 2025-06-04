@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import {BrowserRouter, Routes, Route, Navigate, useLocation} from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import CompetitionsPage from './pages/CompetitionsPage/CompetitionsPage.jsx'
 import LoginPage from './pages/LoginPage/LoginPage.jsx'
@@ -21,15 +21,19 @@ import AuthCallbackPage from "./components/AuthCallback/AuthCallback.jsx";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const checkAuth = () => {
+  const location = useLocation()
+  const checkAuth = () => {
       const userId = getUserId()
       setIsAuthenticated(!!userId)
       setLoading(false)
-    }
+  }
+
+  useEffect(() => {
     checkAuth()
-  }, [])
+    const handleStorageChange = () => checkAuth()
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [location])
 
   const ProtectedRoute = ({ children }) => {
     if (!isAuthenticated) {
