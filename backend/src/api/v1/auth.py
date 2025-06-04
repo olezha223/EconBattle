@@ -72,6 +72,7 @@ async def auth(request: Request):
             key="session",
             value=request.session.get('id'),
         )
+        return response
 
     return RedirectResponse(url='http://econ-battle.ru/login?error=AuthFailed')
 
