@@ -50,6 +50,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/certs
       - nginx_log:/etc/nginx/var/log # Пишем логи в том
 
     depends_on:
