@@ -12,7 +12,7 @@ def main() -> Any:
         port=8000,
         **asdict(configuration.app)
     ).included_cors(
-        allow_origins=["*"],
+        allow_origins=["http://econ-battle.ru", "https://econ-battle.ru"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"]
