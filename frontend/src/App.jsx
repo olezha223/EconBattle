@@ -16,7 +16,7 @@ import UserTasksPage from "./pages/TasksPage/UserTasksPage.jsx";
 import UserCompetitionsPage from "./pages/CompetitionsPage/UserCompetitionsPage.jsx";
 import GameApp from "./components/GameApp/GameApp.jsx";
 import {getUserId} from "./services/api.js";
-import AuthCallbackPage from "./components/AuthCallback/AuthCallback.jsx";
+import AuthSuccessPage from "./pages/AuthSuccessPage/AuthSuccessPage.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -62,7 +62,7 @@ function App() {
           <Route path="user_tasks/:userId" element={<UserTasksPage />} />
           <Route path="user_competitions/:userId" element={<UserCompetitionsPage />} />
           <Route path="game/:competition_id" element={<GameApp />} />
-          <Route path="/auth-callback" element={<AuthCallbackPage />} />
+          <Route path="/auth-success" element={<AuthSuccessPage />} />
         </Route>
 
         <Route path="*" element={isAuthenticated ? <div>404 Not Found</div> : <Navigate to="/" replace />} />

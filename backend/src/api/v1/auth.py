@@ -49,7 +49,8 @@ async def auth(request: Request):
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as error:
-        return HTMLResponse(f'<h1>{error.error}</h1>')
+        return RedirectResponse(url=f'http://econ-battle.ru/login?error={error.error}')
+
     user = token.get('userinfo')
     # получить информацию о юзере
     if user:
@@ -62,17 +63,12 @@ async def auth(request: Request):
                 username=user_data.get("name"),
                 picture=user_data.get("picture")
             )
-        # Отправляем данные пользователя в opener
-        html = f"""
-        <script>
-            window.opener.postMessage({{
-                user: {json.dumps(user_data)}
-            }}, 'http://econ-battle.ru');
-            window.close();
-        </script>
-        """
-        return HTMLResponse(html)
-    return RedirectResponse(url='/')
+
+        # Перенаправляем на фронтенд с токеном в URL
+        return RedirectResponse(
+            url=f'http://econ-battle.ru/auth-success?sub={user_data["sub"]}&name={user_data["name"]}')
+
+    return RedirectResponse(url='http://econ-battle.ru/login?error=AuthFailed')
 
 
 @router_auth.get('/logout')
