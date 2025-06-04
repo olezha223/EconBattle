@@ -21,16 +21,12 @@ class AnswerTypeEnum(str, Enum):
 
 
 class TaskFromAuthor(BaseModel):
+    """Схема от автора задачи"""
     creator_id: str = Field(...)
-    name: str = Field(..., min_length=1, max_length=50)
-    text: str = Field(..., min_length=1, max_length=2000)
-    price: int = Field(..., gt=0, le=1000)
-    task_type: str = Field(..., examples=[
-        TaskTypeEnum.MULTIPLE_CHOICE.value,
-        TaskTypeEnum.SINGLE_CHOICE.value,
-        TaskTypeEnum.ONE_WORD_ANSWER.value,
-        TaskTypeEnum.ONE_NUMBER_ANSWER.value
-    ])
+    name: str = Field(..., min_length=1, max_length=50, title="Название задачи")
+    text: str = Field(..., min_length=1, max_length=2000, title="Условие задачи")
+    price: int = Field(..., gt=0, le=1000, title="Сложность задачи")
+    task_type: str = Field(..., title='Тип задачи (одиночный, множ. выбор и так далее)')
     value: dict[str, Any] = Field(
         ...,
         examples=[
@@ -43,9 +39,10 @@ class TaskFromAuthor(BaseModel):
             {
                 "answers": [1, 2, 3]
             }
-        ]
+        ],
+        title="Все возможные ответы на задачу"
     )
-    correct_value: dict[str, Any] = Field(..., examples=[
+    correct_value: dict[str, Any] = Field(..., title="Правильный ответ(ы) в зависимости от типа задачи", examples=[
         {
             "answers": [
                 "[0 %; 5 %)"
@@ -57,15 +54,11 @@ class TaskFromAuthor(BaseModel):
             ]
         }
     ])
-    access_type: str = Field(..., examples=[
-        AnswerTypeEnum.STRING.value,
-        AnswerTypeEnum.FLOAT.value,
-        AnswerTypeEnum.LIST_INT.value,
-        AnswerTypeEnum.LIST_FLOAT.value
-    ])
+    access_type: str = Field(..., title="Модификатор доступа (публичный или приватный)")
 
 
 class TaskWithoutAnswers(BaseModel):
+    """Задача из базы данных, но без ответов, используется для отправки пользователю в игре"""
     id: int
     creator_id: str
     created_at: datetime
@@ -76,28 +69,32 @@ class TaskWithoutAnswers(BaseModel):
     value: dict[str, Any]
 
 class TaskDTO(TaskWithoutAnswers):
+    """Задача из базы данных с ответами и модификатором доступа, используется для проверки ответов и доступа"""
     correct_value: dict[str, Any]
     access_type: str
 
 class TaskDetailedDTO(TaskDTO):
+    """Задача вместе с именем автора и его аватаркой"""
     creator_name: str
     picture: str
 
 class TaskPreview(BaseModel):
+    """Превью задачи во все возможные ленты"""
     id: int
     # блок инфы про автора
     created_at: datetime
     creator_id: str
     # блок инфы про задачу
     name: str
-    used_in_competitions: int
+    used_in_competitions: int = Field(..., ge=0, title="Сколько раз задачу использовали в соревнованиях")
     creator_name: str
     picture: str
     price: int
     access_type: str
-    correct_percent: float
+    correct_percent: float = Field(..., ge=0, le=100, title="Процент правильных попыток решения задачи")
 
 class TaskForGame(BaseModel):
+    """Еще одна схема для задачи для игрока (без ответов), но со строковой датой"""
     id: int
     creator_id: str
     created_at: str

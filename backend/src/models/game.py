@@ -12,6 +12,7 @@ class EventType(Enum):
 
 
 class NewGame(BaseModel):
+    """Схема создаваемой игры в процессе матча"""
     competition_id: int
     player_1: str
     player_2: str
@@ -24,9 +25,11 @@ class NewGame(BaseModel):
     score_player_2: int
 
 class GameDTO(NewGame):
+    """Схема игры + поле из бд"""
     created_at: datetime
 
 class GameDTOExtended(GameDTO):
+    """Статистика игр"""
     round_data: list[RoundDTO]
     competition_name: str
     creator_name: str

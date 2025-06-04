@@ -7,6 +7,7 @@ class StatusEnum(str, Enum):
     TIE = "tie"
 
 class RoundDTO(BaseModel):
+    """Схема раунда"""
     player_1: str
     player_2: str
     points_player_1: int

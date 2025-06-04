@@ -16,6 +16,7 @@ class TaskRepo(RepoInterface):
             task = result.scalar_one_or_none()
             if task:
                 return TaskDTO.model_validate(task, from_attributes=True)
+            return None
 
     async def get_created_tasks(self, user_id: int) -> List[TaskDTO]:
         stmt = select(Task).where(Task.creator_id == user_id)

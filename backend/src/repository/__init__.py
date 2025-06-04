@@ -12,6 +12,7 @@ class RepoInterface:
         self.session_getter = session_getter
 
     async def create(self, model: BaseModel, orm: Type[Base]) -> int | str:
+        """Создать что-то по схеме pydantic"""
         async with self.session_getter() as session:
             result = await session.execute(
                 insert(orm).values(**model.model_dump())
@@ -20,6 +21,7 @@ class RepoInterface:
             return result.scalar()
 
     async def get(self, object_id: int | str, orm_class: Type[Base], model_class: Type[BaseModel]) -> Optional[BaseModel]:
+        """Получить не гарантированного по айди какой-то объект"""
         async with self.session_getter() as session:
             result = await session.execute(
                 select(orm_class)
@@ -28,3 +30,4 @@ class RepoInterface:
             result_data = result.scalar_one_or_none()
             if result_data:
                 return model_class.model_validate(result_data, from_attributes=True)
+            return None
