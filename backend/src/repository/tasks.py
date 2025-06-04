@@ -33,12 +33,14 @@ class TaskRepo(RepoInterface):
 
     async def get_mean_task_difficulty_for_competition(self, tasks_markup: dict[str, Round]) -> float:
         task_ids = []
+        # собираем все айди задач
         for round_num in tasks_markup:
-            if type(tasks_markup[round_num]) == dict:
+            if type(tasks_markup[round_num]) == dict: # это из-за бага в библиотеке pydantic
                 task_ids.extend(tasks_markup[round_num]['tasks'])
             else:
                 task_ids.extend(tasks_markup[round_num].tasks)
         prices = []
+        # получаем все их значения сложностей
         for task_id in task_ids:
             prices.append((await self.get_task_by_id(task_id)).price)
 
@@ -48,11 +50,13 @@ class TaskRepo(RepoInterface):
 
     async def get_correct_percentage(self, tasks_markup: dict[str, Round]) -> float:
         task_ids = []
+        # собираем айди задач
         for round_num in tasks_markup:
             task_ids.extend(tasks_markup[round_num].tasks)
 
         all_cases = 0
         all_correct = 0
+        # считаем, сколько попыток для каждой были верными, а сколько - нет и считаем потом среднее по всем
         for task_id in task_ids:
             async with self.session_getter() as session:
                 stmt_all = select(TasksStats.id).where(TasksStats.task_id == task_id)

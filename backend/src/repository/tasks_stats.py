@@ -18,6 +18,7 @@ class TasksStatsRepo(RepoInterface):
 
     async def get_correct_percent(self, task_id: int) -> int:
         async with self.session_getter() as session:
+            # берем список всех попыток решить задачу и всех корректных попыток ее решить
             stmt_all = select(TasksStats.id).where(TasksStats.task_id == task_id)
             stmt_correct = stmt_all.where(TasksStats.result == 'correct')
             res = await session.execute(stmt_all)
