@@ -128,18 +128,25 @@ export default function ProfilePage() {
   );
 
   const handleUsernameUpdate = async () => {
-    if (!newUsername.trim()) {
-      setError('Имя не может быть пустым')
-      return
+    const username = newUsername.trim();
+
+    if (!username) {
+      setError('Имя не может быть пустым');
+      return;
+    }
+
+    if (username.length > 50) {
+      setError('Имя пользователя не может превышать 50 символов');
+      return;
     }
 
     try {
-      await updateUsername(getUserId(), newUsername)
-      setUserData(prev => ({ ...prev, username: newUsername }))
-      setIsEditing(false)
-      setError('')
+      await updateUsername(getUserId(), username);
+      setUserData(prev => ({ ...prev, username: username }));
+      setIsEditing(false);
+      setError('');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Ошибка при изменении имени')
+      setError(err.response?.data?.detail || 'Ошибка при изменении имени');
     }
   }
 
@@ -179,7 +186,8 @@ export default function ProfilePage() {
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 className={styles.nameInput}
-                maxLength={30}
+                maxLength={50}
+                placeholder="Максимум 50 символов"
               />
               <div className={styles.modalActions}>
                 <button
