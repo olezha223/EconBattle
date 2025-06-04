@@ -106,7 +106,7 @@ const UserProfile = ({ userData }) => {
     <div className={styles.container}>
       <div className={styles.profileHeader}>
         <img
-          src="/static/default-avatar.jpg"
+          src={userData.picture}
           alt="Аватар"
           className={styles.profileAvatar}
         />
