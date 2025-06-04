@@ -50,6 +50,10 @@ class TaskService:
         return await self._get_previews(tasks)
 
     async def _get_previews(self, tasks: list[TaskDTO]) -> list[TaskPreview]:
+        """
+        Подготовка превью, добавляем к обычной задаче много бизнес-логики,
+        чтобы пользователю было удобнее выбрать
+        """
         previews = []
         for task in tasks:
             creator = await self.user_repo.get_by_id(task.creator_id)

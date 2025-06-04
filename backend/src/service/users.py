@@ -11,7 +11,8 @@ from src.repository.users import UserRepo
 
 
 def get_dates(end_date: datetime) -> list[datetime]:
-    start_date = datetime(2025, 2, 1)
+    """Подготовка данных для активности пользователей"""
+    start_date = datetime(2025, 4, 1)
     if end_date < start_date:
         return []
     delta = end_date - start_date
@@ -88,6 +89,7 @@ class UserService:
         return await self.tasks_stats_repo.get_all_tasks_count(task_ids=task_ids)
 
     async def get_user_info(self, user_id: int) -> UserInfo:
+        """Получение разной статистки об пользователя"""
         user_base_info = await self.get_user(user_id)
         loses_count = await self.games_repo.get_status_count(user_id, StatusEnum.LOSER.value)
         wins_count = await self.games_repo.get_status_count(user_id, StatusEnum.WINNER.value)

@@ -58,7 +58,7 @@ class Game:
                     "round_count": self.competition.max_rounds
                 }
             )
-            while self.current_round < self.competition.max_rounds:
+            while self.current_round < self.competition.max_rounds: # итерируемся до последнего раунда
                 print(f"Начинаем раунд {self.current_round}")
                 await self._start_round()
                 self.current_round += 1
@@ -71,7 +71,9 @@ class Game:
             await self._cleanup()
 
     async def _cleanup(self):
+        """Очистка игры, закрытие всех соединений в конце игры или при остановке"""
         for player in self.players.values():
+            # для каждого игрока закрываем его соединение и отправляем об этом информацию ему
             ws = self.sockets.get(player.id)
             if ws and ws.client_state == WebSocketState.CONNECTED:
                 try:
@@ -81,18 +83,21 @@ class Game:
                     print(str(e))
 
     async def _notify_players(self, event_type: str, data: dict = None):
+        """Рассылка всем подключенным игрокам определенного сообщения"""
         message = {"type": event_type}
         if data:
             message.update(data)
 
         for player in self.players.values():
             ws = self.sockets.get(player.id)
+            # безопасная отправка
             if (not ws) or (ws.client_state != WebSocketState.CONNECTED):
                 continue
 
             await ws.send_json(message)
 
     async def _get_problems_for_round(self) -> list[TaskWithoutAnswers]:
+        """Получаем задачи для раунда"""
         tasks = [
             await self.task_service.get(task_id) for task_id in
             self.competition.tasks_markup[str(self.current_round + 1)].tasks
@@ -100,8 +105,10 @@ class Game:
         return tasks
 
     async def _start_round(self):
+        """Инициализация раунда"""
         problems = await self._get_problems_for_round()
         time_limit = self.competition.tasks_markup[str(self.current_round + 1)].time_limit
+        # отправляем задачи игрокам в начале раунда
         await self._notify_players(
             event_type="Start Round",
             data={
@@ -110,15 +117,19 @@ class Game:
             }
         )
 
-        # Бэкенд ждет на 10 секунд дольше
+        # Бэкенд ждет на 10 секунд дольше чтобы точно успели дойти ответы
         answers = await self._collect_answers(timeout=time_limit)
 
         print(answers)
+        # Считаем очки игроков по полученным ответам
         scores = await self._calculate_scores(answers, problems)
         print(scores)
+        # Обновляем внутренние переменные игры и отправляем результаты раунда игрокам
         await self._update_scores(scores)
 
     async def _collect_answers(self, timeout: int):
+        """Сбор ответов на задачи"""
+        # создаем группу задач с ожиданием ответов
         tasks = {
             asyncio.create_task(self._wait_for_answer(player_id, self.locks[player_id]))
             for player_id in self.players
@@ -137,12 +148,12 @@ class Game:
         # Собираем результаты
         answers = {}
         for task in tasks:
-            if task.done() and not task.cancelled():
+            if task.done() and not task.cancelled(): # проверка, что мы еще не отменили задачу
                 try:
                     player_id, result = task.result()
                     answers[player_id] = result
                 except Exception as e:
-                    print("Неожиданная ошибкак при сборе результатов", str(e))
+                    print("Неожиданная ошибках при сборе результатов", str(e))
 
         # Отменяем оставшиеся задачи
         for task in tasks:
@@ -155,8 +166,8 @@ class Game:
         """Ожидание ответа от конкретного игрока с блокировкой"""
         async with lock:
             try:
-                if self.sockets[player_id].client_state == WebSocketState.CONNECTED:
-                    data = await self.sockets[player_id].receive_json()
+                if self.sockets[player_id].client_state == WebSocketState.CONNECTED: # защита от отключений
+                    data = await self.sockets[player_id].receive_json() # ждем ответы
                     print(data, player_id)
                     return player_id, data.get("answers", {})
                 return player_id, {}
@@ -170,8 +181,10 @@ class Game:
             for problem in problems:
                 problem_id = problem.id
                 answer_list = user_answer.get(str(problem_id), None)
+                # Добавляем в данные статистику по решенной задаче
                 await self.tasks_stats_service.create(pid, problem, answer_list)
                 if answer_list:
+                    # Проверка решения
                     if answer_list == problem.correct_value.get("answers", []):
                         scores[pid] += problem.price
         return scores
@@ -185,6 +198,7 @@ class Game:
             self.player_final_info[self.user_1_id] = {"status": StatusEnum.TIE.value, "diff": 0}
             self.player_final_info[self.user_2_id] = {"status": StatusEnum.TIE.value, "diff": 0}
         else:
+            # Кто-то победил, надо обновить статусы
             winner_id = self.user_1_id if score_1 > score_2 else self.user_2_id
             loser_id = self.user_2_id if winner_id == self.user_1_id else self.user_1_id
             self.player_final_info[winner_id] = {"status": StatusEnum.WINNER.value, "diff": 10}
@@ -206,6 +220,7 @@ class Game:
             status_player_1=self.player_final_info[self.user_1_id]['status'],
             status_player_2=self.player_final_info[self.user_2_id]['status']
         )
+        # создаем объект раунда в базе данных
         round_id = await self.round_service.create(round_dto)
         self.round_ids.append(round_id)
 
@@ -224,6 +239,7 @@ class Game:
             await ws.send_json(results)
 
     def _get_final_msg(self, pid: str):
+        """Сообщение с результатами игры"""
         return {
             "type": EventType.GAME_END.value,
             "status": self.player_final_info[pid]['status'],
@@ -232,6 +248,7 @@ class Game:
         }
 
     async def _end_game(self):
+        """Обработка окончания игры"""
         self._update_statues()
         # Отправка финальных результатов
         for pid, ws in self.sockets.items():
@@ -249,10 +266,12 @@ class Game:
             score_player_1=self.scores[self.user_1_id],
             score_player_2=self.scores[self.user_2_id],
         )
+        # Добавление статистики игры в базу данных
         await self.game_service.create_game(game_dto)
         await self._update_rating()
 
     async def _update_rating(self):
+        # Обновляем рейтинг
         for pid in self.players.keys():
             diff = self.player_final_info[pid]['diff']
             await self.user_service.update_student_rating(diff, pid)

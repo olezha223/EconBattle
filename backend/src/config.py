@@ -14,6 +14,7 @@ if os.path.exists(dotenv_path):
 
 @dataclass(frozen=True)
 class AuthConfig:
+    """Auth to google cloud console api config"""
     client_id: str = os.getenv('GOOGLE_CLIENT_ID', 'example')
     client_secret: str = os.getenv('GOOGLE_CLIENT_SECRET', 'example')
 
@@ -68,6 +69,7 @@ class AppConfig:
 
 @dataclass
 class RedisConf:
+    """Redis connection variables."""
     redis_host: str = os.getenv('REDIS_HOST', 'localhost')
     redis_port: int = os.getenv('REDIS_PORT', 6379)
     redis_db: int = 0

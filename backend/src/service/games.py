@@ -24,6 +24,7 @@ class GameService:
         return await self.game_repo.create_game(model)
 
     async def get_all(self, user_id: str) -> List[GameDTOExtended]:
+        """Получить статистику игр"""
         games = await self.game_repo.get_played_games_by_user(user_id=user_id)
         result = []
         for game in games:

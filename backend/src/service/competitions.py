@@ -20,6 +20,7 @@ class CompetitionService:
         self.task_repo = TaskRepo()
 
     async def get_competition(self, competition_id: int) -> Optional[CompetitionDetailedDTO]:
+        """Получить соревнование с бизнес-логикой: собираем данные по автору и задачам внутри"""
         competition = await self.competition_repo.get_by_id(competition_id)
         if competition:
             user = await self.user_repo.get_by_id(competition.creator_id)
@@ -53,6 +54,10 @@ class CompetitionService:
         return await self._get_previews(competitions)
 
     async def _get_previews(self, competitions: list[CompetitionDTO]) -> list[CompetitionPreview]:
+        """
+        Подготовка превью, добавляем к обычному соревнованию много бизнес-логики,
+        чтобы пользователю было удобнее выбрать
+        """
         result = []
         for competition in competitions:
             games_played = await self.games_repo.get_played_games_in_competition(competition_id=competition.id)
