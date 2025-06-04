@@ -21,14 +21,48 @@ class AnswerTypeEnum(str, Enum):
 
 
 class TaskFromAuthor(BaseModel):
-    creator_id: str
-    name: str
-    text: str
-    price: int
-    task_type: str
-    value: dict[str, Any]
-    correct_value: dict[str, Any]
-    access_type: str
+    creator_id: str = Field(...)
+    name: str = Field(..., min_length=1, max_length=50)
+    text: str = Field(..., min_length=1, max_length=2000)
+    price: int = Field(..., gt=0, le=1000)
+    task_type: str = Field(..., examples=[
+        TaskTypeEnum.MULTIPLE_CHOICE.value,
+        TaskTypeEnum.SINGLE_CHOICE.value,
+        TaskTypeEnum.ONE_WORD_ANSWER.value,
+        TaskTypeEnum.ONE_NUMBER_ANSWER.value
+    ])
+    value: dict[str, Any] = Field(
+        ...,
+        examples=[
+            {
+                "answers": [
+                    "[0 %; 5 %)", "[5 %; 10 %)",
+                    "[10 %; 15 %)", "[15 %; 20 %]"
+                ]
+            },
+            {
+                "answers": [1, 2, 3]
+            }
+        ]
+    )
+    correct_value: dict[str, Any] = Field(..., examples=[
+        {
+            "answers": [
+                "[0 %; 5 %)"
+            ]
+        },
+        {
+            "answers": [
+                80
+            ]
+        }
+    ])
+    access_type: str = Field(..., examples=[
+        AnswerTypeEnum.STRING.value,
+        AnswerTypeEnum.FLOAT.value,
+        AnswerTypeEnum.LIST_INT.value,
+        AnswerTypeEnum.LIST_FLOAT.value
+    ])
 
 
 class TaskWithoutAnswers(BaseModel):

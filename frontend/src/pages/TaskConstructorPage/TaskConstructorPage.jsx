@@ -94,6 +94,14 @@ export default function TaskConstructorPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
+
+    // Ограничение для поля цены
+    if (name === 'price') {
+      const numericValue = Math.min(Number(value), 1000)
+      setFormData(prev => ({ ...prev, [name]: numericValue }))
+      return
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
@@ -114,10 +122,14 @@ export default function TaskConstructorPage() {
             <input
               type="text"
               value={formData.value[key]}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                value: { ...prev.value, [key]: e.target.value }
-              }))}
+              onChange={(e) => {
+                // Ограничение длины для вариантов ответа
+                const newValue = e.target.value.slice(0, 50)
+                setFormData(prev => ({
+                  ...prev,
+                  value: { ...prev.value, [key]: newValue }
+                }))
+              }}
               className={styles.input}
               placeholder={`Вариант ${index + 1}`}
             />
@@ -195,6 +207,8 @@ export default function TaskConstructorPage() {
               onChange={handleInputChange}
               className={styles.input}
               required
+              maxLength={50}  // Ограничение названия
+              placeholder="Максимум 50 символов"
             />
           </label>
         </div>
@@ -209,6 +223,8 @@ export default function TaskConstructorPage() {
               className={styles.textarea}
               rows="5"
               required
+              maxLength={2000}  // Ограничение условия
+              placeholder="Максимум 2000 символов"
             />
           </label>
         </div>
@@ -224,9 +240,11 @@ export default function TaskConstructorPage() {
                 onChange={handleInputChange}
                 className={styles.input}
                 min="0"
+                max="1000"  // Максимальная цена
                 required
               />
             </label>
+            <p className={styles.hint}>Максимум 1000 баллов</p>
           </div>
 
           <div className={styles.group}>
