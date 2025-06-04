@@ -67,7 +67,11 @@ async def auth(request: Request):
         redirect_after = request.session.get('redirect_after', '/')
         redirect_url = f'http://econ-battle.ru/auth-success?sub={user_data["sub"]}&name={user_data["name"]}&redirect={redirect_after}'
         # Перенаправляем на фронтенд с токеном в URL
-        return RedirectResponse(url=redirect_url)
+        response = RedirectResponse(url=redirect_url)
+        response.set_cookie(
+            key="session",
+            value=request.session.get('id'),
+        )
 
     return RedirectResponse(url='http://econ-battle.ru/login?error=AuthFailed')
 
