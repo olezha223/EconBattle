@@ -49,7 +49,7 @@ export default function GameApp() {
 
   const connectToGame = () => {
     const ws = new WebSocket(
-      `ws://econ-battle.ru/api/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
+      `wss://econ-battle.ru/api/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
     );
 
     const calculateResult = (userScore, opponentScore) => {

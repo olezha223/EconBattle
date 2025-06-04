@@ -41,7 +41,7 @@ async def homepage(request: Request):
 @router_auth.get('/login')
 async def login(request: Request, redirect_after: str = Query('/')):
     request.session['redirect_after'] = redirect_after
-    redirect_uri = 'http://econ-battle.ru/api/auth'
+    redirect_uri = 'https://econ-battle.ru/api/auth'
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
@@ -50,7 +50,7 @@ async def auth(request: Request):
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as error:
-        return RedirectResponse(url=f'http://econ-battle.ru/login?error={error.error}')
+        return RedirectResponse(url=f'https://econ-battle.ru/login?error={error.error}')
 
     user = token.get('userinfo')
     # получить информацию о юзере
@@ -65,8 +65,7 @@ async def auth(request: Request):
                 picture=user_data.get("picture")
             )
         redirect_after = request.session.get('redirect_after', '/')
-        redirect_url = f'http://econ-battle.ru/auth-success?sub={user_data["sub"]}&name={user_data["name"]}&redirect={redirect_after}'
-        # Перенаправляем на фронтенд с токеном в URL
+        redirect_url = f'https://econ-battle.ru/auth-success?sub={user_data["sub"]}&name={user_data["name"]}&redirect={redirect_after}'
         response = RedirectResponse(url=redirect_url)
         response.set_cookie(
             key="session",
@@ -74,7 +73,7 @@ async def auth(request: Request):
         )
         return response
 
-    return RedirectResponse(url='http://econ-battle.ru/login?error=AuthFailed')
+    return RedirectResponse(url='https://econ-battle.ru/login?error=AuthFailed')
 
 
 @router_auth.get('/logout')
