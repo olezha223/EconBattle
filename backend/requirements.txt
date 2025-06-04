@@ -1,19 +1,17 @@
-fastapi
-pydantic
-starlette
-itsdangerous
-httpx
+fastapi~=0.115.12
+pydantic~=2.11.5
+starlette~=0.46.1
+itsdangerous~=2.2.0
+httpx~=0.28.1
 Authlib~=1.5.2
 uvicorn~=0.21.1
-websockets
-asyncpg
+websockets~=15.0.1
+asyncpg~=0.30.0
 
-sqlalchemy[asyncio]
+sqlalchemy[asyncio]~=2.0.41
 
 python-dotenv~=1.0.1
 
 redis~=6.0.0
 pytest~=8.3.5
-pytest-asyncio
-
-PyJWT
+pytest-asyncio~=1.0.0
