@@ -12,15 +12,7 @@ router_user = APIRouter(
 async def get_current_user(request: Request):
     user = request.session.get('user')
 
-    # Отладочная информация
     if not user:
-        print("User not found in session")
-        print("Session ID:", request.session.get('id'))
-        print("All session data:", dict(request.session))
-
-        # Проверка заголовков
-        print("Cookies header:", request.headers.get('cookie'))
-
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",

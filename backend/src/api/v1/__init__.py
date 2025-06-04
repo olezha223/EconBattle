@@ -16,11 +16,3 @@ router_v1.include_router(router_auth)
 router_v1.include_router(router_competitions)
 router_v1.include_router(router_user)
 router_v1.include_router(router_games)
-
-@router_v1.post("/cleanup")
-def cleanup():
-    from .ws import match_maker
-    match_maker.game_queue.pop(2)
-    match_maker.game_queue.pop(2)
-    match_maker.game_queue.pop(2)
-    match_maker.game_queue.pop(2)

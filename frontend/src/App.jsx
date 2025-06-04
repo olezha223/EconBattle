@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route, Navigate, useLocation} from 'react-router-dom'
+import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import CompetitionsPage from './pages/CompetitionsPage/CompetitionsPage.jsx'
 import LoginPage from './pages/LoginPage/LoginPage.jsx'
