@@ -98,7 +98,7 @@ async def auth(request: Request):
     return_path_quoted = quote(return_to)
 
     return RedirectResponse(
-        url=f"http://frontend:5173/auth-callback?user={user_jwt_quoted}&return_to={return_path_quoted}"
+        url=f"http://econ-battle.ru/auth-callback?user={user_jwt_quoted}&return_to={return_path_quoted}"
     )
 
 
