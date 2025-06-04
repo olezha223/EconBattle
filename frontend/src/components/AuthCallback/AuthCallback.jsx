@@ -9,7 +9,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const userToken = params.get('user');
-    const returnTo = params.get('return_to') || '/';
+    const returnTo = params.get('return_to') || '/competitions';
 
     if (!userToken) {
       navigate('/login', { state: { error: "Отсутствуют данные пользователя" } });
