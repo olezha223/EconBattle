@@ -1,12 +1,20 @@
 import { useEffect, useState } from 'react';
 import styles from './Opponent.module.css';
 
-
-// Компонент для демонстрации данных нашего соперника в игре
+/*
+ * Компонент для отображения информации о сопернике
+ * Показывает аватар, имя, рейтинги и таймер до начала игры
+ * Принимает пропсы:
+ * - opponent: объект с данными соперника (username, picture, student_rating, teacher_rating)
+ */
 export default function Opponent({ opponent }) {
   const [countdown, setCountdown] = useState(5);
 
-  // таймер до начала матча
+  /*
+   * Эффект для запуска таймера обратного отсчета
+   * Уменьшает значение countdown каждую секунду
+   * Останавливается при достижении 0
+   */
   useEffect(() => {
     if (countdown <= 0) return;
 
@@ -22,6 +30,7 @@ export default function Opponent({ opponent }) {
 
     return () => clearInterval(timer);
   }, []);
+
   if (!opponent) return null;
 
   return (

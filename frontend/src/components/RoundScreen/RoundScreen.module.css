@@ -1,3 +1,4 @@
+/* Основной контейнер экрана раунда */
 .roundContainer {
   padding: 20px;
   background: #f5f5f5;
@@ -6,6 +7,7 @@
   max-width: 800px;
 }
 
+/* Таймер раунда */
 .timer {
   font-size: 1.5rem;
   color: #d32f2f;
@@ -17,6 +19,7 @@
   font-weight: bold;
 }
 
+/* Карточка с задачей */
 .problemCard {
   background: white;
   border-radius: 8px;
@@ -25,18 +28,21 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Заголовок задачи */
 .problemCard h3 {
   margin: 0 0 15px 0;
   color: #1976d2;
   font-size: 1.3rem;
 }
 
+/* Текст задачи */
 .problemCard p {
   margin: 0 0 20px 0;
   color: #333;
   line-height: 1.5;
 }
 
+/* Контейнер с вариантами ответов */
 .options {
   display: flex;
   flex-direction: column;
@@ -44,6 +50,7 @@
   margin: 15px 0;
 }
 
+/* Стили для вариантов ответов */
 .options label {
   display: flex;
   align-items: center;
@@ -55,10 +62,12 @@
   transition: background 0.2s;
 }
 
+/* Эффект при наведении на вариант ответа */
 .options label:hover {
   background: #e9ecef;
 }
 
+/* Поле ввода текста */
 .textInput {
   width: 100%;
   padding: 10px;
@@ -68,6 +77,7 @@
   margin-top: 10px;
 }
 
+/* Кнопка отправки ответов */
 .submitButton {
   display: block;
   width: 100%;
@@ -82,15 +92,18 @@
   margin-top: 25px;
 }
 
+/* Эффект при наведении на кнопку */
 .submitButton:hover {
   background: #43a047;
 }
 
+/* Стили для неактивной кнопки */
 .submitButton:disabled {
   background: #a5d6a7;
   cursor: not-allowed;
 }
 
+/* Подсказка под полями ввода */
 .hint {
   font-size: 0.875rem;
   color: #718096;

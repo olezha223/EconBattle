@@ -1,5 +1,6 @@
 import styles from './RoundIndicator.module.css';
 
+// Компонент для отображения цвета раунда в зависимости от результата
 export default function RoundIndicator({ total, current, results }) {
   return (
     <div className={styles.container}>

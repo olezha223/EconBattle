@@ -1,3 +1,4 @@
+/* Основной контейнер карточки соперника */
 .container {
   display: flex;
   flex-direction: column;
@@ -13,14 +14,17 @@
   transition: transform 0.3s ease;
 }
 
+/* Эффект при наведении на карточку */
 .container:hover {
   transform: translateY(-5px);
 }
 
+/* Контейнер для аватара */
 .avatarContainer {
   position: relative;
 }
 
+/* Стили аватара пользователя */
 .avatar {
   width: 120px;
   height: 120px;
@@ -30,6 +34,7 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Индикатор онлайн-статуса */
 .statusIndicator {
   position: absolute;
   bottom: 10px;
@@ -42,6 +47,7 @@
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
 }
 
+/* Стили имени пользователя */
 .username {
   font-size: 1.8rem;
   color: #2d3748;
@@ -51,6 +57,7 @@
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
+/* Контейнер для статистики */
 .stats {
   display: flex;
   gap: 25px;
@@ -58,18 +65,21 @@
   width: 100%;
 }
 
+/* Стили отдельного блока статистики */
 .stat {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* Подпись к статистике */
 .statLabel {
   font-size: 0.9rem;
   color: #718096;
   margin-bottom: 5px;
 }
 
+/* Значение статистики */
 .statValue {
   font-size: 1.4rem;
   font-weight: 700;
@@ -80,11 +90,13 @@
   box-shadow: 0 3px 10px rgba(66, 153, 225, 0.15);
 }
 
+/* Блок обратного отсчета */
 .countdown {
   margin-top: 25px;
   text-align: center;
 }
 
+/* Текст обратного отсчета */
 .countdownText {
   font-size: 1.2rem;
   color: #718096;
@@ -92,12 +104,14 @@
   animation: pulseText 1.5s infinite;
 }
 
+/* Анимация пульсации текста */
 @keyframes pulseText {
   0% { opacity: 0.7; }
   50% { opacity: 1; }
   100% { opacity: 0.7; }
 }
 
+/* Таймер обратного отсчета */
 .countdownTimer {
   font-size: 3.5rem;
   font-weight: 800;
@@ -106,11 +120,13 @@
   animation: pulseTimer 0.8s infinite alternate;
 }
 
+/* Анимация пульсации таймера */
 @keyframes pulseTimer {
   0% { transform: scale(1); }
   100% { transform: scale(1.2); }
 }
 
+/* Индикатор загрузки */
 .loader {
   width: 40px;
   height: 40px;
@@ -121,6 +137,7 @@
   margin: 15px auto;
 }
 
+/* Анимация вращения индикатора загрузки */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

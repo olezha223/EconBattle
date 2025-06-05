@@ -3,6 +3,13 @@ import styles from './RoundScreen.module.css';
 import RoundIndicator from "../RoundIndicator/RoundIndicator.jsx";
 import ScoreBoard from "../ScoreBoard/ScoreBoard.jsx";
 
+/**
+ * Компонент экрана раунда, отображает:
+ * - Таймер раунда
+ * - Индикатор прогресса раундов
+ * - Задачи раунда с вариантами ответов
+ * - Кнопку отправки ответов
+ */
 export default function RoundScreen({
   roundData,
   onSubmit,
@@ -14,6 +21,7 @@ export default function RoundScreen({
   const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(roundData.time_limit);
 
+  // Таймер обратного отсчета для раунда
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -21,6 +29,7 @@ export default function RoundScreen({
     return () => clearInterval(timer);
   }, []);
 
+  // Обработчик изменения ответов
   const handleAnswerChange = (problemId, value) => {
     setAnswers(prev => ({
       ...prev,
@@ -48,6 +57,7 @@ export default function RoundScreen({
           <h3>{problem.name}</h3>
           <p>{problem.text}</p>
 
+          {/* Варианты ответов для одиночного выбора */}
           {problem.task_type === 'single choice' && (
             <div className={styles.options}>
               {problem.value.answers.map((answer, index) => (
@@ -63,6 +73,7 @@ export default function RoundScreen({
             </div>
           )}
 
+          {/* Варианты ответов для множественного выбора */}
           {problem.task_type === 'multiple choice' && (
             <div className={styles.options}>
               {problem.value.answers.map((answer, index) => (
@@ -82,6 +93,7 @@ export default function RoundScreen({
             </div>
           )}
 
+          {/* Поле ввода для строкового ответа */}
           {problem.task_type === 'string' && (
             <div>
               <input
@@ -93,6 +105,7 @@ export default function RoundScreen({
             </div>
           )}
 
+          {/* Поле ввода для числового ответа */}
           {problem.task_type === 'number' && (
             <div>
               <input
