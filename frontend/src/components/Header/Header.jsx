@@ -4,9 +4,11 @@ import styles from './Header.module.css';
 import {fetchPictureUrl} from "../../services/api.js";
 
 
+// Заголовок страницы
 export default function Header() {
   const [pictureUrl, setPictureUrl] = useState('');
 
+  // загрузка данных
   useEffect(() => {
     const loadPicture = async () => {
       const url = await fetchPictureUrl();

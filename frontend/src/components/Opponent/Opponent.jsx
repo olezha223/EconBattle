@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import styles from './Opponent.module.css';
 
+
+// Компонент для демонстрации данных нашего соперника в игре
 export default function Opponent({ opponent }) {
   const [countdown, setCountdown] = useState(5);
 
+  // таймер до начала матча
   useEffect(() => {
     if (countdown <= 0) return;
 

@@ -2,6 +2,7 @@ import { Link, Outlet } from 'react-router-dom'
 import Header from '../Header/Header.jsx'
 import styles from './Layout.module.css'
 
+// Объединение хедера и кнопок для навигации по основным сущностям
 export default function Layout() {
   return (
     <div className={styles.layout}>
