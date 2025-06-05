@@ -3,6 +3,8 @@ import { formatTimeAgo } from '../../utils/timeUtils'
 import styles from './CompetitionPreview.module.css'
 import {getUserId} from "../../services/api.js";
 
+
+// превью задачи для ленты
 export default function CompetitionPreview({
     id,
     name,
@@ -14,6 +16,7 @@ export default function CompetitionPreview({
     picture,
     mean_task_difficulty
 }) {
+  // обработка кликов по разным ссылкам
   const navigate = useNavigate()
 
   const handleContainerClick = () => {

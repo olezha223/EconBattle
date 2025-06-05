@@ -22,7 +22,7 @@
 
 .stats {
   display: flex;
-  flex-direction: column; /* Меняем направление на вертикальное */
+  flex-direction: column; /* направление вертикальное */
   gap: 8px;
   color: #666;
   font-size: 0.9em;

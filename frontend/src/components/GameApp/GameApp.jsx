@@ -7,6 +7,13 @@ import ScoreBoard from "../ScoreBoard/ScoreBoard.jsx";
 import {getUserId} from "../../services/api.js";
 import Opponent from "../Opponent/Opponent.jsx";
 
+/**
+ * Основной компонент страницы игры, который управляет:
+ * - подключением к WebSocket
+ * - состоянием игры (ожидание, раунд, результаты)
+ * - обработкой входящих сообщений от сервера
+ * - отображением различных экранов в зависимости от состояния игры
+ */
 export default function GameApp() {
   const { competition_id } = useParams();
   const [socket, setSocket] = useState(null);
@@ -27,6 +34,7 @@ export default function GameApp() {
   const [finalScores, setFinalScores] = useState({ user: 0, opponent: 0 });
   const [waitingTime, setWaitingTime] = useState(60);
   const timerRef = useRef(null);
+  // Мапа для отображения цветов в зависимости от статуса игрока в матче
   const statusMap = {
       'winner': { text: 'ПОБЕДА!', color: '#40c057' },
       'loser': { text: 'ПОРАЖЕНИЕ', color: '#fa5252' },
@@ -36,6 +44,10 @@ export default function GameApp() {
   const currentRoundRef = useRef(currentRound);
   currentRoundRef.current = currentRound;
 
+  /**
+   * Запускает таймер обратного отсчета для ожидания соперника
+   * Устанавливает начальное значение 60 секунд и уменьшает каждую секунду
+   */
   const startWaitingTimer = () => {
     setWaitingTime(60);
     if (timerRef.current) {
@@ -52,11 +64,22 @@ export default function GameApp() {
     }, 1000);
   };
 
+  /**
+   * Устанавливает соединение с WebSocket сервером игры
+   * Обрабатывает входящие сообщения и обновляет состояние игры соответственно
+   * @returns {WebSocket} объект WebSocket соединения
+   */
   const connectToGame = () => {
     const ws = new WebSocket(
       `wss://econ-battle.ru/api/ws/?user_id=${getUserId()}&competition_id=${competition_id}`
     );
 
+    /**
+     * Определяет результат раунда на основе сравнения очков игрока и соперника
+     * @param {number} userScore - очки текущего пользователя
+     * @param {number} opponentScore - очки соперника
+     * @returns {'win'|'lose'|'draw'} результат раунда
+     */
     const calculateResult = (userScore, opponentScore) => {
       if (userScore > opponentScore) return 'win';
       if (userScore < opponentScore) return 'lose';
@@ -153,6 +176,12 @@ export default function GameApp() {
     return ws;
   };
 
+  /**
+   * Эффект, который выполняется при монтировании компонента:
+   * - устанавливает соединение с игрой
+   * - добавляет обработчик предупреждения при закрытии страницы
+   * - очищает ресурсы при размонтировании
+   */
   useEffect(() => {
     const ws = connectToGame();
 
@@ -186,6 +215,9 @@ export default function GameApp() {
     }
   }, [competition_id]);
 
+  /**
+   * Повторно пытается подключиться к игре
+   */
   const handleRetry = () => {
     if (socket) {
       socket.close();
@@ -193,6 +225,10 @@ export default function GameApp() {
     connectToGame();
   };
 
+  /**
+   * Отправляет ответы пользователя на сервер
+   * @param {Array} answers - массив ответов пользователя
+   */
   const handleAnswersSubmit = (answers) => {
     socket.send(JSON.stringify({
       type: 'answers',
@@ -201,6 +237,10 @@ export default function GameApp() {
     setGameState('awaiting_opponent');
   };
 
+  /**
+   * Рендерит заголовок с результатом игры (победа/поражение/ничья)
+   * @returns {JSX.Element|null} заголовок с результатом или null если данных нет
+   */
   const renderGameResultHeader = () => {
     if (!gameResult) return null;
 
@@ -209,6 +249,10 @@ export default function GameApp() {
     return <h2 style={{ color, fontSize: '3rem', margin: '20px 0' }}>{text}</h2>;
   };
 
+  /**
+   * Рендерит информацию об изменении рейтинга после игры
+   * @returns {JSX.Element|null} информация о рейтинге или null если данных нет
+   */
   const renderRatingInfo = () => {
     if (!gameResult) return null;
 
