@@ -5,6 +5,7 @@ import './LoginErrorPage.module.css';
 const LoginErrorPage = () => {
   const navigate = useNavigate();
 
+  // Обработчик повторной попытки входа (возвращает на главную)
   const handleRetryLogin = () => {
     navigate('/');
   };
