@@ -1,59 +1,67 @@
+/* Основной контейнер страницы */
 .page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
+/* Шапка страницы с заголовком и кнопками */
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Распределение пространства между элементами */
+  align-items: center; /* Вертикальное выравнивание по центру */
   margin-bottom: 40px;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-wrap: wrap; /* Перенос элементов на новую строку при нехватке места */
+  gap: 20px; /* Пространство между элементами */
 }
 
+/* Заголовок страницы */
 .title {
   margin: 0;
   color: #333;
   font-size: 1.8rem;
 }
 
+/* Контейнер для кнопок управления */
 .controls {
   display: flex;
-  gap: 15px;
+  gap: 15px; /* Пространство между кнопками */
 }
 
+/* Стили для кнопок */
 .button {
   padding: 10px 20px;
-  background: #4CAF50;
+  background: #4CAF50; /* Основной цвет фона */
   color: white;
   border: none;
   border-radius: 4px;
   text-decoration: none;
   font-size: 0.9em;
-  transition: all 0.3s;
+  transition: all 0.3s; /* Плавные анимации */
   cursor: pointer;
   display: flex;
   align-items: center;
 }
 
+/* Эффекты при наведении на кнопку */
 .button:hover {
-  background: #45a049;
-  transform: translateY(-1px);
+  background: #45a049; /* Темный оттенок при наведении */
+  transform: translateY(-1px); /* Легкое смещение вверх */
 }
 
+/* Контейнер для списка задач */
 .list {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex-direction: column; /* Элементы в колонку */
+  gap: 20px; /* Пространство между элементами */
 }
 
+/* Стили для пустого состояния */
 .empty {
   text-align: center;
   color: #666;
   padding: 2rem;
-  border: 2px dashed #e2e8f0;
+  border: 2px dashed #e2e8f0; /* Пунктирная граница */
   border-radius: 8px;
   margin-top: 2rem;
 }

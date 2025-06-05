@@ -4,10 +4,12 @@ import TaskPreview from '../../components/TaskPreview/TaskPreview.jsx'
 import { fetchUserTasks, getUserId } from '../../services/api'
 import styles from './MyTasksPage.module.css'
 
+// Компонент страницы "Мои задачи". Отображает список соревнований пользователя, а также кнопки для перехода к банку и созданию нового.
 export default function MyTasksPage() {
   const [myTasks, setMyTasks] = useState([])
   const [loading, setLoading] = useState(true)
 
+  // Загрузка данных
   useEffect(() => {
     const loadData = async () => {
       try {
