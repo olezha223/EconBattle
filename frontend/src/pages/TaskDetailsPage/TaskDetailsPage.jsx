@@ -109,7 +109,7 @@ export default function TaskDetailsPage() {
           onClick={handleAuthorClick}
         >
           <img
-            src="/static/default-avatar.jpg"
+            src={task.picture}
             alt="Аватар автора"
             className={styles.creatorAvatar}
           />

@@ -48,7 +48,7 @@ export default function CompetitionDetailsPage() {
               onClick={handleAuthorClick}
             >
               <img
-                src="/static/default-avatar.jpg"
+                src={competition.picture}
                 alt="Аватар автора"
                 className={styles.creatorAvatar}
               />
