@@ -4,11 +4,13 @@ import UserProfile from "../../components/UserProfile/UserProfile.jsx";
 import {fetchUserInfo} from "../../services/api.js";
 
 
+// компонент для страницы пользователя (не текущего)
 const UserPage = () => {
   const { userId } = useParams();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // загрузка данных
   useEffect(() => {
     const fetchUserData = async () => {
       try {

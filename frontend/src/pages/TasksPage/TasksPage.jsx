@@ -4,10 +4,12 @@ import TaskPreview from '../../components/TaskPreview/TaskPreview.jsx'
 import { fetchAllTasks } from '../../services/api'
 import styles from './TasksPage.module.css'
 
+// основной компонент страницы банка задач
 export default function TasksPage() {
   const [bankTasks, setBankTasks] = useState([])
   const [loading, setLoading] = useState(true)
 
+  // загрузка данных
   useEffect(() => {
     const loadData = async () => {
       try {

@@ -6,6 +6,7 @@ import styles from './TaskDetailsPage.module.css'
 import {fetchTaskDetails} from "../../services/api.js";
 
 
+// Словарь для русских названий
 const taskTypes = [
   { value: 'single choice', label: 'Выбрать один вариант' },
   { value: 'multiple choice', label: 'Множественный выбор' },
@@ -13,11 +14,13 @@ const taskTypes = [
   { value: 'number', label: 'Вписать число' }
 ];
 
+// получение русского названия
 const taskTypeLabels = taskTypes.reduce((acc, type) => {
   acc[type.value] = type.label;
   return acc;
 }, {});
 
+// форматирование ответов
 const formatValue = (value, type) => {
   if (!value?.answers) return 'Нет данных';
 
@@ -31,6 +34,7 @@ const formatValue = (value, type) => {
   return JSON.stringify(value.answers);
 };
 
+// форматирование правильного ответа
 const formatCorrectValue = (correctValue) => {
   if (!correctValue?.answers) return 'Нет данных';
 
@@ -48,6 +52,7 @@ const formatCorrectValue = (correctValue) => {
   return <div className={styles.singleAnswer}>{JSON.stringify(correctValue.answers)}</div>;
 };
 
+// основной компонент страницы деталей задачи
 export default function TaskDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -56,6 +61,7 @@ export default function TaskDetailsPage() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [error, setError] = useState('');
 
+  // загрузка данных
   useEffect(() => {
     const fetchTask = async () => {
       try {

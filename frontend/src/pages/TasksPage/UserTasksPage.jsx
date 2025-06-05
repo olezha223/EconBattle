@@ -5,11 +5,13 @@ import {fetchPreviews} from '../../services/api'
 import styles from './TasksPage.module.css'
 
 
+// основной компонент страницы задач пользователя
 export default function UserTasksPage() {
   const [userTasks, setUserTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const { userId } = useParams()
 
+  // загрузка данных
   useEffect(() => {
     const loadData = async () => {
       try {
