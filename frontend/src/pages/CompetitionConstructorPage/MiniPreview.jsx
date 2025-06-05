@@ -1,6 +1,8 @@
 import { formatTimeAgo } from '../../utils/timeUtils';
 import styles from './CompetitionConstructorPage.module.css';
 
+
+// Мини превью задачи, которая появляется в выборе задач для соревнования
 export default function MiniPreview({ task, onSelect }) {
   return (
     <div className={styles.miniPreview} onClick={() => onSelect(task.id)}>

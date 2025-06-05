@@ -4,12 +4,14 @@ import MiniPreview from './MiniPreview';
 import styles from './CompetitionConstructorPage.module.css';
 import {createCompetition, fetchAllTasks, fetchUserTasksPreviews, getUserId} from "../../services/api.js";
 
+// константы для ограничений на ввод
 const MAX_NAME_LENGTH = 50;
 const MAX_ROUNDS = 30;
 const MAX_TASKS_PER_ROUND = 50;
 const MAX_TIME_LIMIT = 3000;
 
 const TaskSelectorModal = ({ tasks, onClose, onSelect }) => (
+  // функция для получения небольшого меню с задачами для раунда
   <div className={styles.modalOverlay}>
     <div className={styles.modalContent}>
       <div className={styles.modalHeader}>
@@ -31,6 +33,8 @@ const TaskSelectorModal = ({ tasks, onClose, onSelect }) => (
 
 export default function CompetitionConstructorPage() {
   const navigate = useNavigate();
+
+  // создаем форму для заполнения
   const [formData, setFormData] = useState({
     name: '',
     tasks_markup: { '1': { tasks: [], time_limit: 60 } }
@@ -44,7 +48,7 @@ export default function CompetitionConstructorPage() {
   const loadTasks = async (source) => {
     try {
       let tasksData;
-
+      // загружаем задачи на фронтенд
       if (source === 'my') {
         tasksData = await fetchUserTasksPreviews();
       } else {
@@ -71,6 +75,7 @@ export default function CompetitionConstructorPage() {
       return;
     }
 
+    // заполняем форму
     setFormData(prev => ({
       ...prev,
       tasks_markup: {
@@ -92,6 +97,7 @@ export default function CompetitionConstructorPage() {
       return;
     }
 
+    // заполняем раунд
     const nextRound = String(Number(currentRound) + 1);
     setFormData(prev => ({
       ...prev,
@@ -105,6 +111,7 @@ export default function CompetitionConstructorPage() {
 
   const handleRemoveTask = (round, index) => {
     const updatedTasks = formData.tasks_markup[round].tasks.filter((_, i) => i !== index);
+    // меняем форму
     setFormData(prev => ({
       ...prev,
       tasks_markup: {
@@ -122,12 +129,13 @@ export default function CompetitionConstructorPage() {
     setLoading(true);
 
     try {
+      // создаем итоговое соревнование по полученным данных
       const competitionData = {
         ...formData,
         creator_id: getUserId(),
         max_rounds: Object.keys(formData.tasks_markup).length,
       };
-
+      // отправляем данные
       await createCompetition(competitionData);
       navigate('/competitions');
     } catch (err) {
@@ -137,6 +145,7 @@ export default function CompetitionConstructorPage() {
     }
   };
 
+  // функция для случая если пользователь хочет удалить раунд
   const handleRemoveRound = (roundToRemove) => {
     if (roundToRemove === '1') return;
 
@@ -157,7 +166,7 @@ export default function CompetitionConstructorPage() {
       };
     });
   };
-
+  // функция для заполнения названия
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -173,6 +182,7 @@ export default function CompetitionConstructorPage() {
     }));
   };
 
+  // функция для заполнения данных раунда
   const handleRoundTimeChange = (round, value) => {
     // Проверка максимального времени
     const timeValue = Math.min(Number(value), MAX_TIME_LIMIT);
