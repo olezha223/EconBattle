@@ -4,16 +4,20 @@ import CompetitionPreview from '../../components/CompetitionPreview/CompetitionP
 import { fetchCompetitions } from '../../services/api'
 import styles from './CompetitionsPage.module.css'
 
+// Главная страница ленты соревнований
 export default function CompetitionsPage() {
   const [competitions, setCompetitions] = useState([])
   const [loading, setLoading] = useState(true)
 
+  // Загружаем соревнования при монтировании компонента
   useEffect(() => {
     const loadCompetitions = async () => {
       try {
+        // Получаем данные о соревнованиях с сервера
         const data = await fetchCompetitions()
         setCompetitions(data)
       } catch (error) {
+        // Обработка ошибок загрузки
         console.error('Error loading competitions:', error)
       } finally {
         setLoading(false)
@@ -23,6 +27,7 @@ export default function CompetitionsPage() {
   }, [])
 
   return (
+    // Основной контейнер страницы
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Лента соревнований</h1>
@@ -36,6 +41,7 @@ export default function CompetitionsPage() {
         </div>
       </div>
 
+      {/* Список соревнований или индикатор загрузки */}
       {loading ? (
         <div>Loading competitions...</div>
       ) : (

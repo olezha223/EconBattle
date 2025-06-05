@@ -4,15 +4,19 @@ import CompetitionPreview from '../../components/CompetitionPreview/CompetitionP
 import { fetchUserCompetitions } from '../../services/api'
 import styles from './CompetitionsPage.module.css'
 
+// Страница соревнований конкретного пользователя
 export default function UserCompetitionsPage() {
   const [competitions, setCompetitions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  // Получаем userId из параметров маршрута
   const { userId } = useParams()
 
+  // Загружаем соревнования пользователя при изменении userId
   useEffect(() => {
     const loadCompetitions = async () => {
       try {
+        // Получаем данные о соревнованиях пользователя с сервера
         const data = await fetchUserCompetitions(userId)
 
         // Гарантируем, что data всегда будет массивом
@@ -35,6 +39,7 @@ export default function UserCompetitionsPage() {
   }, [userId])
 
   return (
+    // Основной контейнер страницы
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>Соревнования пользователя</h1>
@@ -45,6 +50,7 @@ export default function UserCompetitionsPage() {
         </div>
       </div>
 
+      {/* Список соревнований, индикатор загрузки или сообщение об ошибке */}
       {loading ? (
         <div>Загрузка соревнований...</div>
       ) : error ? (

@@ -1,9 +1,11 @@
+/** Основной контейнер страницы */
 .page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
+/** Шапка страницы: заголовок и элементы управления */
 .header {
   display: flex;
   justify-content: space-between;
@@ -13,16 +15,19 @@
   gap: 20px;
 }
 
+/** Заголовок страницы */
 .title {
   margin: 0;
   color: #333;
 }
 
+/** Контейнер для управляющих кнопок */
 .controls {
   display: flex;
   gap: 15px;
 }
 
+/** Стили для кнопок */
 .button {
   padding: 10px 20px;
   background: #4CAF50;
@@ -35,16 +40,19 @@
   cursor: pointer;
 }
 
+/** Эффект наведения на кнопку */
 .button:hover {
   background: #45a049;
 }
 
+/** Список элементов (например, соревнований) */
 .list {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+/** Стили для отображения ошибок */
 .error {
   color: #dc3545;
   padding: 1rem;
