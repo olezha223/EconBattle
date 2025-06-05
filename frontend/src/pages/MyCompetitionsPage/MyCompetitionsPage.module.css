@@ -1,9 +1,11 @@
+/* Основной контейнер страницы, ограничивает ширину и добавляет отступы */
 .page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
+/* Шапка страницы: заголовок и панель управления (кнопки) */
 .header {
   display: flex;
   justify-content: space-between;
@@ -13,17 +15,20 @@
   gap: 20px;
 }
 
+/* Заголовок страницы */
 .title {
   margin: 0;
   color: #333;
   font-size: 1.8rem;
 }
 
+/* Контейнер для кнопок управления */
 .controls {
   display: flex;
   gap: 15px;
 }
 
+/* Общий стиль для кнопок */
 .button {
   padding: 10px 20px;
   background: #4CAF50;
@@ -38,17 +43,20 @@
   align-items: center;
 }
 
+/* Эффект наведения на кнопку */
 .button:hover {
   background: #45a049;
   transform: translateY(-1px);
 }
 
+/* Список соревнований (вертикальный список) */
 .list {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+/* Заглушка, если нет соревнований */
 .empty {
   text-align: center;
   color: #666;
@@ -62,11 +70,13 @@
   gap: 1rem;
 }
 
+/* Кнопка внутри блока .empty — чуть шире */
 .empty .button {
   width: fit-content;
   padding: 10px 30px;
 }
 
+/* Стиль для индикатора загрузки */
 .loading {
   text-align: center;
   padding: 2rem;
@@ -74,6 +84,7 @@
   color: #4a5568;
 }
 
+/* Стиль для блока ошибки */
 .error {
   text-align: center;
   padding: 2rem;
