@@ -18,6 +18,7 @@ import GameApp from "./components/GameApp/GameApp.jsx";
 import AuthSuccessPage from "./pages/AuthSuccessPage/AuthSuccessPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import LoginErrorPage from "./pages/LoginErrorPage/LoginErrorPage.jsx";
+import {getUserId} from "./services/api.js";
 
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -35,7 +36,7 @@ function AppContent() {
 
     // Синхронизация между вкладками
     const handleStorage = () => {
-      const userId = localStorage.getItem('user_id')
+      const userId = getUserId()
       setIsAuthenticated(!!userId)
     }
     window.addEventListener('storage', handleStorage)
@@ -43,7 +44,7 @@ function AppContent() {
   }, [])
 
   useEffect(() => {
-    const userId = localStorage.getItem('user_id')
+    const userId = getUserId()
     setIsAuthenticated(!!userId)
   }, [])
 
