@@ -69,7 +69,7 @@ class TaskService:
                 price=task.price,
                 access_type=task.access_type,
                 picture=creator.picture,
-                correct_percent=correct_percent
+                correct_percent=round(correct_percent, 1)
             )
             previews.append(preview)
         return previews
