@@ -33,6 +33,9 @@ class TaskService:
         return None
 
     async def create_task(self, task: TaskFromAuthor) -> int:
+        """Создать задачу"""
+        # добавить преподавателю рейтинга (+10)
+        await self.user_repo.update_teacher_rating(rating_difference=10, user_id=task.creator_id)
         return await self.task_repo.create_task(task)
 
     async def get_all_problems_previews_for_user(self, user_id: str) -> list[TaskPreview]:

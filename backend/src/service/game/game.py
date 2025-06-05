@@ -278,3 +278,6 @@ class Game:
             diff = self.player_final_info[pid]['diff']
             await self.user_service.update_student_rating(diff, pid)
 
+        # обновляем рейтинг преподавателя (+2) за сыгранную игру
+        await self.user_service.count_game(self.competition_id)
+

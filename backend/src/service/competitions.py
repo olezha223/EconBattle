@@ -37,6 +37,9 @@ class CompetitionService:
         return None
 
     async def create_competition(self, competition: NewCompetition) -> int:
+        """Создать соревнование"""
+        # добавить преподавателю рейтинга (+20)
+        await self.user_repo.update_teacher_rating(rating_difference=20, user_id=competition.creator_id)
         return await self.competition_repo.create_competition(competition)
 
     async def get_all_competitions_created_by_user(self, user_id: str) -> list[CompetitionDTO]:

@@ -2,14 +2,17 @@ from typing import Optional
 
 from src.models.problems import TaskDTO
 from src.repository.tasks_stats import TasksStatsRepo
+from src.repository.users import UserRepo
 
 
 class TaskStatsService:
     def __init__(
             self,
-            tasks_stats_repo: TasksStatsRepo
+            tasks_stats_repo: TasksStatsRepo,
+            user_repo: UserRepo,
     ):
         self.tasks_stats_repo = tasks_stats_repo
+        self.user_repo = user_repo
 
     async def create(self, pid: str, problem: TaskDTO, answer_list: Optional[list] = None) -> None:
         """Создает запись об ответе пользователя на задачу"""
@@ -25,3 +28,6 @@ class TaskStatsService:
             task_id=problem.id,
             result=result,
         )
+        # добавить автору (+1) в рейтинг за то, что его задачу решают на платформе
+        creator = problem.creator_id
+        await self.user_repo.update_teacher_rating(rating_difference=1, user_id=creator)

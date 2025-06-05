@@ -50,4 +50,5 @@ def get_round_service():
 def get_task_stats_service():
     return TaskStatsService(
         tasks_stats_repo=TasksStatsRepo(),
+        user_repo=UserRepo(),
     )

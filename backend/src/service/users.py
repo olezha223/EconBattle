@@ -111,3 +111,9 @@ class UserService:
             competitions_created=len(await self.competitions_repo.get_all_competitions_created_by_user(user_id)),
             games_played=len(await self.games_repo.get_played_games_by_user(user_id)),
         )
+
+    async def count_game(self, competition_id: str) -> None:
+        """Обновление рейтинга преподавателя, который создал игру"""
+        competition = await self.competitions_repo.get_by_id(competition_id)
+        # добавить пользователю рейтинга за то, что в его игру сыграли (+2)
+        await self.update_teacher_rating(rating_difference=2, user_id=competition.creator_id)
