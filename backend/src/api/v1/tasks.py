@@ -3,7 +3,7 @@ from typing import List, Any
 from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
-from src.api.v1.users import get_current_user
+from src.api.v1.users import get_current_user, get_current_active_user
 from src.models.problems import TaskDTO, TaskFromAuthor, TaskPreview, TaskDetailedDTO
 from src.service import get_task_service, UserService, get_user_service
 from src.service.tasks import TaskService
@@ -77,9 +77,8 @@ async def get_problem(
     name="Get all problems previews for creator",
 )
 async def get_all_problems_previews_for_user(
-        user_id: str = Query(..., description="ID of the creator"),
+        user_id: str = Depends(get_current_active_user),
         service: TaskService = Depends(get_task_service),
-        user_service: UserService = Depends(get_user_service),
         current_user: dict = Depends(get_current_user),
 ) -> List[TaskPreview]:
     if user_id != current_user['sub']:
@@ -87,9 +86,6 @@ async def get_all_problems_previews_for_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can't access private page of user",
         )
-    user = await user_service.get_user(user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return await service.get_all_problems_previews_for_user(user_id)
 
 

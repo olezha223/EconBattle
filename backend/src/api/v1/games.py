@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Query, Depends, HTTPException
 from starlette import status
 
+from src.api.v1.users import get_current_active_user
 from src.models.game import GameDTOExtended
 from src.service import GameService, get_game_service, UserService, get_user_service
 
@@ -20,11 +21,7 @@ router_games = APIRouter(
     name="Get All Games",
 )
 async def get_all_games(
-        user_id: str = Query(..., description="User ID"),
+        user_id: str = Depends(get_current_active_user),
         service: GameService = Depends(get_game_service),
-        user_service: UserService = Depends(get_user_service)
 ) -> List[GameDTOExtended]:
-    user = await user_service.get_user(user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return await service.get_all(user_id)

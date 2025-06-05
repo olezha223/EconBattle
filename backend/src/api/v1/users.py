@@ -10,6 +10,7 @@ router_user = APIRouter(
 )
 
 async def get_current_user(request: Request):
+    """Проверяем наивно, что пользователь авторизован"""
     user = request.session.get('user')
     # если пользователь нам делает нужный запрос не авторизовавшись, мы не можем это позволить
     if not user:
@@ -19,21 +20,28 @@ async def get_current_user(request: Request):
         )
     return user
 
-@router_user.get(
-    path="/info",
-    description="Get user information",
-    name="Get user information",
-)
-async def get_user_info(
+async def get_current_active_user(
         user_id: str = Query(..., title="User ID"),
         service: UserService = Depends(get_user_service),
-) -> UserInfo:
+):
+    """Проверяем, что айди пользователя валиден"""
     user = await service.get_user(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+    return user_id
+
+@router_user.get(
+    path="/info",
+    description="Get user information",
+    name="Get user information",
+)
+async def get_user_info(
+        user_id: str = Depends(get_current_active_user),
+        service: UserService = Depends(get_user_service),
+) -> UserInfo:
     return await service.get_user_info(user_id)
 
 @router_user.put(
@@ -42,7 +50,7 @@ async def get_user_info(
     name="Update username",
 )
 async def update_username(
-        user_id: str = Query(..., title="User ID"),
+        user_id: str = Depends(get_current_active_user),
         username: str = Query(..., title="New username"),
         service: UserService = Depends(get_user_service),
         current_user: dict = Depends(get_current_user),
@@ -51,13 +59,6 @@ async def update_username(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can't rename other user",
-        )
-
-    user = await service.get_user(user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
         )
     return await service.update_username(user_id, username)
 
@@ -68,13 +69,8 @@ async def update_username(
     name="Get profile picture"
 )
 async def get_user_picture(
-        user_id: str = Query(..., title="User ID"),
+        user_id: str = Depends(get_current_active_user),
         service: UserService = Depends(get_user_service),
 ) -> str:
     user = await service.get_user(user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
     return user.picture
