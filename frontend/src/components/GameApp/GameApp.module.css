@@ -86,17 +86,6 @@
   100% { transform: rotate(360deg); }
 }
 
-.finalStats {
-  margin: 20px 0;
-  text-align: center;
-  font-size: 1.1rem;
-}
-
-.finalStats p {
-  margin: 10px 0;
-  color: #444;
-}
-
 .matched {
   display: flex;
   flex-direction: column;
@@ -127,6 +116,9 @@
 }
 
 .finalStats {
+  margin: 20px 0;
+  text-align: center;
+  font-size: 1.1rem;
   display: flex;
   flex-direction: column;
   align-items: center;

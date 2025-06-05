@@ -215,7 +215,7 @@ export default function GameApp() {
     const { new_rating, diff } = gameResult;
     // Форматируем разницу со знаком
     const formattedDiff = diff > 0 ? `+${diff}` : diff;
-
+    console.log(statusMap[gameResult.status])
     return (
       <p className={styles.ratingInfo}>
         Рейтинг студента: {new_rating} (
