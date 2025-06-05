@@ -42,7 +42,7 @@ async def create_competition(
 
     # проверка на то что все айди задач существуют в базе
     for round_num in competition.tasks_markup.keys():
-        for task_id in competition.tasks_markup[round_num]:
+        for task_id in competition.tasks_markup[round_num].tasks:
             task = await task_service.get(task_id)
             if not task:
                 raise HTTPException(
