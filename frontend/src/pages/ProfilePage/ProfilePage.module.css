@@ -1,25 +1,30 @@
+/* Основной контейнер страницы профиля */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
 
+/* Состояния загрузки и ошибки */
 .loading, .error {
   text-align: center;
   font-size: 1.5rem;
   margin: 2rem;
 }
 
+/* Шапка профиля с аватаром и именем */
 .profileHeader {
   text-align: center;
   margin-bottom: 3rem;
 }
 
+/* Заголовок с именем пользователя */
 .profileHeader h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
 
+/* Информационная панель с рейтингами и датой */
 .profileInfo {
   display: flex;
   justify-content: center;
@@ -27,6 +32,7 @@
   flex-wrap: wrap;
 }
 
+/* Элемент информации (рейтинг/дата) */
 .infoItem {
   text-align: center;
   padding: 1rem;
@@ -35,22 +41,26 @@
   min-width: 150px;
 }
 
+/* Стили для отображения рейтинга */
 .rating {
   font-size: 1.8rem;
   font-weight: bold;
   color: #2e7d32;
 }
 
+/* Стиль для даты */
 .date {
   color: #666;
 }
 
+/* Контейнер для статистических блоков */
 .statsContainer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
 }
 
+/* Блок статистики (игры/задачи) */
 .statsBlock {
   background: #fff;
   border-radius: 10px;
@@ -58,17 +68,20 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Заголовок блока статистики */
 .statsBlock h3 {
   margin-bottom: 1rem;
   color: #333;
 }
 
+/* Контент статистики (метки и значения) */
 .statsContent {
   display: grid;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
+/* Отдельный элемент статистики */
 .statItem {
   display: flex;
   justify-content: space-between;
@@ -77,22 +90,26 @@
   border-bottom: 1px solid #eee;
 }
 
+/* Метка статистики */
 .statLabel {
   color: #666;
 }
 
+/* Значение статистики */
 .statValue {
   font-weight: bold;
   color: #2e7d32;
 }
 
+/* Контейнер для активности (календарь) */
 .activityContainer {
   display: flex;
   gap: 10px;
   margin-top: 20px;
-    margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 
+/* Легенда дней недели */
 .weekDaysLegend {
   display: flex;
   flex-direction: column;
@@ -100,6 +117,7 @@
   margin-right: 10px;
 }
 
+/* Элемент дня недели */
 .weekDay {
   height: 16px;
   width: 30px;
@@ -109,17 +127,20 @@
   padding-right: 5px;
 }
 
+/* Сетка недель активности */
 .weeksGrid {
   display: flex;
   gap: 3px;
 }
 
+/* Колонка недели */
 .weekColumn {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
+/* Ячейка дня */
 .dayCell {
   position: relative;
   width: 16px;
@@ -127,6 +148,7 @@
   z-index: 1;
 }
 
+/* Квадратик активности */
 .activitySquare {
   width: 100%;
   height: 100%;
@@ -134,11 +156,13 @@
   transition: transform 0.15s;
 }
 
+/* Эффект при наведении на квадратик */
 .dayCell:hover .activitySquare {
   transform: scale(1.3);
   z-index: 1;
 }
 
+/* Тултип при наведении на день */
 .dayCell:hover::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -158,12 +182,14 @@
   text-align: center;
 }
 
+/* Кнопки в блоках статистики */
 .statsButtons {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
 }
 
+/* Кнопка статистики */
 .statsButton {
   flex: 1;
   padding: 0.8rem;
@@ -175,29 +201,12 @@
   transition: background 0.2s;
 }
 
+/* Эффект при наведении на кнопку статистики */
 .statsButton:hover {
   background: #1b5e20;
 }
 
-.activityContainer {
-  position: relative;
-  z-index: 1;
-  overflow: visible !important;
-}
-
-.weeksGrid {
-  position: static;
-  z-index: 0;
-}
-
-.dayCell:hover::after {
-  top: -50px;
-  left: calc(50% + 8px); /* Сдвигаем тултип правее */
-  transform: translateX(-50%);
-  min-width: 160px;
-  white-space: pre; /* Сохраняем форматирование даты */
-}
-
+/* Аватар пользователя */
 .profileAvatar {
   width: 80px;
   height: 80px;
@@ -207,13 +216,14 @@
   border: 3px solid #2e7d32;
 }
 
-/* Добавляем новые стили для редактирования имени */
+/* Контейнер для имени пользователя */
 .usernameContainer {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
+/* Кнопка редактирования */
 .editButton {
   padding: 5px 15px;
   background-color: #f0f0f0;
@@ -223,16 +233,19 @@
   transition: background-color 0.2s;
 }
 
+/* Эффект при наведении на кнопку редактирования */
 .editButton:hover {
   background-color: #e0e0e0;
 }
 
+/* Контейнер для формы изменения имени */
 .usernameEditContainer {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Поле ввода имени */
 .usernameInput {
   padding: 8px 12px;
   border: 1px solid #ccc;
@@ -241,12 +254,14 @@
   width: 250px;
 }
 
+/* Контейнер кнопок редактирования */
 .editButtons {
   display: flex;
   gap: 10px;
   justify-content: center;
 }
 
+/* Кнопка сохранения */
 .saveButton {
   padding: 8px 20px;
   background-color: #4CAF50;
@@ -256,10 +271,12 @@
   cursor: pointer;
 }
 
+/* Эффект при наведении на кнопку сохранения */
 .saveButton:hover {
   background-color: #45a049;
 }
 
+/* Кнопка отмены */
 .cancelButton {
   padding: 8px 20px;
   background-color: #f44336;
@@ -269,37 +286,19 @@
   cursor: pointer;
 }
 
+/* Эффект при наведении на кнопку отмены */
 .cancelButton:hover {
   background-color: #da190b;
 }
 
-/* Стили для кнопки редактирования */
-.nameContainer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-}
-
-.editButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  transition: opacity 0.2s;
-}
-
-.editButton:hover {
-  opacity: 0.7;
-}
-
+/* Иконка редактирования */
 .editIcon {
   width: 20px;
   height: 20px;
   fill: #666;
 }
 
-/* Стили модального окна */
+/* Оверлей модального окна */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -313,6 +312,7 @@
   z-index: 1000;
 }
 
+/* Само модальное окно */
 .modal {
   background: white;
   padding: 2rem;
@@ -322,6 +322,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Поле ввода в модальном окне */
 .nameInput {
   width: 100%;
   padding: 0.8rem;
@@ -331,79 +332,33 @@
   font-size: 1rem;
 }
 
+/* Контейнер кнопок в модальном окне */
 .modalActions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
 }
 
-.saveButton {
-  background: #4CAF50;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.cancelButton {
-  background: #f44336;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-/* Обновленные стили для центрирования */
-.profileHeader {
+/* Контейнер для имени пользователя */
+.nameContainer {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 20px;
-  text-align: center;
+  gap: 10px;
+  position: relative;
 }
 
+/* Обертка для имени пользователя */
 .nameWrapper {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-.nameContainer {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  background: #f8f9fa;
-  padding: 8px 20px;
-  border-radius: 30px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
+/* Имя пользователя */
 .username {
   margin: 0;
   font-size: 1.8rem;
   color: #2d3436;
-}
-
-.editButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  transition: all 0.2s;
-}
-
-.editButton:hover {
-  transform: scale(1.1);
-}
-
-.editIcon {
-  width: 20px;
-  height: 20px;
-  fill: #636e72;
 }
 
 /* Адаптивность для мобильных устройств */

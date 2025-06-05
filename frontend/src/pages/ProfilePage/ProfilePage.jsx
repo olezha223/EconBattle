@@ -11,6 +11,7 @@ export default function ProfilePage() {
   const [newUsername, setNewUsername] = useState('');
   const [error, setError] = useState('');
 
+  // Загружаем данные
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -102,6 +103,7 @@ export default function ProfilePage() {
     );
   };
 
+  // Блок со статистикой пользователя
   const StatsBlock = ({ title, stats, buttons }) => (
     <div className={styles.statsBlock}>
       <h3>{title}</h3>
@@ -127,6 +129,7 @@ export default function ProfilePage() {
     </div>
   );
 
+  // Обработка измененного пользователем имени
   const handleUsernameUpdate = async () => {
     const username = newUsername.trim();
 
