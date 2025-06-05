@@ -4,7 +4,7 @@ import styles from './CompetitionPreview.module.css'
 import {getUserId} from "../../services/api.js";
 
 
-// превью задачи для ленты
+// превью соревнования для ленты
 export default function CompetitionPreview({
     id,
     name,

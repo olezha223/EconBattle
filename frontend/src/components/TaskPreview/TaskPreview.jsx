@@ -2,6 +2,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { formatTimeAgo } from '../../utils/timeUtils'
 import styles from './TaskPreview.module.css'
 
+
+// превью задачи для ленты
 export default function TaskPreview(
     {
         id,
@@ -14,6 +16,7 @@ export default function TaskPreview(
         picture
     }
 ) {
+    // обработка разных переходов по ссылкам
     const navigate = useNavigate()
 
     const handleContainerClick = () => {

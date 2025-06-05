@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import styles from './UserProfile.module.css';
 
+// профиль пользователя (не текущего)
 const UserProfile = ({ userData }) => {
+  // Активность
   const renderActivityGrid = () => {
     if (!userData?.user_activity) return null;
 
@@ -77,6 +79,7 @@ const UserProfile = ({ userData }) => {
     );
   };
 
+  // Блок со статистикой
   const StatsBlock = ({ title, stats, links }) => (
   <div className={styles.statsBlock}>
     <h3>{title}</h3>

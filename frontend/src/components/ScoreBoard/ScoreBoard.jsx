@@ -1,5 +1,6 @@
 import styles from './ScoreBoard.module.css';
 
+// Компонент для отображения счета в матче
 export default function ScoreBoard({ userScore, opponentScore, status}) {
   return (
     <div className={`${styles.scoreContainer} ${styles[status]}`}>
