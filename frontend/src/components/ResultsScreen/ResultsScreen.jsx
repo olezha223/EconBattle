@@ -2,6 +2,7 @@ import styles from './ResultsScreen.module.css';
 import RoundIndicator from "../RoundIndicator/RoundIndicator.jsx";
 import ScoreBoard from "../ScoreBoard/ScoreBoard.jsx";
 
+// Компонент для визуализации результатов раунда
 export default function ResultsScreen({
   results,
   totalRounds,
