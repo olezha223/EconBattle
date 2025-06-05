@@ -27,6 +27,11 @@ export default function GameApp() {
   const [finalScores, setFinalScores] = useState({ user: 0, opponent: 0 });
   const [waitingTime, setWaitingTime] = useState(60);
   const timerRef = useRef(null);
+  const statusMap = {
+      'winner': { text: 'ПОБЕДА!', color: '#40c057' },
+      'loser': { text: 'ПОРАЖЕНИЕ', color: '#fa5252' },
+      'tie': { text: 'НИЧЬЯ', color: '#ffd43b' }
+  };
 
   const currentRoundRef = useRef(currentRound);
   currentRoundRef.current = currentRound;
@@ -199,15 +204,25 @@ export default function GameApp() {
   const renderGameResultHeader = () => {
     if (!gameResult) return null;
 
-    const statusMap = {
-      'winner': { text: 'ПОБЕДА!', color: '#40c057' },
-      'loser': { text: 'ПОРАЖЕНИЕ', color: '#fa5252' },
-      'tie': { text: 'НИЧЬЯ', color: '#ffd43b' }
-    };
-
     const { text, color } = statusMap[gameResult.status] || { text: 'Игра завершена', color: '#666' };
 
     return <h2 style={{ color, fontSize: '3rem', margin: '20px 0' }}>{text}</h2>;
+  };
+
+  const renderRatingInfo = () => {
+    if (!gameResult) return null;
+
+    const { new_rating, diff } = gameResult;
+    // Форматируем разницу со знаком
+    const formattedDiff = diff > 0 ? `+${diff}` : diff;
+
+    return (
+      <p className={styles.ratingInfo}>
+        Рейтинг студента: {new_rating} (
+        <span style={{ color: statusMap[gameResult.status] }}>{formattedDiff}</span>
+        )
+      </p>
+    );
   };
 
   return (
@@ -264,7 +279,7 @@ export default function GameApp() {
           totalRounds={totalRounds}
           currentRound={currentRound}
           roundResults={roundResults}
-          currentScores={currentScores} // Добавляем передачу счетов
+          currentScores={currentScores}
           onContinue={() => setGameState('waiting')}
         />
       )}
@@ -278,7 +293,7 @@ export default function GameApp() {
             status={gameResult.status}
           />
           <div className={styles.finalStats}>
-            <p>Разница очков: {gameResult.diff}</p>
+            {renderRatingInfo()}
           </div>
           <a href="/" className={styles.button}>На главную</a>
         </div>

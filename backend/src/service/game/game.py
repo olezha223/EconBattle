@@ -238,21 +238,19 @@ class Game:
         for ws in self.sockets.values():
             await ws.send_json(results)
 
-    def _get_final_msg(self, pid: str):
+    async def _get_final_msg(self, pid: str):
         """Сообщение с результатами игры"""
         return {
             "type": EventType.GAME_END.value,
             "status": self.player_final_info[pid]['status'],
             "diff": self.player_final_info[pid]['diff'],
+            "new_rating": (await self.user_service.get_user(pid)).student_rating,
             "final_scores": self.scores
         }
 
     async def _end_game(self):
         """Обработка окончания игры"""
         self._update_statues()
-        # Отправка финальных результатов
-        for pid, ws in self.sockets.items():
-            await ws.send_json(self._get_final_msg(pid))
 
         game_dto = NewGame(
             competition_id=self.competition_id,
@@ -269,6 +267,10 @@ class Game:
         # Добавление статистики игры в базу данных
         await self.game_service.create_game(game_dto)
         await self._update_rating()
+        # Отправка финальных результатов
+        for pid, ws in self.sockets.items():
+            msg = await self._get_final_msg(pid)
+            await ws.send_json(msg)
 
     async def _update_rating(self):
         # Обновляем рейтинг

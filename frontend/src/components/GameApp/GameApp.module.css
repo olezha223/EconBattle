@@ -119,3 +119,16 @@
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
+
+.ratingInfo {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+.finalStats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
