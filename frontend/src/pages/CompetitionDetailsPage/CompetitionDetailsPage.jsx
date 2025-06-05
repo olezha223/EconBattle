@@ -9,6 +9,7 @@ export default function CompetitionDetailsPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
 
+  // Загружает детали соревнования при монтировании компонента или изменении id
   useEffect(() => {
     const loadCompetition = async () => {
       try {
@@ -23,10 +24,12 @@ export default function CompetitionDetailsPage() {
     loadCompetition()
   }, [id])
 
+  // Навигация к началу игры по id соревнования
   const handleStartGame = () => {
     navigate(`/game/${id}`)
   }
 
+  // Останавливает всплытие события при клике по автору
   const handleAuthorClick = (e) => {
     e.stopPropagation()
   }
