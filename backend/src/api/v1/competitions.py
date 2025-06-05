@@ -4,7 +4,8 @@ from starlette import status
 
 from src.api.v1.users import get_current_user, get_current_active_user
 from src.models.competition import CompetitionPreview, NewCompetition, CompetitionDetailedDTO
-from src.service import CompetitionService, get_competition_service, get_user_service, UserService
+from src.service import CompetitionService, get_competition_service, get_user_service, UserService, TaskService, \
+    get_task_service
 
 router_competitions = APIRouter(
     prefix="/competitions",
@@ -24,6 +25,7 @@ async def create_competition(
         service: CompetitionService = Depends(get_competition_service),
         current_user: dict = Depends(get_current_user),
         user_service: UserService = Depends(get_user_service),
+        task_service: TaskService = Depends(get_task_service),
 ) -> int:
     creator = competition.creator_id
     if creator != current_user['sub']:
@@ -37,6 +39,16 @@ async def create_competition(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+
+    # проверка на то что все айди задач существуют в базе
+    for round_num in competition.tasks_markup.keys():
+        for task_id in competition.tasks_markup[round_num]:
+            task = await task_service.get(task_id)
+            if not task:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Task {task_id} not found",
+                )
     return await service.create_competition(competition)
 
 @router_competitions.get(
