@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from starlette import status
 
-from src.api.v1.users import get_current_user
+from src.api.v1.users import get_current_user, get_current_active_user
 from src.models.competition import CompetitionPreview, NewCompetition, CompetitionDetailedDTO
 from src.service import CompetitionService, get_competition_service, get_user_service, UserService
 
@@ -67,13 +67,9 @@ async def get_competition_by_id(
     name="Get all competitions previews",
 )
 async def get_all_competitions_previews_for_user(
-        user_id: str = Query(..., description="Creator ID"),
+        user_id: str = Depends(get_current_active_user),
         service: CompetitionService = Depends(get_competition_service),
-        user_service: UserService = Depends(get_user_service)
 ) -> List[CompetitionPreview]:
-    user = await user_service.get_user(user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return await service.get_all_competitions_previews_for_user(user_id)
 
 
