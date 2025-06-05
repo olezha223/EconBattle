@@ -1,0 +1,70 @@
+.login-error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.error-card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.error-title {
+  color: #e74c3c;
+  font-size: 28px;
+  margin-bottom: 30px;
+  line-height: 1.4;
+}
+
+.retry-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 30px;
+}
+
+.retry-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.support-text {
+  color: #555;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-top: 20px;
+}
+
+.email-link {
+  color: #3498db;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 6px;
+  transition: color 0.2s;
+}
+
+.email-link:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}

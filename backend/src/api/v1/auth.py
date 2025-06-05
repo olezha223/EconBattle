@@ -64,7 +64,7 @@ async def auth(request: Request):
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as error:
         print(f"Получили ошибку при аутентификации пользователя: {error}")
-        return RedirectResponse(url=f'https://econ-battle.ru/login?error=AuthFailed')
+        return RedirectResponse(url='https://econ-battle.ru/login-error')
 
     user = token.get('userinfo')
     # получить информацию о юзере
@@ -90,7 +90,7 @@ async def auth(request: Request):
         )
         return response
 
-    return RedirectResponse(url='https://econ-battle.ru/login?error=AuthFailed')
+    return RedirectResponse(url='https://econ-battle.ru/login-error')
 
 
 @router_auth.get('/logout')

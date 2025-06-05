@@ -17,6 +17,7 @@ import UserCompetitionsPage from "./pages/CompetitionsPage/UserCompetitionsPage.
 import GameApp from "./components/GameApp/GameApp.jsx";
 import AuthSuccessPage from "./pages/AuthSuccessPage/AuthSuccessPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import LoginErrorPage from "./pages/LoginErrorPage/LoginErrorPage.jsx";
 
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -50,6 +51,7 @@ function AppContent() {
 
   return (
     <Routes>
+      <Route path="/login-error" element={<LoginErrorPage />} />
       <Route
         path="/"
         element={isAuthenticated ? <Navigate to="/competitions" replace /> : <LoginPage />}
